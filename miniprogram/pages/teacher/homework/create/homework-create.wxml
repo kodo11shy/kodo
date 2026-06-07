@@ -1,0 +1,74 @@
+<!-- 新建作业页 -->
+<view class="page">
+  <!-- 加载中 -->
+  <view class="loading-container" wx:if="{{loading}}"><text>加载中...</text></view>
+
+  <view wx:else>
+    <!-- 科目显示（普通老师锁定，管理员可切换） -->
+    <view class="form-section" wx:if="{{isAdmin}}">
+      <text class="form-label">科目</text>
+      <view class="subject-options">
+        <view class="subject-tag {{subject === item ? 'active' : ''}}" wx:for="{{_allSubjects}}" wx:key="*this" bindtap="setSubject" data-subject="{{item}}">{{item}}</view>
+      </view>
+    </view>
+    <view class="form-section" wx:else>
+      <text class="form-label">科目</text>
+      <view class="subject-locked">
+        <text class="locked-tag">{{subjectDisplay}}</text>
+        <text class="locked-hint">（由管理员分配，如需更改请联系管理员）</text>
+      </view>
+    </view>
+
+    <!-- 选择学生 -->
+    <view class="form-section">
+      <text class="form-label">
+        学生
+        <text class="student-count" wx:if="{{allCheckedIn.length > 0}}">
+          （已签到 {{allCheckedIn.length}} 人 · 已交 {{submittedCount}} 人 · 可选 {{students.length}} 人）
+        </text>
+      </text>
+      <picker range="{{students}}" range-key="name" value="{{studentIndex}}" bindchange="onStudentChange">
+        <view class="picker-box">
+          <text wx:if="{{studentIndex > -1}}">{{students[studentIndex].name}}</text>
+          <text wx:elif="{{students.length === 0 && !loading}}" class="picker-empty">暂无可选学生（所有签到学生已交作业）</text>
+          <text wx:else class="picker-empty">请选择学生</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 作业类型 -->
+    <view class="form-section">
+      <text class="form-label">作业类型</text>
+      <picker range="{{homeworkTypes}}" value="{{homeworkTypeIndex}}" bindchange="onTypeChange">
+        <view class="picker-box">{{homeworkTypes[homeworkTypeIndex]}}</view>
+      </picker>
+    </view>
+
+    <!-- 完成照片 -->
+    <view class="form-section">
+      <text class="form-label">📸 完成照片（1-9张）</text>
+      <view class="photo-grid">
+        <view class="photo-cell" wx:for="{{donePhotos}}" wx:key="index">
+          <image class="photo-thumb" src="{{item}}" mode="aspectFill"></image>
+          <text class="photo-del" bindtap="removeDonePhoto" data-index="{{index}}">✕</text>
+        </view>
+        <view class="photo-cell photo-add" wx:if="{{donePhotos.length < 9}}" bindtap="addDonePhoto">
+          <text class="add-icon">+</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 备注 -->
+    <view class="form-section">
+      <text class="form-label">备注（选填）</text>
+      <textarea class="textarea-field" placeholder="可以写语音备注的文字" value="{{remark}}" bindinput="onRemarkInput" maxlength="200" />
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-bar">
+      <button class="btn-primary" bindtap="submitHomework" disabled="{{!canSubmit}}">
+        {{submitText}}
+      </button>
+    </view>
+  </view>
+</view>

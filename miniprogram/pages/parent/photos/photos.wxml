@@ -1,0 +1,47 @@
+<view class="page">
+  <!-- 加载 -->
+  <view class="loading-container" wx:if="{{loading}}"><text>加载中...</text></view>
+
+  <block wx:else>
+    <!-- 标题 -->
+    <view class="header">
+      <text class="header-name">{{studentName}}</text>
+      <text class="header-count">共 {{photos.length}} 张照片</text>
+    </view>
+
+    <!-- 照片墙 -->
+    <view class="photo-wall" wx:if="{{photos.length > 0}}">
+      <view
+        class="photo-item"
+        wx:for="{{photos}}"
+        wx:key="id"
+        data-index="{{index}}"
+        bindtap="previewPhoto"
+        bindlongpress="savePhoto"
+      >
+        <image class="photo-image" src="{{item.imageUrl}}" mode="aspectFill" lazy-load />
+        <view class="photo-overlay">
+          <text class="photo-type tag tag-{{item.photo_type === 'daily' || item.photo_type === 'general' ? 'blue' : item.photo_type === 'activity' ? 'green' : item.photo_type === 'meal' ? 'orange' : 'red'}}">{{item.typeLabel}}</text>
+        </view>
+        <text class="photo-date" wx:if="{{item.timeStr}}">{{item.timeStr}}</text>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:else>
+      <image class="empty-image" src="/images/empty-photos-v2.png" mode="aspectFit"></image>
+      <text>暂无照片</text>
+      <text class="empty-desc">老师拍照并关联后，会出现在这里</text>
+    </view>
+  </block>
+
+  <!-- 全屏预览遮罩 -->
+  <view class="preview-mask {{previewing ? 'show' : ''}}" catchtouchmove="onPreviewTouchMove">
+    <view class="preview-header">
+      <text class="preview-close" bindtap="closePreview">✕</text>
+      <text class="preview-download" bindtap="savePreviewPhoto">💾 保存</text>
+    </view>
+    <image class="preview-image" src="{{previewUrl}}" mode="widthFix" wx:if="{{previewUrl}}" />
+    <text class="preview-remark" wx:if="{{previewRemark}}">{{previewRemark}}</text>
+  </view>
+</view>

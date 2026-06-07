@@ -1,0 +1,407 @@
+/* 家长首页 · 成长日记型 */
+.page { min-height: 100vh; background: #FFFAF7; padding-bottom: 40rpx; }
+
+/* 多孩子切换 */
+.child-tabs {
+  display: flex;
+  background: #FFF;
+  padding: 20rpx 30rpx;
+  gap: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(49,64,90,0.04);
+}
+.child-tab {
+  padding: 10rpx 32rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  background: #F0F2F5;
+  color: #7B8496;
+}
+.child-tab.active {
+  background: #FFF3E8;
+  color: #FF8C42;
+  font-weight: bold;
+}
+
+/* ====== 1. 顶部问候 + 今日状态 ====== */
+.hero-section {
+  background: #FF8C5A;
+  margin: 20rpx 24rpx;
+  border-radius: 28rpx;
+  padding: 32rpx 28rpx;
+  color: #FFF;
+}
+
+.hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hero-greeting {
+  font-size: 30rpx;
+  opacity: 0.9;
+}
+
+.hero-name {
+  font-size: 42rpx;
+  font-weight: bold;
+  display: block;
+  margin-top: 4rpx;
+}
+
+.hero-grade {
+  font-size: 24rpx;
+  opacity: 0.8;
+  display: block;
+  margin-top: 4rpx;
+}
+
+.hero-avatar {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  font-size: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hero-status {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.status-badge {
+  flex: 1;
+  background: rgba(255,255,255,0.15);
+  border-radius: 999rpx;
+  padding: 14rpx 20rpx;
+  font-size: 24rpx;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+}
+
+.status-badge.active {
+  background: rgba(255,255,255,0.28);
+}
+
+.status-dot {
+  font-size: 16rpx;
+  opacity: 0.6;
+}
+
+.status-badge.active .status-dot {
+  opacity: 1;
+}
+
+/* ====== 分区标题 ====== */
+.section {
+  padding: 20rpx 24rpx 0;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #2F3A4C;
+  margin-bottom: 14rpx;
+  display: block;
+}
+
+/* ====== 2. 今日瞬间 ====== */
+.photo-scroll {
+  white-space: nowrap;
+  padding: 8rpx 0;
+}
+
+.scroll-photo {
+  width: 220rpx;
+  min-height: 100rpx;
+  border-radius: 16rpx;
+  margin-right: 14rpx;
+  display: inline-block;
+  vertical-align: top;
+  box-shadow: 0 4rpx 16rpx rgba(49,64,90,0.08);
+  background: #FFF8F0;
+}
+
+/* ====== 3. 今日餐食 ====== */
+.meal-card {
+  background: #FFF;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(49,64,90,0.06);
+}
+
+.meal-type {
+  font-size: 22rpx;
+  color: #FF8C5A;
+  background: #FFF5EE;
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+  display: inline-block;
+  margin-bottom: 12rpx;
+}
+
+.meal-text {
+  font-size: 28rpx;
+  color: #2F3A4C;
+  display: block;
+  line-height: 1.5;
+}
+
+.meal-remark {
+  font-size: 24rpx;
+  color: #7B8496;
+  display: block;
+  margin-top: 10rpx;
+  padding-top: 10rpx;
+  border-top: 2rpx solid #F0F2F5;
+}
+
+/* ====== 4. 作业动态 ====== */
+.hw-card {
+  background: #FFF;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(49,64,90,0.06);
+}
+
+.hw-card:active { opacity: 0.7; }
+
+.hw-left {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.hw-subject {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2F3A4C;
+}
+
+.hw-status {
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+}
+
+.tag-waiting { background: #FFF3E8; color: #FF8C42; }
+.tag-graded { background: #E8F5E9; color: #4CAF50; }
+.tag-done { background: #E3F2FD; color: #2196F3; }
+
+.hw-remark {
+  font-size: 24rpx;
+  color: #7B8496;
+  display: block;
+  margin-top: 12rpx;
+  line-height: 1.4;
+}
+
+.hw-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 2rpx solid #F0F2F5;
+}
+
+.hw-date {
+  font-size: 22rpx;
+  color: #B1B8C7;
+}
+
+.hw-arrow {
+  font-size: 24rpx;
+  color: #5B7FFF;
+}
+
+/* ====== 5. 老师点评 ====== */
+.remark-card {
+  background: linear-gradient(135deg, #FFF8F0, #FFF0E0);
+  border-radius: 20rpx;
+  padding: 28rpx;
+  box-shadow: 0 4rpx 16rpx rgba(255,140,66,0.08);
+}
+
+.remark-card:active { opacity: 0.7; }
+
+.remark-text {
+  font-size: 28rpx;
+  color: #5D4037;
+  line-height: 1.6;
+  display: block;
+  font-style: italic;
+}
+
+.remark-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 16rpx;
+  padding-top: 14rpx;
+  border-top: 2rpx solid rgba(255,140,66,0.15);
+}
+
+.remark-tag {
+  font-size: 20rpx;
+  color: #FF8C42;
+  background: rgba(255,140,66,0.12);
+  padding: 2rpx 14rpx;
+  border-radius: 999rpx;
+}
+
+.remark-date {
+  font-size: 22rpx;
+  color: #B98A73;
+}
+
+.remark-arrow {
+  font-size: 24rpx;
+  color: #FF8C42;
+  margin-left: auto;
+}
+
+/* ====== 6. 功能导航 ====== */
+.nav-section {
+  padding: 28rpx 24rpx 0;
+}
+
+.nav-grid {
+  display: flex;
+  gap: 16rpx;
+}
+
+.nav-item {
+  flex: 1;
+  background: #FFF;
+  border-radius: 20rpx;
+  padding: 28rpx 12rpx;
+  text-align: center;
+  box-shadow: 0 4rpx 16rpx rgba(49,64,90,0.06);
+}
+
+.nav-item:active { background: #F8F8F8; }
+
+.nav-icon {
+  font-size: 48rpx;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.nav-label {
+  font-size: 24rpx;
+  color: #7B8496;
+}
+
+/* ====== 通知列表 ====== */
+.notice-card {
+  display: flex;
+  align-items: center;
+  background: #FFF;
+  border-radius: 16rpx;
+  padding: 22rpx 24rpx;
+  margin-bottom: 12rpx;
+  box-shadow: 0 4rpx 16rpx rgba(49,64,90,0.06);
+}
+.notice-card:active { opacity: 0.7; }
+.notice-dot { font-size: 28rpx; margin-right: 14rpx; flex-shrink: 0; }
+.notice-title { flex: 1; font-size: 26rpx; color: #2F3A4C; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.notice-arrow { font-size: 28rpx; color: #B1B8C7; flex-shrink: 0; margin-left: 10rpx; }
+
+/* ====== 联系老师 ====== */
+.contact-card {
+  background: #FFF;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(49,64,90,0.06);
+}
+.contact-row {
+  display: flex;
+  align-items: center;
+  padding: 26rpx 24rpx;
+}
+.contact-row:active { background: #FFF8F0; }
+.contact-icon { font-size: 36rpx; margin-right: 16rpx; flex-shrink: 0; }
+.contact-info { flex: 1; }
+.contact-lbl { font-size: 22rpx; color: #B1B8C7; display: block; }
+.contact-val { font-size: 28rpx; color: #2F3A4C; font-weight: 500; display: block; margin-top: 2rpx; }
+.contact-action {
+  font-size: 24rpx; color: #FF8C5A; font-weight: 600; padding: 10rpx 20rpx;
+  border: 2rpx solid #FFDCC0; border-radius: 999rpx; flex-shrink: 0;
+}
+.contact-action.call { background: #FF8C5A; color: #FFF; border-color: #FF8C5A; }
+.contact-divider { height: 2rpx; background: #F0F2F5; margin: 0 24rpx; }
+
+/* ====== 通知弹窗 ====== */
+.notice-modal {
+  background: #FFF;
+  border-radius: 28rpx;
+  width: 580rpx;
+  max-height: 70vh;
+  padding: 36rpx 32rpx 28rpx;
+  box-shadow: 0 20rpx 60rpx rgba(0,0,0,0.2);
+}
+.notice-modal-title { font-size: 32rpx; font-weight: bold; color: #2F3A4C; display: block; text-align: center; }
+.notice-modal-type { font-size: 22rpx; color: #FF8C5A; display: block; text-align: center; margin-top: 8rpx; }
+.notice-modal-divider { height: 2rpx; background: #F0F2F5; margin: 20rpx 0; }
+.notice-modal-body { max-height: 40vh; }
+.notice-modal-content { font-size: 28rpx; color: #4A5568; line-height: 1.7; display: block; }
+.notice-modal-footer { text-align: center; margin-top: 28rpx; }
+.notice-close-btn { font-size: 28rpx; color: #FF8C5A; font-weight: 600; padding: 10rpx 40rpx; }
+
+/* ====== 退出 ====== */
+.logout-section {
+  padding: 40rpx 24rpx 0;
+  text-align: center;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: #B1B8C7;
+  font-size: 26rpx;
+  padding: 0;
+}
+
+.btn-text::after {
+  border: none;
+}
+
+/* ====== 加载 & 空状态 ====== */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+  color: #B1B8C7;
+  font-size: 28rpx;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 120rpx 30rpx;
+  color: #B1B8C7;
+  font-size: 28rpx;
+}
+
+.empty-image {
+  width: 240rpx;
+  height: 240rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-desc {
+  font-size: 24rpx;
+  color: #D0D3DA;
+  margin-top: 10rpx;
+  display: block;
+}

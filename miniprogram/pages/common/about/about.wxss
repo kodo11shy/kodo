@@ -1,0 +1,59 @@
+.page { min-height: 100vh; background: #F7F8FC; }
+
+/* Logo 区域 */
+.logo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 30rpx 40rpx;
+}
+.logo-img { width: 160rpx; height: 160rpx; }
+.app-name { font-size: 44rpx; font-weight: bold; color: #2F3A4C; margin-top: 20rpx; }
+.app-version { font-size: 26rpx; color: #7B8496; margin-top: 8rpx; }
+
+/* 卡片 */
+.section-card {
+  background: rgba(255,255,255,0.92);
+  border-radius: 24rpx;
+  margin: 20rpx 30rpx;
+  padding: 28rpx;
+  box-shadow: 0 10rpx 30rpx rgba(49,64,90,0.08);
+  border: 1rpx solid rgba(255,255,255,0.8);
+}
+.card-title { font-size: 30rpx; font-weight: bold; display: block; margin-bottom: 16rpx; }
+
+.info-row {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 0;
+  border-bottom: 2rpx solid #ECEFF5;
+}
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 26rpx; color: #666; width: 140rpx; flex-shrink: 0; }
+.info-value { font-size: 26rpx; color: #333; flex: 1; }
+
+/* 菜单 */
+.menu-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28rpx 0;
+  font-size: 28rpx;
+  color: #2F3A4C;
+  border-bottom: 2rpx solid #ECEFF5;
+}
+.menu-row:last-child { border-bottom: none; }
+.menu-row:active { opacity: 0.6; }
+.menu-arrow { font-size: 32rpx; color: #CCC; }
+
+/* 底部 */
+.footer-info {
+  padding: 60rpx 30rpx;
+  text-align: center;
+}
+.footer-text {
+  display: block;
+  font-size: 22rpx;
+  color: #CCC;
+  margin-top: 6rpx;
+}

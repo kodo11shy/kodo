@@ -1,0 +1,172 @@
+<view class="page">
+
+  <!-- 顶部状态卡 -->
+  <view class="overview-card">
+    <view class="overview-head">
+      <view>
+        <text class="overview-title">今日餐食</text>
+        <text class="overview-subtitle">已记录 {{todayCount}} 餐</text>
+      </view>
+      <view class="mini-action" bindtap="openForm">记录餐食</view>
+    </view>
+    <view class="metric-grid">
+      <view class="metric-item">
+        <text class="metric-value">{{todayCount}}</text>
+        <text class="metric-label">今日已记录</text>
+      </view>
+      <view class="metric-item">
+        <text class="metric-value">{{pendingTypes.length}}</text>
+        <text class="metric-label">待记录餐别</text>
+      </view>
+      <view class="metric-item">
+        <text class="metric-value">{{weekCount}}</text>
+        <text class="metric-label">本周总记录</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 待记录队列 -->
+  <view class="todo-card" wx:if="{{pendingTypes.length > 0}}">
+    <view class="todo-head">
+      <text class="todo-title">今日待记录</text>
+      <text class="todo-count">{{pendingTypes.length}} 餐</text>
+    </view>
+    <view class="todo-row" wx:for="{{pendingTypes}}" wx:key="*this" data-type="{{item}}" bindtap="openFormForType">
+      <text>⏳ {{item}}</text>
+      <text class="todo-num">去记录 ›</text>
+    </view>
+  </view>
+
+  <!-- 筛选 -->
+  <scroll-view class="filter-scroll" scroll-x>
+    <view class="filter-row">
+      <view
+        class="filter-chip {{item.className}}"
+        wx:for="{{filters}}"
+        wx:key="key"
+        data-filter="{{item.key}}"
+        bindtap="switchFilter"
+      >
+        <text>{{item.label}}</text>
+        <text class="filter-count">{{item.count}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 加载 -->
+  <view class="loading-container" wx:if="{{loading}}"><text>加载中...</text></view>
+
+  <!-- 餐食列表 -->
+  <view class="meal-list" wx:if="{{!loading && filteredRecords.length > 0}}">
+    <view class="meal-card" wx:for="{{filteredRecords}}" wx:key="id" data-index="{{index}}" bindtap="toggleDetail">
+      <view class="meal-header-row">
+        <view class="meal-header-left">
+          <text class="meal-date">{{item.date}}</text>
+          <text class="meal-type tag tag-green">{{item.meal_type}}</text>
+        </view>
+        <text class="card-arrow" wx:if="{{item.showDetail}}">▾</text>
+        <text class="card-arrow" wx:else>▸</text>
+      </view>
+      <text class="meal-menu">{{item.menuText}}</text>
+      <text class="meal-remark" wx:if="{{item.overallRemark}}">💬 {{item.overallRemark}}</text>
+
+      <!-- 缩略图 -->
+      <view class="meal-photos" wx:if="{{item.donePhotos.length > 0}}">
+        <image class="meal-thumb" wx:for="{{item.donePhotos}}" wx:key="*this" wx:for-item="photo" src="{{photo.url}}" mode="aspectFill" />
+      </view>
+
+      <!-- 展开详情 -->
+      <view class="meal-detail" wx:if="{{item.showDetail}}">
+        <view class="detail-section" wx:if="{{item.hasDetailNotes}}">
+          <text class="detail-label">记录详情</text>
+          <text wx:if="{{item.ingredient_notes}}">🛒 采购：{{item.ingredient_notes}}</text>
+          <text wx:if="{{item.cooking_notes}}">👨‍🍳 制作：{{item.cooking_notes}}</text>
+          <text wx:if="{{item.hygiene_notes}}">🧹 卫生：{{item.hygiene_notes}}</text>
+        </view>
+        <view class="detail-section" wx:if="{{item.hasPhotos}}">
+          <text class="detail-label">照片分组</text>
+          <view class="photo-group-badges">
+            <text class="group-badge" wx:for="{{item.photoGroupCounts}}" wx:key="group" wx:if="{{item.count > 0}}">
+              {{item.displayText}}
+            </text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && filteredRecords.length === 0}}">
+    <image class="empty-image" src="/images/empty-photos-v2.png" mode="aspectFit"></image>
+    <text class="empty-title">{{emptyTitle}}</text>
+    <text class="empty-desc">{{emptyDesc}}</text>
+  </view>
+
+  <!-- 记录餐食弹窗 -->
+  <view class="modal-overlay" wx:if="{{showForm}}" bindtap="closeForm">
+    <view class="modal-content modal-large" catchtap="nop">
+      <text class="modal-title">🍱 记录餐食</text>
+
+      <view class="form-group">
+        <text class="form-label">日期</text>
+        <input class="input-field" type="text" value="{{form.meal_date}}" bindinput="onFormField" data-field="meal_date" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">餐别</text>
+        <picker bindchange="onMealTypeChange" range="{{mealTypes}}">
+          <view class="picker-field">{{form.meal_type}}</view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">菜单</text>
+        <textarea class="input-field textarea-field" placeholder="土豆炖排骨+清炒青菜" value="{{form.menu_text}}" bindinput="onFormField" data-field="menu_text" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">采购记录</text>
+        <input class="input-field" placeholder="今天买了..." value="{{form.ingredient_notes}}" bindinput="onFormField" data-field="ingredient_notes" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">制作记录</text>
+        <input class="input-field" placeholder="制作过程..." value="{{form.cooking_notes}}" bindinput="onFormField" data-field="cooking_notes" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">卫生记录</text>
+        <input class="input-field" placeholder="卫生情况..." value="{{form.hygiene_notes}}" bindinput="onFormField" data-field="hygiene_notes" />
+      </view>
+
+      <!-- 照片分组 -->
+      <view class="form-group">
+        <text class="form-label">照片</text>
+        <view class="photo-groups">
+          <view class="photo-group" wx:for="{{formPhotoGroups}}" wx:key="key">
+            <view class="photo-group-header">
+              <text class="photo-group-label">{{item.label}}</text>
+              <text class="photo-add-btn" bindtap="addGroupPhotos" data-group="{{item.key}}">+ 添加</text>
+            </view>
+            <view class="photo-thumbs" wx:if="{{item.files.length > 0}}">
+              <view class="thumb-wrap" wx:for="{{item.files}}" wx:for-item="photo" wx:key="path">
+                <image class="thumb" src="{{photo.path}}" mode="aspectFill" />
+                <text class="thumb-remove" bindtap="removeGroupPhoto" data-group="{{item.key}}" data-index="{{index}}">✕</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">总体备注</text>
+        <input class="input-field" placeholder="今天大家吃得很香..." value="{{form.overall_remark}}" bindinput="onFormField" data-field="overall_remark" />
+      </view>
+
+      <view class="modal-actions">
+        <button class="btn-secondary modal-btn" bindtap="closeForm">取消</button>
+        <button class="btn-primary modal-btn" bindtap="submitMeal" loading="{{submitting}}" disabled="{{submitting}}">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,175 @@
+<view class="page">
+
+  <!-- 顶部状态卡 -->
+  <view class="overview-card">
+    <view class="overview-head">
+      <view>
+        <text class="overview-title">照片库总览</text>
+        <text class="overview-subtitle">共 {{totalCount}} 张照片</text>
+      </view>
+      <view class="mini-action" bindtap="goUpload">上传照片</view>
+    </view>
+    <view class="metric-grid">
+      <view class="metric-item">
+        <text class="metric-value">{{totalCount}}</text>
+        <text class="metric-label">全部照片</text>
+      </view>
+      <view class="metric-item">
+        <text class="metric-value">{{featuredCount}}</text>
+        <text class="metric-label">精选</text>
+      </view>
+      <view class="metric-item">
+        <text class="metric-value">{{unassociatedCount}}</text>
+        <text class="metric-label">未分类</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 待处理卡 -->
+  <view class="todo-card" wx:if="{{unassociatedPhotos.length > 0}}">
+    <view class="todo-head">
+      <text class="todo-title">待关联学生</text>
+      <text class="todo-count">{{unassociatedCount}} 张</text>
+    </view>
+    <view class="todo-row" wx:for="{{unassociatedPhotos}}" wx:key="text">
+      <text>⏳ {{item.text}}</text>
+      <text class="todo-num">去处理 ›</text>
+    </view>
+  </view>
+
+  <!-- 筛选标签 -->
+  <view class="filter-tabs">
+    <view class="filter-tab {{item.className}}" wx:for="{{filterTabs}}" wx:key="key" data-key="{{item.key}}" bindtap="switchFilter">
+      <text>{{item.label}}</text>
+    </view>
+  </view>
+
+  <!-- 多选模式头部 -->
+  <view class="multi-bar" wx:if="{{multiMode}}">
+    <text class="multi-count">已选 {{selectedIds.length}} 张</text>
+    <view class="multi-actions">
+      <text class="multi-btn" bindtap="batchAssociate">👤 批量关联</text>
+      <text class="multi-btn" bindtap="batchFeatured">⭐ 批量精选</text>
+      <text class="multi-btn danger" bindtap="batchDelete">🗑️ 批量删除</text>
+      <text class="multi-btn" bindtap="clearSelection">取消选择</text>
+    </view>
+  </view>
+  <view class="multi-exit-bar" wx:if="{{multiMode}}" bindtap="exitMultiMode">
+    <text>退出多选模式</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading && photos.length === 0}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 照片网格 -->
+  <view class="photo-grid" wx:if="{{photos.length > 0}}">
+    <view class="photo-grid-item"
+      wx:for="{{photos}}"
+      wx:key="id"
+      data-index="{{index}}"
+      bindtap="tapPhoto"
+      bindlongpress="onLongPress">
+      <image class="photo-img" src="{{item.url}}" mode="aspectFill"></image>
+      <view class="photo-featured-badge" wx:if="{{item.isFeatured && !multiMode}}">
+        <text>⭐</text>
+      </view>
+      <view class="photo-unassociated-badge" wx:if="{{!item.photoTypeLabel && !multiMode}}">
+        <text>未分类</text>
+      </view>
+      <view class="photo-checkbox" wx:if="{{multiMode}}">
+        <view class="checkbox-box {{item.checkboxClass}}">
+          <text wx:if="{{item.selected}}">✓</text>
+        </view>
+      </view>
+      <view class="photo-type-tag" wx:if="{{item.photoTypeLabel && !multiMode}}">
+        <text>{{item.photoTypeLabel}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && photos.length === 0}}">
+    <image class="empty-image" src="/images/empty-photos-v2.png" mode="aspectFit"></image>
+    <text class="empty-text">暂无照片</text>
+    <text class="empty-desc">拍照或本地上传后，照片会出现在这里</text>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{loading && photos.length > 0}}">
+    <text>加载更多...</text>
+  </view>
+
+  <!-- 长按操作菜单 -->
+  <view class="modal-overlay" wx:if="{{showMenu}}" bindtap="closeMenu">
+    <view class="menu-popup" catchtap="nop">
+      <view class="menu-header">
+        <image class="menu-preview" src="{{menuPhoto.url}}" mode="aspectFill"></image>
+        <text class="menu-date">{{menuPhoto.takenAt}}</text>
+      </view>
+      <view class="menu-items">
+        <view class="menu-item" bindtap="menuAction" data-action="associate">
+          <text class="menu-icon">👤</text>
+          <text class="menu-text">关联学生</text>
+        </view>
+        <view class="menu-item" bindtap="menuAction" data-action="tag">
+          <text class="menu-icon">🏷️</text>
+          <text class="menu-text">修改标签</text>
+        </view>
+        <view class="menu-item" bindtap="menuAction" data-action="feature">
+          <text class="menu-icon">{{menuPhoto.featureIcon}}</text>
+          <text class="menu-text">{{menuPhoto.featureText}}</text>
+        </view>
+        <view class="menu-item" bindtap="menuAction" data-action="save">
+          <text class="menu-icon">💾</text>
+          <text class="menu-text">保存到手机</text>
+        </view>
+        <view class="menu-item" bindtap="menuAction" data-action="multi">
+          <text class="menu-icon">📋</text>
+          <text class="menu-text">多选</text>
+        </view>
+        <view class="menu-item danger" bindtap="menuAction" data-action="delete">
+          <text class="menu-icon">🗑️</text>
+          <text class="menu-text">删除</text>
+        </view>
+      </view>
+      <view class="menu-cancel" bindtap="closeMenu">
+        <text>取消</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作确认弹窗 -->
+  <view class="modal-overlay" wx:if="{{showConfirm}}" bindtap="closeConfirm">
+    <view class="confirm-dialog" catchtap="nop">
+      <text class="confirm-title">{{confirmTitle}}</text>
+      <text class="confirm-text">{{confirmText}}</text>
+      <view class="confirm-actions">
+        <button class="btn-secondary confirm-btn" bindtap="closeConfirm">取消</button>
+        <button class="btn-primary confirm-btn" bindtap="doConfirm">确定</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 标签选择器 -->
+  <view class="modal-overlay" wx:if="{{showTagPicker}}" bindtap="cancelTagPicker">
+    <view class="tag-picker" catchtap="nop">
+      <text class="tag-picker-title">修改标签</text>
+      <text class="tag-picker-hint">标签仅在此照片库中显示，不修改照片属性</text>
+      <view class="tag-picker-options">
+        <view class="tag-picker-option {{item.className}}"
+          wx:for="{{tagOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="selectTag">
+          <text class="tag-picker-label">{{item.label}}</text>
+          <text class="tag-picker-check" wx:if="{{item.checked}}">✓</text>
+        </view>
+      </view>
+      <view class="tag-picker-clear" wx:if="{{tagPickerPhoto.localTag}}" data-key="" bindtap="selectTag">
+        <text>清除标签</text>
+      </view>
+      <view class="tag-picker-cancel" bindtap="cancelTagPicker">
+        <text>取消</text>
+      </view>
+    </view>
+  </view>
+</view>

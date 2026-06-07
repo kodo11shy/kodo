@@ -1,0 +1,98 @@
+<view class="page">
+  <view class="overview-card">
+    <view class="overview-head">
+      <view>
+        <text class="overview-title">班级概况</text>
+        <text class="overview-subtitle">学生档案、到班和家长绑定状态</text>
+      </view>
+      <view class="mini-action" bindtap="goAttendance">签到</view>
+    </view>
+    <view class="metric-grid">
+      <view class="metric-item">
+        <text class="metric-value">{{total}}</text>
+        <text class="metric-label">在读学生</text>
+      </view>
+      <view class="metric-item">
+        <text class="metric-value">{{checkedInCount}}</text>
+        <text class="metric-label">今日到班</text>
+      </view>
+      <view class="metric-item">
+        <text class="metric-value">{{parentBoundText}}</text>
+        <text class="metric-label">家长绑定</text>
+      </view>
+      <view class="metric-item">
+        <text class="metric-value">{{completeText}}</text>
+        <text class="metric-label">档案完整</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="todo-card">
+    <view class="todo-head">
+      <text class="todo-title">待补资料</text>
+      <text class="todo-count">{{issueCount}} 人</text>
+    </view>
+    <view wx:if="{{issueSummary.length > 0}}">
+      <view class="todo-row" wx:for="{{issueSummary}}" wx:key="label">
+        <text>{{item.label}}</text>
+        <text class="todo-num">{{item.count}}</text>
+      </view>
+    </view>
+    <view class="todo-empty" wx:else>
+      <text>暂无待补事项，学生基础资料状态良好</text>
+    </view>
+  </view>
+
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索学生姓名、学校、班级" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
+      <text class="clear-btn" wx:if="{{keyword}}" bindtap="onClearSearch">✕</text>
+    </view>
+    <button class="search-btn" bindtap="onSearch">搜索</button>
+  </view>
+
+  <scroll-view class="filter-scroll" scroll-x>
+    <view class="filter-row">
+      <view
+        class="filter-chip {{activeFilter === item.key ? 'active' : ''}}"
+        wx:for="{{filters}}"
+        wx:key="key"
+        data-filter="{{item.key}}"
+        bindtap="switchFilter"
+      >
+        <text>{{item.label}}</text>
+        <text class="filter-count">{{item.count}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="loading-container" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="student-list" wx:if="{{!loading && students.length > 0}}">
+    <view class="student-card" wx:for="{{students}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+      <view class="card-main">
+        <view class="card-avatar">{{item.initial}}</view>
+        <view class="card-info">
+          <view class="name-row">
+            <text class="card-name">{{item.name}}</text>
+            <text class="issue-text {{item.profileComplete ? 'ok' : 'warn'}}">{{item.issueText}}</text>
+          </view>
+          <text class="card-detail">{{item.detailText}}</text>
+          <view class="tag-row">
+            <text class="state-tag tag-{{tag.className}}" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="text">{{tag.text}}</text>
+          </view>
+        </view>
+      </view>
+      <text class="card-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{!loading && students.length === 0}}">
+    <image class="empty-image" src="/images/empty-students-v2.png" mode="aspectFit"></image>
+    <text class="empty-title">{{emptyTitle}}</text>
+    <text class="empty-desc">{{emptyDesc}}</text>
+  </view>
+</view>

@@ -1,0 +1,94 @@
+<view class="page">
+  <!-- 加载 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:else>
+    <!-- 概览卡片 -->
+    <view class="overview-card" wx:if="{{overview}}">
+      <view class="overview-header">
+        <text class="overview-name">{{studentName}}</text>
+        <text class="overview-grade">{{overviewGrade}}</text>
+      </view>
+      <view class="overview-stats">
+        <view class="stat-box">
+          <text class="stat-number">{{attendedDays}}</text>
+          <text class="stat-label">本月出勤<br/>天数</text>
+        </view>
+        <view class="stat-box">
+          <text class="stat-number">{{avgScore}}</text>
+          <text class="stat-label">平均<br/>作业分</text>
+        </view>
+        <view class="stat-box">
+          <text class="stat-number">{{homeworkCount}}</text>
+          <text class="stat-label">本月<br/>作业数</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 时间线标题 -->
+    <view class="section-header">
+      <text class="section-title">动态时间线</text>
+    </view>
+
+    <!-- 时间线 -->
+    <view class="timeline" wx:if="{{timeline.length > 0}}">
+      <view class="timeline-item" wx:for="{{timeline}}" wx:key="index">
+        <view class="timeline-dot"></view>
+          <view class="timeline-card">
+            <view class="tl-header">
+            <text class="tl-icon">{{item.icon}}</text>
+            <text class="tl-title">{{item.displayTitle}}</text>
+          </view>
+          <text class="tl-desc" wx:if="{{item.description}}">{{item.description}}</text>
+          <view class="tl-score" wx:if="{{item.score != null}}">
+            <text class="score-label">评分</text>
+            <text class="score-value">{{item.score}}/10</text>
+          </view>
+          <text class="tl-date">{{item.displayDate}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 保存报告按钮 -->
+    <view class="action-bar" wx:if="{{overview}}">
+      <button class="btn-download" bindtap="saveReport">📥 保存成长报告</button>
+    </view>
+
+    <!-- 成长报告卡片（便于截屏保存） -->
+    <view class="report-overlay" wx:if="{{showReport}}" bindtap="closeReport">
+      <view class="report-card" catchtap="nop">
+        <text class="report-title">📋 成长报告</text>
+        <text class="report-student">{{studentName}} · {{overviewGrade}}</text>
+        <view class="report-divider"></view>
+        <view class="report-row">
+          <text class="report-label">本月出勤</text>
+          <text class="report-value">{{attendedDays}} 天</text>
+        </view>
+        <view class="report-row">
+          <text class="report-label">平均作业分</text>
+          <text class="report-value">{{avgScore}}</text>
+        </view>
+        <view class="report-row">
+          <text class="report-label">本月作业</text>
+          <text class="report-value">{{homeworkCount}} 次</text>
+        </view>
+        <view class="report-row" wx:if="{{overview && overview.latest_remark}}">
+          <text class="report-label">最新评语</text>
+          <text class="report-value">{{overview.latest_remark}}</text>
+        </view>
+        <view class="report-divider"></view>
+        <text class="report-tip">📸 截屏保存本卡片</text>
+        <text class="report-close" bindtap="closeReport">关闭</text>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:else>
+      <image class="empty-image" src="/images/empty-notices-v2.png" mode="aspectFit"></image>
+      <text>暂无成长记录</text>
+      <text class="empty-desc">老师的评语和评分会出现在这里</text>
+    </view>
+  </block>
+</view>

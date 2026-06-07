@@ -1,0 +1,459 @@
+/* 首页样式 · 家长信任型 */
+.page {
+  background: linear-gradient(180deg, #FFF8F0 0%, #FFFFFF 30%, #F7F9FC 100%);
+  padding-bottom: 60rpx;
+  min-height: 100vh;
+}
+
+/* ====== 1. 氛围大图 ====== */
+.hero {
+  margin: 24rpx 24rpx 0;
+  height: 360rpx;
+  position: relative;
+  overflow: hidden;
+  border-radius: 32rpx;
+  background: #FFE8D6;
+  box-shadow: 0 18rpx 42rpx rgba(255, 140, 90, 0.16);
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hero-content {
+  position: absolute;
+  top: 28rpx;
+  right: 28rpx;
+  width: 292rpx;
+  display: flex;
+  align-items: center;
+  padding: 18rpx 20rpx;
+  border-radius: 26rpx;
+  background: rgba(255, 250, 247, 0.86);
+  box-shadow: 0 10rpx 28rpx rgba(124, 85, 60, 0.10);
+}
+
+.hero-logo {
+  width: 72rpx;
+  height: 72rpx;
+  margin-right: 14rpx;
+  flex-shrink: 0;
+}
+
+.hero-copy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #2F3A4C;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 22rpx;
+  color: #8A6A5B;
+  margin-top: 6rpx;
+  line-height: 1.35;
+}
+
+/* ====== 2. 家长行动区 ====== */
+.contact-section {
+  padding: 24rpx 24rpx 0;
+}
+
+.contact-card {
+  background: #FFFFFF;
+  border-radius: 26rpx;
+  overflow: hidden;
+  box-shadow: 0 10rpx 30rpx rgba(49,64,90,0.08);
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  padding: 26rpx 28rpx;
+}
+
+.contact-row:active {
+  opacity: 0.6;
+}
+
+.contact-icon-big {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 22rpx;
+  background: #FFF3E8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.contact-info {
+  flex: 1;
+}
+
+.contact-label {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2F3A4C;
+  display: block;
+}
+
+.contact-value {
+  font-size: 26rpx;
+  color: #7B8496;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.contact-desc {
+  font-size: 24rpx;
+  color: #B1B8C7;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.contact-btn {
+  font-size: 24rpx;
+  color: #FF8C42;
+  font-weight: 600;
+  padding: 8rpx 24rpx;
+  border: 2rpx solid #FFDCC0;
+  border-radius: 999rpx;
+  flex-shrink: 0;
+}
+
+.call-btn {
+  color: #4CAF50;
+  border-color: #C8E6C9;
+}
+
+.contact-arrow {
+  font-size: 40rpx;
+  color: #C7CDD8;
+  flex-shrink: 0;
+}
+
+.parent-row {
+  margin-top: 0;
+}
+
+.contact-divider {
+  height: 2rpx;
+  background: #F0F2F5;
+  margin: 0 28rpx;
+}
+
+/* ====== 分区标题 ====== */
+.section {
+  padding: 28rpx 24rpx 0;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #2F3A4C;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+/* ====== 3. 精彩瞬间 ====== */
+.photo-swiper {
+  height: 340rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 8rpx 24rpx rgba(49,64,90,0.08);
+}
+
+.photo-item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #FFF5EE;
+}
+
+.photo-img {
+  width: 100%;
+  display: block;
+  min-height: 160rpx;
+}
+
+.photo-placeholder {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: #FFF1E8;
+  border-radius: 24rpx;
+  justify-content: center;
+  align-items: center;
+}
+
+.placeholder-text {
+  font-size: 24rpx;
+  color: #B98A73;
+}
+
+.photo-swiper .wx-swiper-dots {
+  margin-bottom: 8rpx;
+}
+.photo-swiper .wx-swiper-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 999rpx;
+  margin: 0 6rpx;
+  background: rgba(255,255,255,0.5);
+}
+.photo-swiper .wx-swiper-dot-active {
+  width: 24rpx;
+  background: #FFFFFF;
+}
+
+/* ====== 4. 最新通知（温和信息条） ====== */
+.notice-card {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 22rpx 26rpx;
+  box-shadow: 0 6rpx 20rpx rgba(49,64,90,0.06);
+}
+
+.notice-card:active {
+  opacity: 0.6;
+}
+
+.notice-dot {
+  font-size: 28rpx;
+  margin-right: 14rpx;
+  flex-shrink: 0;
+}
+
+.notice-text-short {
+  flex: 1;
+  font-size: 26rpx;
+  color: #2F3A4C;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notice-more {
+  font-size: 24rpx;
+  color: #5B7FFF;
+  flex-shrink: 0;
+  margin-left: 12rpx;
+}
+
+/* ====== 5. 透明收费 ====== */
+.fee-card {
+  background: #FFFFFF;
+  border-radius: 26rpx;
+  overflow: hidden;
+  box-shadow: 0 10rpx 30rpx rgba(49,64,90,0.08);
+}
+
+.fee-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 28rpx;
+  border-bottom: 2rpx solid #ECEFF5;
+}
+
+.fee-item:last-child {
+  border-bottom: none;
+}
+
+.fee-left {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.fee-name {
+  font-size: 28rpx;
+  color: #2F3A4C;
+  font-weight: 600;
+  display: block;
+}
+
+.fee-desc {
+  font-size: 22rpx;
+  color: #B1B8C7;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.fee-amount {
+  font-size: 34rpx;
+  color: #FF8C42;
+  font-weight: bold;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.fee-unit {
+  font-size: 22rpx;
+  color: #B1B8C7;
+  font-weight: normal;
+}
+
+.fee-empty {
+  padding: 40rpx;
+  text-align: center;
+}
+
+.fee-empty-text {
+  font-size: 24rpx;
+  color: #B1B8C7;
+}
+
+/* ====== 6. 关于托班 ====== */
+.about-card {
+  background: #FFFFFF;
+  border-radius: 26rpx;
+  padding: 28rpx;
+  box-shadow: 0 10rpx 30rpx rgba(49,64,90,0.08);
+}
+
+.about-card-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #2F3A4C;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.about-card-desc {
+  font-size: 26rpx;
+  color: #7B8496;
+  line-height: 1.7;
+  display: block;
+}
+
+/* ====== 7. 老师入口（底部弱化） ====== */
+.teacher-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36rpx 24rpx 0;
+}
+
+.teacher-bottom:active {
+  opacity: 0.5;
+}
+
+.teacher-bottom-icon {
+  font-size: 24rpx;
+  margin-right: 8rpx;
+}
+
+.teacher-bottom-text {
+  font-size: 24rpx;
+  color: #B1B8C7;
+}
+
+.teacher-bottom-arrow {
+  font-size: 24rpx;
+  color: #C7CDD8;
+  margin-left: 4rpx;
+}
+
+/* ====== 8. 底部 ====== */
+.footer {
+  text-align: center;
+  padding: 40rpx 30rpx 20rpx;
+}
+
+.footer-text {
+  font-size: 22rpx;
+  color: #C7CDD8;
+}
+
+/* ====== 通知详情弹窗 ====== */
+.notice-modal {
+  background: #FFF;
+  border-radius: 32rpx;
+  width: 640rpx;
+  max-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20rpx 60rpx rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.notice-modal-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #2F3A4C;
+  padding: 36rpx 32rpx 8rpx;
+  text-align: center;
+  display: block;
+}
+
+.notice-modal-type {
+  font-size: 22rpx;
+  color: #FF8C5A;
+  text-align: center;
+  display: block;
+  padding: 4rpx 0 12rpx;
+}
+
+.notice-modal-divider {
+  height: 2rpx;
+  background: #F0F0F0;
+  margin: 0 32rpx;
+}
+
+.notice-modal-body {
+  flex: 1;
+  padding: 24rpx 32rpx;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.notice-modal-content {
+  font-size: 28rpx;
+  color: #4A4A5A;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  display: block;
+}
+
+.notice-modal-footer {
+  border-top: 2rpx solid #F0F0F0;
+  padding: 24rpx 0;
+  text-align: center;
+}
+
+.notice-close-btn {
+  font-size: 28rpx;
+  color: #5B7FFF;
+  font-weight: 600;
+  padding: 8rpx 48rpx;
+}
+
+/* 半透明遮罩 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}

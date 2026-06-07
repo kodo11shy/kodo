@@ -1,0 +1,164 @@
+<view class="page">
+  <view class="loading-container" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:else>
+    <!-- 多孩子切换 -->
+    <view class="child-tabs" wx:if="{{students.length > 1}}">
+      <view class="child-tab {{index === currentIndex ? 'active' : ''}}" wx:for="{{students}}" wx:key="id" data-index="{{index}}" bindtap="switchStudent">
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+
+    <block wx:if="{{currentStudent}}">
+      <!-- ====== 1. 顶部问候 + 今日状态 ====== -->
+      <view class="hero-section">
+        <view class="hero-top">
+          <view class="hero-left">
+            <text class="hero-greeting">{{greeting}}，</text>
+            <text class="hero-name">{{currentStudent.name}}</text>
+            <text class="hero-grade">{{currentStudent.gradeText}}</text>
+          </view>
+          <view class="hero-avatar">{{currentStudent.initial}}</view>
+        </view>
+        <view class="hero-status">
+          <view class="status-badge status-in {{currentStudent.checkinTime ? 'active' : ''}}">
+            <text class="status-dot">●</text>
+            <text>到班 {{currentStudent.checkinTime || '未签到'}}</text>
+          </view>
+          <view class="status-badge status-out {{currentStudent.checkoutTime ? 'active' : ''}}">
+            <text class="status-dot">●</text>
+            <text>离班 {{currentStudent.checkoutTime || '未签退'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- ====== 2. 今日瞬间 ====== -->
+      <view class="section" wx:if="{{todayPhotos.length > 0}}">
+        <text class="section-title">📸 今日瞬间</text>
+        <scroll-view class="photo-scroll" scroll-x>
+          <image class="scroll-photo" wx:for="{{todayPhotos}}" wx:key="id" src="{{item.url}}" mode="widthFix" bindtap="previewPhoto" data-url="{{item.url}}"></image>
+        </scroll-view>
+      </view>
+
+      <!-- ====== 3. 今日餐食 ====== -->
+      <view class="section" wx:if="{{todayMeal}}">
+        <text class="section-title">🍚 今日餐食</text>
+        <view class="meal-card">
+          <text class="meal-type">{{todayMeal.meal_type}}</text>
+          <text class="meal-text">{{todayMeal.menu_text}}</text>
+          <text class="meal-remark" wx:if="{{todayMeal.overall_remark}}">💬 {{todayMeal.overall_remark}}</text>
+        </view>
+      </view>
+
+      <!-- ====== 4. 最新作业 ====== -->
+      <view class="section" wx:if="{{latestHomework}}">
+        <text class="section-title">📚 作业动态</text>
+        <view class="hw-card" bindtap="goHomework">
+          <view class="hw-left">
+            <text class="hw-subject">{{latestHomework.subject}}</text>
+            <text class="hw-status tag-{{latestHomework.statusClass}}">{{latestHomework.statusLabel}}</text>
+          </view>
+          <text class="hw-remark" wx:if="{{latestHomework.remark}}">{{latestHomework.remark}}</text>
+          <view class="hw-footer">
+            <text class="hw-date">{{latestHomework.date}}</text>
+            <text class="hw-arrow">查看详情 ›</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- ====== 5. 老师评语 ====== -->
+      <view class="section" wx:if="{{latestRemark}}">
+        <text class="section-title">💝 老师点评</text>
+        <view class="remark-card" bindtap="goGrowth">
+          <text class="remark-text">“{{latestRemark.content}}”</text>
+          <view class="remark-footer">
+            <text class="remark-tag" wx:if="{{latestRemark.mood_tag}}">{{latestRemark.mood_tag}}</text>
+            <text class="remark-date">{{latestRemark.date}}</text>
+            <text class="remark-arrow">查看成长档案 ›</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- ====== 6. 通知 ====== -->
+      <view class="section" wx:if="{{notices.length > 0}}">
+        <text class="section-title">📢 最新通知</text>
+        <view class="notice-card" wx:for="{{notices}}" wx:key="id" bindtap="tapNotice" data-id="{{item.id}}">
+          <text class="notice-dot">📌</text>
+          <text class="notice-title">{{item.title}}</text>
+          <text class="notice-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- ====== 7. 功能导航 ====== -->
+      <view class="nav-section">
+        <view class="nav-grid">
+          <view class="nav-item" bindtap="goGrowth">
+            <text class="nav-icon">🌟</text>
+            <text class="nav-label">成长档案</text>
+          </view>
+          <view class="nav-item" bindtap="goHomework">
+            <text class="nav-icon">📚</text>
+            <text class="nav-label">作业记录</text>
+          </view>
+          <view class="nav-item" bindtap="goPhotos">
+            <text class="nav-icon">📸</text>
+            <text class="nav-label">照片墙</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- ====== 8. 联系老师 ====== -->
+      <view class="section" wx:if="{{contactWechat || contactPhone}}">
+        <text class="section-title">📞 联系老师</text>
+        <view class="contact-card">
+          <view class="contact-row" wx:if="{{contactWechat}}" bindtap="copyWechat">
+            <text class="contact-icon">💬</text>
+            <view class="contact-info">
+              <text class="contact-lbl">微信号</text>
+              <text class="contact-val">{{contactWechat}}</text>
+            </view>
+            <text class="contact-action">复制</text>
+          </view>
+          <view class="contact-divider" wx:if="{{contactWechat && contactPhone}}"></view>
+          <view class="contact-row" wx:if="{{contactPhone}}" bindtap="callPhone">
+            <text class="contact-icon">📞</text>
+            <view class="contact-info">
+              <text class="contact-lbl">联系电话</text>
+              <text class="contact-val">{{contactPhone}}</text>
+            </view>
+            <text class="contact-action call">拨打</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 退出 -->
+      <view class="logout-section">
+        <button class="btn-text logout-btn" bindtap="doLogout">退出登录</button>
+      </view>
+    </block>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:elif="{{!loading}}">
+      <image class="empty-image" src="/images/empty-students-v2.png" mode="aspectFit"></image>
+      <text>暂无关联学生</text>
+      <text class="empty-desc">请使用邀请码绑定</text>
+    </view>
+  </block>
+
+  <!-- 通知详情弹窗 -->
+  <view class="modal-overlay" wx:if="{{showNoticeModal}}" bindtap="closeNotice">
+    <view class="notice-modal" catchtap="nop">
+      <text class="notice-modal-title">{{selectedNotice.title}}</text>
+      <text class="notice-modal-type" wx:if="{{selectedNotice.notice_type}}">{{selectedNotice.notice_type}}</text>
+      <view class="notice-modal-divider"></view>
+      <scroll-view class="notice-modal-body" scroll-y>
+        <text class="notice-modal-content">{{selectedNotice.content}}</text>
+      </scroll-view>
+      <view class="notice-modal-footer" bindtap="closeNotice">
+        <text class="notice-close-btn">知道了</text>
+      </view>
+    </view>
+  </view>
+</view>

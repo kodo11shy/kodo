@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>小明 · 6月成长报告</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+      background: #f5f0eb;
+      color: #2c2c2c;
+      overflow-x: hidden;
+    }
+
+    /* 动画关键帧 */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    @keyframes drawLine {
+      from { stroke-dashoffset: 1000; }
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0.3); }
+      50% { transform: scale(1.05); }
+      70% { transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(60px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+      background: #ffffff;
+      min-height: 100vh;
+      position: relative;
+      box-shadow: 0 0 30px rgba(0,0,0,0.08);
+    }
+
+    /* ===== 封面 ===== */
+    .cover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 60px 30px 50px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      animation: fadeIn 0.8s ease;
+    }
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+      animation: float 6s ease-in-out infinite;
+    }
+    .cover-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      animation: bounceIn 1s ease 0.3s both;
+    }
+    .cover h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      animation: fadeInUp 0.6s ease 0.5s both;
+    }
+    .cover .subtitle {
+      font-size: 18px;
+      opacity: 0.9;
+      font-weight: 300;
+      margin-bottom: 6px;
+      animation: fadeInUp 0.6s ease 0.7s both;
+    }
+    .cover .date {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-top: 20px;
+      animation: fadeInUp 0.6s ease 0.9s both;
+    }
+    .cover .scroll-hint {
+      margin-top: 40px;
+      font-size: 12px;
+      opacity: 0.6;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .cover .student-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      border: 3px solid rgba(255,255,255,0.3);
+      animation: bounceIn 1s ease 0.1s both;
+    }
+
+    /* ===== 页面区块通用 ===== */
+    .section {
+      padding: 40px 24px;
+      animation: slideUp 0.8s ease both;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title .emoji {
+      font-size: 22px;
+    }
+
+    /* ===== 数据概览 ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #f8f9ff 0%, #eef1ff 100%);
+      border-radius: 16px;
+      padding: 20px 16px;
+      text-align: center;
+      animation: scaleIn 0.5s ease both;
+    }
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    .stat-card .num {
+      font-size: 32px;
+      font-weight: 800;
+      color: #667eea;
+    }
+    .stat-card .num.green { color: #2ecc71; }
+    .stat-card .num.orange { color: #f39c12; }
+    .stat-card .num.pink { color: #e74c3c; }
+    .stat-card .label {
+      font-size: 13px;
+      color: #888;
+      margin-top: 4px;
+    }
+    .stat-card .trend {
+      font-size: 12px;
+      margin-top: 6px;
+    }
+    .trend.up { color: #2ecc71; }
+    .trend.down { color: #e74c3c; }
+
+    /* ===== 精选照片 ===== */
+    .photo-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 4px 0 12px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .photo-scroll::-webkit-scrollbar {
+      height: 4px;
+    }
+    .photo-scroll::-webkit-scrollbar-thumb {
+      background: #ddd;
+      border-radius: 4px;
+    }
+    .photo-item {
+      flex: 0 0 200px;
+      height: 200px;
+      border-radius: 16px;
+      overflow: hidden;
+      scroll-snap-align: start;
+      position: relative;
+      animation: scaleIn 0.5s ease both;
+    }
+    .photo-item:nth-child(1) { animation-delay: 0.1s; }
+    .photo-item:nth-child(2) { animation-delay: 0.2s; }
+    .photo-item:nth-child(3) { animation-delay: 0.3s; }
+    .photo-item .placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+    }
+    .photo-item .label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 30px 12px 12px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.5));
+      color: white;
+      font-size: 13px;
+    }
+    .photo-item.bg-1 .placeholder { background: linear-gradient(135deg, #FFE4E6, #FFD4E0); }
+    .photo-item.bg-2 .placeholder { background: linear-gradient(135deg, #E0F7FA, #B2EBF2); }
+    .photo-item.bg-3 .placeholder { background: linear-gradient(135deg, #FFF3E0, #FFE0B2); }
+    .photo-item.bg-4 .placeholder { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); }
+
+    /* ===== 进步曲线 ===== */
+    .chart-container {
+      background: #fafafa;
+      border-radius: 16px;
+      padding: 20px;
+      animation: scaleIn 0.8s ease both;
+    }
+    .chart {
+      width: 100%;
+      height: 180px;
+      position: relative;
+    }
+    .chart svg {
+      width: 100%;
+      height: 100%;
+    }
+    .chart .line-path {
+      stroke: #667eea;
+      stroke-width: 3;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: drawLine 2s ease 0.5s forwards;
+    }
+    .chart .area-path {
+      fill: url(#grad);
+      opacity: 0.3;
+    }
+    .chart .dot {
+      animation: fadeIn 0.3s ease both;
+    }
+    .chart .dot:nth-child(1) { animation-delay: 1.0s; }
+    .chart .dot:nth-child(2) { animation-delay: 1.2s; }
+    .chart .dot:nth-child(3) { animation-delay: 1.4s; }
+    .chart .dot:nth-child(4) { animation-delay: 1.6s; }
+    .chart .dot:nth-child(5) { animation-delay: 1.8s; }
+    .chart .dot circle {
+      fill: white;
+      stroke: #667eea;
+      stroke-width: 2.5;
+    }
+    .chart-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #999;
+      padding: 0 8px;
+    }
+    .score-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* ===== 各科对比 ===== */
+    .subject-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      animation: slideInRight 0.5s ease both;
+    }
+    .subject-bar:nth-child(1) { animation-delay: 0.1s; }
+    .subject-bar:nth-child(2) { animation-delay: 0.2s; }
+    .subject-bar:nth-child(3) { animation-delay: 0.3s; }
+    .subject-bar .name {
+      width: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: right;
+    }
+    .subject-bar .bar-track {
+      flex: 1;
+      height: 22px;
+      background: #f0f0f0;
+      border-radius: 11px;
+      overflow: hidden;
+    }
+    .subject-bar .bar-fill {
+      height: 100%;
+      border-radius: 11px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      transition: width 1.2s ease;
+      display: flex;
+      align-items: center;
+      padding-left: 10px;
+      font-size: 12px;
+      color: white;
+      font-weight: 500;
+    }
+    .subject-bar .bar-fill.math { width: 88%; background: linear-gradient(90deg, #667eea, #764ba2); }
+    .subject-bar .bar-fill.chinese { width: 65%; background: linear-gradient(90deg, #f093fb, #f5576c); }
+    .subject-bar .bar-fill.english { width: 72%; background: linear-gradient(90deg, #4facfe, #00f2fe); }
+
+    /* ===== 老师寄语 ===== */
+    .message-box {
+      background: linear-gradient(135deg, #f8f9ff, #eef1ff);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      animation: scaleIn 0.8s ease both;
+    }
+    .message-box::before {
+      content: '"';
+      font-size: 60px;
+      color: #667eea;
+      opacity: 0.2;
+      position: absolute;
+      top: 8px;
+      left: 16px;
+      font-family: Georgia, serif;
+    }
+    .message-box .text {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #444;
+      position: relative;
+      z-index: 1;
+    }
+    .message-box .teacher {
+      margin-top: 16px;
+      font-size: 13px;
+      color: #888;
+      text-align: right;
+    }
+
+    /* ===== 页脚 ===== */
+    .footer {
+      padding: 40px 24px;
+      text-align: center;
+      background: #fafafa;
+    }
+    .footer .btn {
+      display: inline-block;
+      padding: 12px 32px;
+      border-radius: 25px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 6px;
+      transition: all 0.3s ease;
+    }
+    .footer .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    .footer .btn-primary:active {
+      transform: scale(0.95);
+    }
+    .footer .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+    .footer .footer-text {
+      font-size: 12px;
+      color: #bbb;
+      margin-top: 20px;
+    }
+
+    /* ===== 班牌徽章 ===== */
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      animation: scaleIn 0.4s ease both;
+    }
+    .badge.gold { background: #FFF8E1; color: #F9A825; }
+    .badge.blue { background: #E3F2FD; color: #1E88E5; }
+    .badge.green { background: #E8F5E9; color: #43A047; }
+    .badge.pink { background: #FCE4EC; color: #E91E63; }
+
+    /* ===== 加载示意动画 ===== */
+    .loading-bar {
+      width: 100%;
+      height: 4px;
+      background: #f0f0f0;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .loading-bar .fill {
+      height: 100%;
+      width: 40%;
+      background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+      background-size: 200% 100%;
+      border-radius: 2px;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    /* 第n个section进入动画依次延迟 */
+    .section:nth-child(1) { animation-delay: 0.1s; }
+    .section:nth-child(2) { animation-delay: 0.2s; }
+    .section:nth-child(3) { animation-delay: 0.3s; }
+    .section:nth-child(4) { animation-delay: 0.4s; }
+    .section:nth-child(5) { animation-delay: 0.5s; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ===== 封面 ===== -->
+    <div class="cover">
+      <div class="student-avatar">👦</div>
+      <div class="cover-icon">📖</div>
+      <h1>小明的成长报告</h1>
+      <div class="subtitle">每一个进步都值得被看见</div>
+      <div class="date">2026 年 6 月 · 三年级</div>
+      <div class="badge-row" style="justify-content:center;margin-top:16px;">
+        <span class="badge gold">🏆 全勤之星</span>
+        <span class="badge blue">📈 进步最大</span>
+      </div>
+      <div class="scroll-hint">↑↓ 向上滑动查看 ↑↓</div>
+    </div>
+
+    <!-- ===== 数据概览 ===== -->
+    <div class="section">
+      <div class="section-title"><span class="emoji">📊</span> 6月概览</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="num green">20</div>
+          <div class="label">出勤天数</div>
+          <div class="trend up">↑ 全勤</div>
+        </div>
+        <div class="stat-card">
+          <div class="num">18</div>
+          <div class="label">作业记录</div>
+          <div class="trend up">↑ 较上月+3次</div>
+        </div>
+        <div class="stat-card">
+          <div class="num orange">7.8</div>
+          <div class="label">平均评分</div>
+          <div class="trend up">↑ 较上月+0.6</div>
+        </div>
+        <div class="stat-card">
+          <div class="num pink">15</div>
+          <div class="label">光盘次数</div>
+          <div class="trend up">🍱 吃得好</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 徽章墙 ===== -->
+    <div class="section" style="padding-top:0;">
+      <div class="section-title"><span class="emoji">🏅</span> 本月成就</div>
+      <div class="badge-row">
+        <span class="badge gold">⭐ 数学全对 5 次</span>
+        <span class="badge blue">📚 作业全勤</span>
+        <span class="badge green">🥬 青菜挑战成功</span>
+        <span class="badge pink">💪 主动举手 8 次</span>
+        <span class="badge gold">🏅 进步之星</span>
+      </div>
+    </div>
+
+    <!-- ===== 精选照片 ===== -->
+    <div class="section">
+      <div class="section-title"><span class="emoji">🌟</span> 本月精选</div>
+      <div class="photo-scroll">
+        <div class="photo-item bg-1">
+          <div class="placeholder">📸</div>
+          <div class="label">数学作业全对 ✨</div>
+        </div>
+        <div class="photo-item bg-2">
+          <div class="placeholder">🧱</div>
+          <div class="label">和小红搭积木</div>
+        </div>
+        <div class="photo-item bg-3">
+          <div class="placeholder">🍱</div>
+          <div class="label">今天吃光光！</div>
+        </div>
+        <div class="photo-item bg-4">
+          <div class="placeholder">🏃</div>
+          <div class="label">户外活动时间</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 进步曲线 ===== -->
+    <div class="section">
+      <div class="section-title"><span class="emoji">📈</span> 学业趋势</div>
+      <div class="chart-container">
+        <div class="chart">
+          <svg viewBox="0 0 340 160">
+            <defs>
+              <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#667eea" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#667eea" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+            <!-- 网格线 -->
+            <line x1="40" y1="30" x2="320" y2="30" stroke="#f0f0f0" stroke-dasharray="4"/>
+            <line x1="40" y1="60" x2="320" y2="60" stroke="#f0f0f0" stroke-dasharray="4"/>
+            <line x1="40" y1="90" x2="320" y2="90" stroke="#f0f0f0" stroke-dasharray="4"/>
+            <line x1="40" y1="120" x2="320" y2="120" stroke="#f0f0f0" stroke-dasharray="4"/>
+            <!-- 面积 -->
+            <path class="area-path" d="M 60,110 C 100,100 140,70 180,60 C 220,50 260,35 300,45 L 300,130 L 60,130 Z"/>
+            <!-- 折线 -->
+            <path class="line-path" d="M 60,110 C 100,100 140,70 180,60 C 220,50 260,35 300,45"/>
+            <!-- 数据点 -->
+            <g class="dot"><circle cx="60" cy="110" r="5"/></g>
+            <g class="dot"><circle cx="140" cy="70" r="5"/></g>
+            <g class="dot"><circle cx="180" cy="60" r="5"/></g>
+            <g class="dot"><circle cx="220" cy="50" r="5"/></g>
+            <g class="dot"><circle cx="260" cy="35" r="5"/></g>
+            <g class="dot"><circle cx="300" cy="45" r="5"/></g>
+          </svg>
+        </div>
+        <div class="chart-labels">
+          <span>6/1</span>
+          <span>6/8</span>
+          <span>6/15</span>
+          <span>6/22</span>
+          <span>6/29</span>
+          <span>今日</span>
+        </div>
+        <div style="text-align:center;margin-top:8px;">
+          <span class="score-tag">📈 全月上升趋势</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 各科对比 ===== -->
+    <div class="section">
+      <div class="section-title"><span class="emoji">🏆</span> 各科表现</div>
+      <div class="subject-bar">
+        <span class="name">数学</span>
+        <div class="bar-track"><div class="bar-fill math">88 分</div></div>
+      </div>
+      <div class="subject-bar">
+        <span class="name">语文</span>
+        <div class="bar-track"><div class="bar-fill chinese">65 分</div></div>
+      </div>
+      <div class="subject-bar">
+        <span class="name">英语</span>
+        <div class="bar-track"><div class="bar-fill english">72 分</div></div>
+      </div>
+      <div style="font-size:13px;color:#888;margin-top:12px;">
+        💡 建议：语文生字可以多练习，数学继续保持！
+      </div>
+    </div>
+
+    <!-- ===== 老师寄语 ===== -->
+    <div class="section">
+      <div class="section-title"><span class="emoji">💌</span> 老师寄语</div>
+      <div class="message-box">
+        <div class="text">
+          小明这个月进步很大！数学连续好几次全对，口算也稳定了很多。<br><br>
+          最让我开心的是，他开始主动举手回答问题了，以前总是低着头，现在有了自信。<br><br>
+          吃饭也很棒，以前不爱吃的青菜也能吃完了。下个学期继续加油！💪
+        </div>
+        <div class="teacher">—— 张老师 · 2026年6月</div>
+      </div>
+    </div>
+
+    <!-- ===== 页脚 ===== -->
+    <div class="footer">
+      <button class="btn btn-primary" onclick="alert('保存到手机相册 📥')">📥 保存到手机</button>
+      <button class="btn btn-secondary" onclick="alert('分享给家人 📤')">📤 分享给家人</button>
+      <div class="footer-text">
+        🏫 智慧托班管理系统 · 每一个进步都值得被看见
+      </div>
+    </div>
+
+    <!-- 加载进度条 -->
+    <div class="loading-bar" style="position:fixed;top:0;left:0;right:0;z-index:999;">
+      <div class="fill"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // 滚动时触发section动画
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.section').forEach(el => {
+      el.style.opacity = '0';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

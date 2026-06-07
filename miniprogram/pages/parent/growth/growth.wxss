@@ -1,0 +1,119 @@
+.page { min-height: 100vh; background: #FFFAF7; }
+
+/* 概览卡片 */
+.overview-card {
+  background: #FF8C5A;
+  border-radius: 24rpx;
+  margin: 30rpx;
+  padding: 40rpx 30rpx;
+  color: #FFF;
+}
+.overview-header { margin-bottom: 30rpx; }
+.overview-name { font-size: 36rpx; font-weight: bold; display: block; }
+.overview-grade { font-size: 24rpx; opacity: 0.9; margin-top: 6rpx; display: block; }
+
+.overview-stats {
+  display: flex;
+  gap: 16rpx;
+}
+.stat-box {
+  flex: 1;
+  background: rgba(255,255,255,0.15);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  text-align: center;
+}
+.stat-number {
+  font-size: 40rpx;
+  font-weight: bold;
+  display: block;
+}
+.stat-label { font-size: 22rpx; opacity: 0.8; display: block; margin-top: 8rpx; line-height: 1.4; }
+
+/* 时间线标题 */
+.section-header { padding: 20rpx 30rpx 10rpx; }
+
+/* 时间线 */
+.timeline {
+  padding: 0 30rpx 30rpx;
+  position: relative;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 45rpx;
+  top: 0;
+  bottom: 0;
+  width: 4rpx;
+  background: #E8E8E8;
+}
+.timeline-item {
+  display: flex;
+  margin-bottom: 20rpx;
+  position: relative;
+}
+.timeline-dot {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background: #FF8C5A;
+  border: 4rpx solid #FFE8DC;
+  margin-top: 28rpx;
+  flex-shrink: 0;
+  z-index: 1;
+}
+.timeline-card {
+  flex: 1;
+  background: #FFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-left: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+}
+.tl-header { display: flex; align-items: center; }
+.tl-icon { font-size: 32rpx; margin-right: 12rpx; }
+.tl-title { font-size: 28rpx; font-weight: bold; color: #333; }
+.tl-desc { font-size: 26rpx; color: #666; margin-top: 10rpx; display: block; line-height: 1.5; }
+.tl-score { margin-top: 10rpx; }
+.score-label { font-size: 22rpx; color: #999; margin-right: 8rpx; }
+.score-value { font-size: 26rpx; color: #F39C12; font-weight: bold; }
+.tl-date { font-size: 22rpx; color: #BBB; margin-top: 10rpx; display: block; }
+
+/* 下载按钮 */
+.action-bar { padding: 0 30rpx 20rpx; }
+.btn-download {
+  width: 100%;
+  padding: 22rpx;
+  background: #FFF;
+  border: 2rpx solid #FF8C5A;
+  color: #FF8C5A;
+  border-radius: 14rpx;
+  font-size: 28rpx;
+  text-align: center;
+}
+
+/* 报告卡片弹出层 */
+.report-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+.report-card {
+  background: #FFF;
+  border-radius: 24rpx;
+  padding: 40rpx 36rpx;
+  width: 600rpx;
+  box-shadow: 0 8rpx 40rpx rgba(0,0,0,0.15);
+}
+.report-title { font-size: 34rpx; font-weight: bold; color: #333; display: block; text-align: center; }
+.report-student { font-size: 26rpx; color: #999; display: block; text-align: center; margin-top: 8rpx; }
+.report-divider { height: 2rpx; background: #F5F3F7; margin: 24rpx 0; }
+.report-row { display: flex; justify-content: space-between; padding: 14rpx 0; }
+.report-label { font-size: 28rpx; color: #666; }
+.report-value { font-size: 28rpx; font-weight: bold; color: #FF8C5A; text-align: right; max-width: 60%; }
+.report-tip { font-size: 24rpx; color: #CCC; display: block; text-align: center; margin-top: 8rpx; }
+.report-close {
+  display: block; text-align: center; margin-top: 20rpx;
+  font-size: 28rpx; color: #999; padding: 16rpx;
+}

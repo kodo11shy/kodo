@@ -1,0 +1,137 @@
+<view class="page">
+
+  <!-- 顶部状态卡 -->
+  <view class="overview-card">
+    <view class="overview-head">
+      <view>
+        <text class="overview-title">通知总览</text>
+        <text class="overview-subtitle">当前 {{activeCount}} 条通知生效中</text>
+      </view>
+      <view class="mini-action" bindtap="openForm">发布通知</view>
+    </view>
+    <view class="metric-grid">
+      <view class="metric-item">
+        <text class="metric-value">{{totalCount}}</text>
+        <text class="metric-label">全部通知</text>
+      </view>
+      <view class="metric-item">
+        <text class="metric-value">{{activeCount}}</text>
+        <text class="metric-label">生效中</text>
+      </view>
+      <view class="metric-item">
+        <text class="metric-value">{{pinnedCount}}</text>
+        <text class="metric-label">已置顶</text>
+      </view>
+      <view class="metric-item">
+        <text class="metric-value">{{expiredCount}}</text>
+        <text class="metric-label">已过期</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 即将到期的通知 -->
+  <view class="todo-card" wx:if="{{expiringNotices.length > 0}}">
+    <view class="todo-head">
+      <text class="todo-title">即将到期</text>
+      <text class="todo-count">{{expiringNotices.length}} 条</text>
+    </view>
+    <view class="todo-row" wx:for="{{expiringNotices}}" wx:key="id">
+      <text>{{item.title}}</text>
+      <text class="todo-num">{{item.endDate}} 到期</text>
+    </view>
+  </view>
+
+  <!-- 筛选 -->
+  <scroll-view class="filter-scroll" scroll-x>
+    <view class="filter-row">
+      <view
+        class="filter-chip {{item.className}}"
+        wx:for="{{filters}}"
+        wx:key="key"
+        data-filter="{{item.key}}"
+        bindtap="switchFilter"
+      >
+        <text>{{item.label}}</text>
+        <text class="filter-count">{{item.count}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 加载 -->
+  <view class="loading-container" wx:if="{{loading}}"><text>加载中...</text></view>
+
+  <!-- 通知列表 -->
+  <view class="notice-list" wx:if="{{!loading && filteredNotices.length > 0}}">
+    <view class="notice-card" wx:for="{{filteredNotices}}" wx:key="id">
+      <view class="notice-header">
+        <text class="notice-title">{{item.title}}</text>
+        <text class="state-tag tag-{{item.statusClass}}">{{item.statusText}}</text>
+        <text class="notice-type tag tag-blue">{{item.notice_type}}</text>
+        <text class="pin-tag tag tag-red" wx:if="{{item.is_pinned}}">置顶</text>
+      </view>
+      <text class="notice-content">{{item.content}}</text>
+      <view class="notice-footer">
+        <text class="notice-date">{{item.displayStartText}} ~ {{item.displayEndText}}</text>
+        <view class="notice-actions">
+          <text class="action-edit" bindtap="openEdit" data-notice="{{item}}">编辑</text>
+          <text class="action-delete" bindtap="deleteNotice" data-id="{{item.id}}">删除</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && filteredNotices.length === 0}}">
+    <image class="empty-image" src="/images/empty-notices-v2.png" mode="aspectFit"></image>
+    <text class="empty-title">{{emptyTitle}}</text>
+    <text class="empty-desc">{{emptyDesc}}</text>
+  </view>
+
+  <!-- 通知编辑弹窗 -->
+  <view class="modal-overlay" wx:if="{{showForm}}" bindtap="closeForm">
+    <view class="modal-content modal-large" catchtap="nop">
+      <text class="modal-title">{{formTitle}}</text>
+
+      <view class="form-group">
+        <text class="form-label">标题</text>
+        <input class="input-field" placeholder="通知标题" value="{{form.title}}" bindinput="onFormField" data-field="title" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">内容</text>
+        <textarea class="input-field textarea-field" placeholder="通知内容" value="{{form.content}}" bindinput="onFormField" data-field="content" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">类型</text>
+        <picker bindchange="selectNoticeType" range="{{noticeTypes}}">
+          <view class="picker-field">{{form.notice_type}}</view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">置顶</text>
+        <view class="toggle-row">
+          <switch checked="{{form.is_pinned}}" bindchange="togglePinned" />
+          <text wx:if="{{form.is_pinned}}" class="tag tag-red">已置顶</text>
+        </view>
+      </view>
+
+      <view class="form-row">
+        <view class="form-group half">
+          <text class="form-label">开始显示</text>
+          <input class="input-field" type="text" placeholder="2026-06-01" value="{{form.display_start}}" bindinput="onFormField" data-field="display_start" />
+        </view>
+        <view class="form-group half">
+          <text class="form-label">结束显示</text>
+          <input class="input-field" type="text" placeholder="留空长期" value="{{form.display_end}}" bindinput="onFormField" data-field="display_end" />
+        </view>
+      </view>
+
+      <view class="modal-actions">
+        <button class="btn-secondary modal-btn" bindtap="closeForm">取消</button>
+        <button class="btn-primary modal-btn" bindtap="submitNotice" loading="{{submitting}}" disabled="{{submitting}}">{{formSubmitText}}</button>
+      </view>
+    </view>
+  </view>
+</view>

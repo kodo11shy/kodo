@@ -1,0 +1,75 @@
+<view class="page">
+  <!-- 加载 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:else>
+    <!-- 标题 -->
+    <view class="section-header">
+      <text class="section-title">{{studentName}} 的作业记录</text>
+    </view>
+
+    <!-- 作业列表 -->
+    <view class="hw-list" wx:if="{{records.length > 0}}">
+      <view class="hw-card" wx:for="{{records}}" wx:key="id">
+        <!-- 头部 -->
+        <view class="hw-header">
+          <view class="hw-subject">
+            <text class="subject-text">{{item.subject}}</text>
+            <text class="hw-type tag tag-blue">{{item.homeworkTypeText}}</text>
+          </view>
+          <view class="hw-status tag {{item.statusClass}}">
+            <text>{{item.statusIcon}} {{item.status}}</text>
+          </view>
+        </view>
+
+        <!-- 日期 -->
+        <text class="hw-date">{{item.date}}</text>
+
+        <!-- 评分信息 -->
+        <view class="hw-score" wx:if="{{item.score != null}}">
+          <text class="score-label">评分</text>
+          <text class="score-value">{{item.score}}/10</text>
+          <text class="score-accuracy" wx:if="{{item.accuracy}}">· {{item.accuracy}}</text>
+          <text class="score-errors" wx:if="{{item.error_count > 0}}">· 错{{item.error_count}}题</text>
+        </view>
+
+        <!-- 三步照片 -->
+        <view class="hw-photos" wx:if="{{item.photos}}">
+          <!-- 完成照片 -->
+          <view class="photo-group" wx:if="{{item.photos.done && item.photos.done.length > 0}}">
+            <text class="photo-step-label">📝 完成</text>
+            <view class="photo-thumbs">
+              <image class="thumb" wx:for="{{item.photos.done}}" wx:key="*this" src="{{item.url}}" mode="aspectFill" bindtap="previewPhotos" data-list="{{item.photos.done}}" bindlongpress="saveHomeworkPhoto" data-src="{{item.url}}" />
+            </view>
+          </view>
+          <!-- 批改照片 -->
+          <view class="photo-group" wx:if="{{item.photos.graded && item.photos.graded.length > 0}}">
+            <text class="photo-step-label">✏️ 批改</text>
+            <view class="photo-thumbs">
+              <image class="thumb" wx:for="{{item.photos.graded}}" wx:key="*this" src="{{item.url}}" mode="aspectFill" bindtap="previewPhotos" data-list="{{item.photos.graded}}" bindlongpress="saveHomeworkPhoto" data-src="{{item.url}}" />
+            </view>
+          </view>
+          <!-- 改错照片 -->
+          <view class="photo-group" wx:if="{{item.photos.corrected && item.photos.corrected.length > 0}}">
+            <text class="photo-step-label">✅ 改错</text>
+            <view class="photo-thumbs">
+              <image class="thumb" wx:for="{{item.photos.corrected}}" wx:key="*this" src="{{item.url}}" mode="aspectFill" bindtap="previewPhotos" data-list="{{item.photos.corrected}}" bindlongpress="saveHomeworkPhoto" data-src="{{item.url}}" />
+            </view>
+          </view>
+        </view>
+
+        <!-- 备注 -->
+        <text class="hw-remark" wx:if="{{item.remark}}">{{item.remark}}</text>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:else>
+      <image class="empty-image" src="/images/empty-homework-v2.png" mode="aspectFit"></image>
+      <text>暂无作业记录</text>
+      <text class="empty-desc">老师布置作业后，会出现在这里</text>
+    </view>
+  </block>
+</view>

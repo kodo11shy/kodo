@@ -1,0 +1,240 @@
+.page { min-height: 100vh; background: #F7F8FC; }
+
+/* 头部 */
+.profile-header {
+  display: flex;
+  align-items: center;
+  padding: 40rpx 30rpx;
+  background: #5B7FFF;
+  color: #FFF;
+}
+.profile-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  font-size: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.profile-info { flex: 1; margin-left: 24rpx; }
+.profile-name { font-size: 36rpx; font-weight: bold; display: block; }
+.profile-meta { font-size: 24rpx; opacity: 0.9; margin-top: 6rpx; display: block; }
+.profile-status { margin-top: 8rpx; display: inline-block !important; }
+.edit-btn {
+  background: rgba(255,255,255,0.2);
+  color: #FFF;
+  border: 2rpx solid rgba(255,255,255,0.4);
+  font-size: 26rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  padding: 0 24rpx;
+  border-radius: 12rpx;
+}
+
+/* 选项卡 */
+.tab-bar {
+  display: flex;
+  background: #FFF;
+  border-bottom: 2rpx solid #EEE;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: #666;
+  position: relative;
+}
+.tab-item.active {
+  color: #5B7FFF;
+  font-weight: bold;
+}
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  width: 60%;
+  height: 4rpx;
+  background: #5B7FFF;
+  border-radius: 2rpx;
+}
+
+.tab-content { padding: 20rpx 30rpx; }
+
+/* 信息网格 */
+.info-grid { display: flex; flex-wrap: wrap; }
+.info-item {
+  width: 50%;
+  padding: 20rpx 16rpx;
+  border-bottom: 2rpx solid #ECEFF5;
+}
+.info-full { width: 100%; }
+.info-label { font-size: 24rpx; color: #999; display: block; margin-bottom: 8rpx; }
+.info-value { font-size: 28rpx; color: #333; display: block; }
+
+/* 快捷操作 */
+.quick-actions {
+  padding: 30rpx 0;
+  display: flex;
+  gap: 20rpx;
+}
+.quick-actions .btn-secondary { flex: 1; font-size: 28rpx; }
+
+/* 编辑表单 */
+.edit-form { padding: 10rpx 0; }
+.form-group { margin-bottom: 24rpx; }
+.form-label { font-size: 26rpx; color: #666; margin-bottom: 8rpx; display: block; }
+.edit-textarea { height: 160rpx; padding: 20rpx 30rpx; }
+.form-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 40rpx;
+}
+.form-actions .btn-primary,
+.form-actions .btn-secondary { flex: 1; }
+
+/* 家长卡片 */
+.parent-card {
+  display: flex;
+  align-items: flex-start;
+  background: #FFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+}
+.parent-avatar {
+  width: 72rpx; height: 72rpx;
+  border-radius: 50%;
+  background: #EEF2FF;
+  color: #5B7FFF;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.parent-info { flex: 1; margin-left: 16rpx; }
+.parent-name { font-size: 30rpx; font-weight: bold; display: block; }
+.parent-relation { display: inline-block !important; margin: 6rpx 0; }
+.parent-phone { font-size: 24rpx; color: #999; display: block; }
+.parent-invite { text-align: center; margin-left: 12rpx; }
+.invite-label { font-size: 20rpx; color: #999; display: block; }
+.invite-code { font-size: 28rpx; color: #5B7FFF; font-weight: bold; letter-spacing: 2rpx; }
+
+/* 接送授权人 */
+.section-actions { margin-bottom: 20rpx; }
+.pickup-card {
+  display: flex;
+  align-items: center;
+  background: #FFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+}
+.pickup-avatar {
+  width: 72rpx; height: 72rpx;
+  border-radius: 50%;
+  background: #E8F8E8;
+  color: #27AE60;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.pickup-info { flex: 1; margin-left: 16rpx; }
+.pickup-name { font-size: 30rpx; font-weight: bold; display: block; }
+.pickup-relation { display: inline-block !important; margin: 6rpx 6rpx 6rpx 0; }
+.pickup-phone { font-size: 24rpx; color: #999; display: block; margin-top: 4rpx; }
+.pickup-tag { display: inline-block !important; }
+
+/* 健康 */
+.health-card {
+  background: #FFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+}
+.health-row {
+  padding: 16rpx 0;
+  border-bottom: 2rpx solid #ECEFF5;
+}
+.health-row:last-child { border-bottom: none; }
+.health-label { font-size: 24rpx; color: #999; display: block; margin-bottom: 4rpx; }
+.health-value { font-size: 28rpx; color: #333; }
+.consent-section {
+  background: #FFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+}
+.consent-title { font-size: 28rpx; font-weight: bold; display: block; margin-bottom: 16rpx; }
+.consent-status { display: flex; align-items: center; gap: 20rpx; }
+.consent-btn { font-size: 24rpx; height: 60rpx; line-height: 60rpx; padding: 0 20rpx; width: auto; flex-shrink: 0; }
+
+/* 弹窗 */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: flex-end;
+  z-index: 100;
+}
+.modal-content {
+  background: #FFF;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 40rpx 30rpx;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-large { max-height: 90vh; }
+.modal-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  text-align: center;
+  display: block;
+  margin-bottom: 30rpx;
+}
+.modal-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 30rpx;
+}
+.modal-btn { flex: 1; }
+.nop { border: none; background: none; padding: 0; }
+
+/* 接送编辑弹窗 */
+.pickup-edit-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding: 20rpx;
+  background: #F8F8F8;
+  border-radius: 12rpx;
+}
+.pickup-edit-fields { flex: 1; }
+.pick-field { margin-bottom: 12rpx; }
+.pick-field:last-child { margin-bottom: 0; }
+.remove-btn {
+  color: #E74C3C;
+  font-size: 24rpx;
+  padding: 10rpx;
+  margin-left: 12rpx;
+  flex-shrink: 0;
+}
+.add-row-btn { margin-bottom: 10rpx; }
+
+/* 空状态补充 */
+.empty-desc { font-size: 24rpx; color: #BBB; margin-top: 10rpx; }

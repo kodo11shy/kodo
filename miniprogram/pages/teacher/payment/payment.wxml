@@ -1,0 +1,182 @@
+<view class="page">
+  <view class="month-bar">
+    <picker mode="date" fields="month" value="{{month}}" bindchange="onMonthChange">
+      <view class="month-picker">
+        <text class="month-text">{{month}}</text>
+        <text class="month-arrow">📅</text>
+      </view>
+    </picker>
+    <button class="btn-primary add-btn" bindtap="openAddPayment">+ 记一笔</button>
+  </view>
+
+  <view class="loading-container" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:else>
+    <view class="summary-card">
+      <view class="summary-head">
+        <view>
+          <text class="summary-title">本月收费</text>
+          <text class="summary-subtitle">按学生查看缴费状态</text>
+        </view>
+      </view>
+      <view class="amount-row">
+        <view class="amount-main">
+          <text class="amount-label">应收</text>
+          <text class="amount-value total">¥{{totalFeeText}}</text>
+        </view>
+        <view class="amount-main">
+          <text class="amount-label">已收</text>
+          <text class="amount-value paid">¥{{paidText}}</text>
+        </view>
+        <view class="amount-main">
+          <text class="amount-label">未收</text>
+          <text class="amount-value unpaid">¥{{unpaidText}}</text>
+        </view>
+      </view>
+      <view class="people-row">
+        <view class="people-item"><text class="people-num">{{paidCount}}</text><text>已缴</text></view>
+        <view class="people-item"><text class="people-num">{{unpaidCount}}</text><text>未缴</text></view>
+        <view class="people-item"><text class="people-num">{{partialCount}}</text><text>部分缴</text></view>
+        <view class="people-item"><text class="people-num">{{uncreatedCount}}</text><text>未生成</text></view>
+      </view>
+    </view>
+
+    <view class="todo-card">
+      <view class="todo-head">
+        <text class="todo-title">待处理</text>
+        <text class="todo-count">{{todoRows.length}} 人</text>
+      </view>
+      <view wx:if="{{todoRows.length > 0}}">
+        <view class="todo-row" wx:for="{{todoRows}}" wx:key="studentId">
+          <view>
+            <text class="todo-name">{{item.studentName}}</text>
+            <text class="todo-desc">{{item.status}} · {{item.feeTypeText}}</text>
+          </view>
+          <view class="todo-action" data-student-id="{{item.studentId}}" bindtap="openAddPayment">记账</view>
+        </view>
+      </view>
+      <view class="todo-empty" wx:else>
+        <text>本月收费状态都已处理</text>
+      </view>
+    </view>
+
+    <scroll-view class="filter-scroll" scroll-x>
+      <view class="filter-row">
+        <view
+          class="filter-chip {{activeFilter === item.key ? 'active' : ''}}"
+          wx:for="{{filters}}"
+          wx:key="key"
+          data-filter="{{item.key}}"
+          bindtap="switchFilter"
+        >
+          <text>{{item.label}}</text>
+          <text class="filter-count">{{item.count}}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="payment-list" wx:if="{{filteredRows.length > 0}}">
+      <view class="payment-card" wx:for="{{filteredRows}}" wx:key="studentId">
+        <view class="student-row">
+          <view class="avatar">{{item.initial}}</view>
+          <view class="student-info">
+            <view class="name-row">
+              <text class="student-name">{{item.studentName}}</text>
+              <text class="status-tag tag-{{item.statusClass}}">{{item.status}}</text>
+            </view>
+            <text class="student-detail">{{item.detailText}}</text>
+          </view>
+        </view>
+        <view class="bill-row">
+          <view class="bill-item">
+            <text class="bill-label">本月金额</text>
+            <text class="bill-value">¥{{item.totalText}}</text>
+          </view>
+          <view class="bill-item">
+            <text class="bill-label">已缴</text>
+            <text class="bill-value paid">¥{{item.paidText}}</text>
+          </view>
+          <view class="bill-item">
+            <text class="bill-label">未缴</text>
+            <text class="bill-value unpaid">¥{{item.unpaidText}}</text>
+          </view>
+        </view>
+        <view class="fee-line">
+          <text>{{item.feeTypeText}}</text>
+          <text wx:if="{{item.remarkText}}">{{item.remarkText}}</text>
+        </view>
+        <view class="card-actions">
+          <view class="action-btn" data-student-id="{{item.studentId}}" bindtap="openAddPayment">记一笔</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:else>
+      <image class="empty-image" src="/images/empty-notices-v2.png" mode="aspectFit"></image>
+      <text class="empty-title">暂无对应缴费记录</text>
+      <text class="empty-desc">切换筛选或点击“记一笔”添加本月收费</text>
+    </view>
+  </block>
+
+  <view class="modal-overlay" wx:if="{{showAddPayment}}" bindtap="closeAddPayment">
+    <view class="modal-content modal-large" catchtap="nop">
+      <text class="modal-title">记一笔</text>
+
+      <view class="form-group">
+        <text class="form-label">学生</text>
+        <picker bindchange="selectStudent" range="{{students}}" range-key="name">
+          <view class="picker-field">{{selectedStudentName}}</view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">费用项目</text>
+        <picker bindchange="selectFeeType" range="{{feeTypes}}">
+          <view class="picker-field">{{addForm.fee_type}}</view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">金额</text>
+        <input class="input-field" type="digit" placeholder="0.00" value="{{addForm.amount}}" bindinput="onFormField" data-field="amount" />
+      </view>
+
+      <view class="form-row">
+        <view class="form-group half">
+          <text class="form-label">开始日期</text>
+          <input class="input-field" type="text" placeholder="2026-06-01" value="{{addForm.period_start}}" bindinput="onFormField" data-field="period_start" />
+        </view>
+        <view class="form-group half">
+          <text class="form-label">结束日期</text>
+          <input class="input-field" type="text" placeholder="2026-06-30" value="{{addForm.period_end}}" bindinput="onFormField" data-field="period_end" />
+        </view>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">缴费状态</text>
+        <picker bindchange="selectPaymentStatus" range="{{paymentStatuses}}">
+          <view class="picker-field">{{addForm.status}}</view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">支付方式</text>
+        <picker bindchange="selectPaymentMethod" range="{{paymentMethods}}">
+          <view class="picker-field">{{addForm.payment_method}}</view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">备注</text>
+        <input class="input-field" placeholder="备注..." value="{{addForm.remark}}" bindinput="onFormField" data-field="remark" />
+      </view>
+
+      <view class="modal-actions">
+        <button class="btn-secondary modal-btn" bindtap="closeAddPayment">取消</button>
+        <button class="btn-primary modal-btn" bindtap="submitPayment" loading="{{submitting}}" disabled="{{submitting}}">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

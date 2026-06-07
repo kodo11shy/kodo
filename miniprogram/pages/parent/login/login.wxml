@@ -1,0 +1,23 @@
+<view class="page">
+  <view class="login-container">
+    <view class="login-header">
+      <text class="login-icon">👨‍👩‍👧</text>
+      <text class="login-title">家长入口</text>
+      <text class="login-desc">输入邀请码绑定孩子</text>
+    </view>
+    <view class="login-form">
+      <view class="input-group">
+        <input class="code-input" placeholder="请输入邀请码（如：ABCD12）" value="{{inviteCode}}" bindinput="onCodeInput" maxlength="8" />
+      </view>
+      <view class="input-group" wx:if="{{!devOpenid}}">
+        <input class="code-input code-input-sub" placeholder="开发环境OpenID（可选，留空自动生成）" value="{{devOpenid}}" bindinput="onDevOpenidInput" maxlength="50" />
+      </view>
+      <view class="error-msg" wx:if="{{errorMsg}}"><text>{{errorMsg}}</text></view>
+      <button class="btn-primary login-btn" bindtap="doBind" loading="{{loading}}" disabled="{{loading || inviteCode.length < 4}}">{{loading ? '绑定中...' : '绑定微信'}}</button>
+    </view>
+    <view class="login-footer">
+      <text class="tip-text">邀请码请向托班老师索取</text>
+      <text class="back-link" bindtap="goBack">← 返回首页</text>
+    </view>
+  </view>
+</view>

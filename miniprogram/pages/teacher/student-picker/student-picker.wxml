@@ -1,0 +1,66 @@
+<!-- 学生选择页 -->
+<view class="page">
+  <!-- 顶部提示 -->
+  <view class="header-bar">
+    <text class="header-title">{{isBatch ? '批量关联照片' : '这是谁的照片？'}}</text>
+    <text class="header-desc">{{isBatch ? '为选中的照片统一选择学生' : '选择照片中的学生'}}，已选 {{selectedIds.length}} 人</text>
+  </view>
+
+  <!-- 模式切换 -->
+  <view class="mode-bar">
+    <view class="mode-tab {{mode === 'single' ? 'active' : ''}}" bindtap="switchMode" data-mode="single">
+      <text>单选</text>
+    </view>
+    <view class="mode-tab {{mode === 'multi' ? 'active' : ''}}" bindtap="switchMode" data-mode="multi">
+      <text>多选</text>
+    </view>
+  </view>
+
+  <!-- 照片预览 -->
+  <view class="photo-preview" wx:if="{{photoPath}}">
+    <image class="preview-img" src="{{photoUrl}}" mode="aspectFill"></image>
+  </view>
+
+  <!-- 学生网格 -->
+  <view class="student-grid">
+    <view class="student-item" wx:for="{{students}}" wx:key="id" bindtap="toggleStudent" data-id="{{item.id}}">
+      <view class="student-avatar {{item.selected ? 'selected' : ''}}">
+        <text>{{item.initial}}</text>
+        <view class="check-mark" wx:if="{{item.selected}}">✓</view>
+      </view>
+      <text class="student-name {{item.selected ? 'selected-text' : ''}}">{{item.name}}</text>
+      <text class="student-grade">{{item.grade || ''}}</text>
+    </view>
+  </view>
+
+  <!-- 分类标签 -->
+  <view class="type-section">
+    <text class="section-label">照片分类</text>
+    <view class="type-options">
+      <view class="type-tag {{photoType === 'activity' ? 'active' : ''}}" bindtap="setType" data-type="activity">
+        <text>🎪 活动</text>
+      </view>
+      <view class="type-tag {{photoType === 'homework' ? 'active' : ''}}" bindtap="setType" data-type="homework">
+        <text>📚 作业</text>
+      </view>
+      <view class="type-tag {{photoType === 'meal' ? 'active' : ''}}" bindtap="setType" data-type="meal">
+        <text>🍱 餐食</text>
+      </view>
+      <view class="type-tag {{photoType === 'daily' ? 'active' : ''}}" bindtap="setType" data-type="daily">
+        <text>📸 日常</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="remark-section">
+    <textarea class="remark-input" placeholder="添加备注（选填）" value="{{remark}}" bindinput="onRemarkInput" maxlength="200" />
+  </view>
+
+  <!-- 确认按钮 -->
+  <view class="confirm-bar">
+    <button class="btn-primary" bindtap="confirmAssociate" disabled="{{selectedIds.length === 0 || saving}}">
+      {{saving ? '保存中...' : '✅ 确认保存'}}
+    </button>
+  </view>
+</view>

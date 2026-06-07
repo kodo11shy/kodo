@@ -1,0 +1,284 @@
+/* 拍照页 */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.photo-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30rpx;
+}
+
+.preview-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.preview-image {
+  width: 100%;
+  height: 600rpx;
+  background-color: #2F3A4C;
+  border-radius: 16rpx;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 30rpx;
+  width: 100%;
+}
+
+.camera-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #7B8496;
+}
+
+.camera-icon {
+  font-size: 120rpx;
+}
+
+.camera-text {
+  font-size: 32rpx;
+  margin-top: 20rpx;
+}
+
+.camera-desc {
+  font-size: 26rpx;
+  margin-top: 10rpx;
+}
+
+/* 底部按钮 */
+.action-bar {
+  padding: 30rpx;
+  background-color: #FFFFFF;
+  box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.06);
+}
+
+.take-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100rpx;
+  font-size: 36rpx;
+  border-radius: 50rpx;
+}
+
+.take-icon {
+  margin-right: 12rpx;
+}
+
+.album-btn {
+  margin-top: 20rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 40rpx;
+}
+
+/* 上传进度 */
+.upload-progress {
+  padding: 30rpx;
+  text-align: center;
+}
+
+.progress-bar {
+  height: 12rpx;
+  background-color: #F0F0F0;
+  border-radius: 6rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #5B7FFF;
+  transition: width 0.3s;
+}
+
+.progress-text {
+  font-size: 26rpx;
+  color: #7B8496;
+  margin-top: 12rpx;
+  display: block;
+}
+
+/* ===== 批量本地上传模式 ===== */
+.batch-page {
+  padding: 24rpx;
+}
+
+.batch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.batch-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #2F3A4C;
+}
+
+.batch-count {
+  font-size: 26rpx;
+  color: #5B7FFF;
+  font-weight: 600;
+}
+
+.batch-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-bottom: 30rpx;
+}
+
+.batch-grid-item {
+  width: 216rpx;
+  height: 216rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  position: relative;
+  background: #F5F5F5;
+}
+
+.batch-thumb {
+  width: 100%;
+  height: 100%;
+}
+
+.batch-thumb-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(91, 127, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.batch-thumb-check {
+  font-size: 48rpx;
+  color: #FFF;
+  font-weight: bold;
+}
+
+.batch-remove-btn {
+  position: absolute;
+  top: 6rpx;
+  right: 6rpx;
+  width: 36rpx;
+  height: 36rpx;
+  background: rgba(0,0,0,0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.batch-remove-btn text {
+  font-size: 24rpx;
+  color: #FFF;
+}
+
+.batch-add-more {
+  border: 4rpx dashed #D6E0FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F8FAFF;
+}
+
+.batch-add-icon {
+  font-size: 64rpx;
+  color: #5B7FFF;
+}
+
+.batch-progress-area {
+  margin-bottom: 24rpx;
+}
+
+.batch-progress-text {
+  font-size: 24rpx;
+  color: #7B8496;
+  display: block;
+  margin-top: 12rpx;
+  text-align: center;
+}
+
+.batch-done {
+  text-align: center;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.batch-done-text {
+  font-size: 28rpx;
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+.batch-actions {
+  margin-top: 20rpx;
+}
+
+.batch-action-btn {
+  width: 100%;
+  margin-bottom: 16rpx;
+}
+
+/* 批量入口（单张模式下方） */
+.batch-entry {
+  margin-top: 40rpx;
+  padding: 0 24rpx;
+}
+
+.batch-divider {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.batch-divider::before,
+.batch-divider::after {
+  content: '';
+  flex: 1;
+  height: 2rpx;
+  background: #E8ECF2;
+}
+
+.batch-divider-text {
+  font-size: 24rpx;
+  color: #B1B8C7;
+  margin: 0 24rpx;
+}
+
+.batch-upload-btn {
+  width: 100%;
+  margin-bottom: 12rpx;
+}
+
+.batch-hint {
+  font-size: 22rpx;
+  color: #B1B8C7;
+  display: block;
+  text-align: center;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2rpx solid #5B7FFF;
+  color: #5B7FFF;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}

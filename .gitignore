@@ -1,0 +1,42 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+backend/.venv/
+
+# Environment and secrets
+.env
+*.env.local
+backend/.env
+backend/deploy/.env
+CC.pem
+*.pem
+
+# Databases and runtime data
+*.db
+backend/tuoban_dev.db
+backend/attendance.db
+backend/backups/
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Logs
+*.log
+backend/server*.log
+backend/server*.err.log
+backend/server-*.log
+backend/server-*.cmd.log
+backend/server-*.combined.log
+backend/server-*.err.log
+
+# Node / mini program local
+node_modules/
+dist/
+miniprogram/project.private.config.json
+.DS_Store
+Thumbs.db
+
+# Collaboration scratch
+Codex-Claude协作联系单-*.md
+*.sync-conflict-*.md

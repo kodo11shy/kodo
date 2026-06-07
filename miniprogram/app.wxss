@@ -1,0 +1,195 @@
+/* 全局样式 */
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 28rpx;
+  color: #2F3A4C;
+  box-sizing: border-box;
+}
+
+/* 页面背景：老师端蓝紫底、家长端暖橙底 */
+.page-teacher { background-color: #F7F8FC; }
+.page-parent { background-color: #FFFAF7; }
+.page-public { background-color: #FFF7EF; }
+
+/* 通用按钮 */
+.btn-primary {
+  background-color: #5B7FFF;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999rpx;
+  padding: 22rpx 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+  box-shadow: 0 10rpx 24rpx rgba(91, 127, 255, 0.20);
+}
+
+.btn-primary:active {
+  background-color: #496BE8;
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: #5B6476;
+  border: 2rpx solid #E7EAF2;
+  border-radius: 999rpx;
+  padding: 22rpx 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+}
+
+.btn-secondary:active {
+  background-color: #F7F8FC;
+}
+
+.btn-danger {
+  background-color: #FFF1EF;
+  color: #D84A3A;
+  border: 2rpx solid #FFDAD4;
+  border-radius: 999rpx;
+  padding: 22rpx 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+}
+
+/* 家长端主按钮（暖橙） */
+.btn-primary-parent {
+  background-color: #FF8C5A;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999rpx;
+  padding: 22rpx 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+  box-shadow: 0 10rpx 24rpx rgba(255, 140, 90, 0.20);
+}
+
+.btn-primary-parent:active {
+  background-color: #E87A4A;
+}
+
+/* 卡片 */
+.card {
+  background-color: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  margin: 20rpx 30rpx;
+  box-shadow: 0 10rpx 30rpx rgba(49, 64, 90, 0.08);
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
+}
+
+/* 标题 */
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  padding: 30rpx 30rpx 20rpx;
+  color: #2F3A4C;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  color: #2F3A4C;
+}
+
+/* 输入框 */
+.input-field {
+  background-color: #FFFFFF;
+  border-radius: 18rpx;
+  padding: 24rpx 30rpx;
+  font-size: 30rpx;
+  border: 2rpx solid #E7EAF2;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input-field:focus {
+  border-color: #5B7FFF;
+}
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  margin: 6rpx;
+}
+
+.tag-blue {
+  background-color: #EEF2FF;
+  color: #5B7FFF;
+}
+
+.tag-green {
+  background-color: #E7F8F3;
+  color: #22A587;
+}
+
+.tag-orange {
+  background-color: #FFF1E8;
+  color: #FF8C5A;
+}
+
+.tag-red {
+  background-color: #FFF1EF;
+  color: #D84A3A;
+}
+
+/* 加载 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 30rpx;
+  color: #7B8496;
+}
+
+.empty-image {
+  width: 260rpx;
+  height: 260rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-state text {
+  margin-top: 16rpx;
+  font-size: 28rpx;
+}
+
+.empty-desc {
+  font-size: 24rpx;
+  color: #B1B8C7;
+  margin-top: 8rpx;
+  max-width: 400rpx;
+  text-align: center;
+}
+
+/* 全局模态框遮罩 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}

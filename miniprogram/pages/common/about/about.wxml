@@ -1,0 +1,39 @@
+<view class="page">
+  <!-- Logo 区域 -->
+  <view class="logo-section">
+    <image class="logo-img" src="/images/logo-v2.png" mode="aspectFit"></image>
+    <text class="app-name">{{appName}}</text>
+    <text class="app-version">v{{version}}</text>
+  </view>
+
+  <!-- 机构信息 -->
+  <view class="section-card" wx:if="{{config}}">
+    <text class="card-title">🏫 {{config.school_name || '智慧托班'}}</text>
+    <view class="info-row" wx:if="{{config.welcome_message}}">
+      <text class="info-label">欢迎语</text>
+      <text class="info-value">{{config.welcome_message}}</text>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="section-card">
+    <view class="menu-row" bindtap="goPrivacy">
+      <text>隐私政策</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-row" bindtap="goTerms">
+      <text>用户协议</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-row" bindtap="contact">
+      <text>联系客服</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 底部信息 -->
+  <view class="footer-info">
+    <text class="footer-text">智慧托班管理系统</text>
+    <text class="footer-text">© 2026 All Rights Reserved</text>
+  </view>
+</view>

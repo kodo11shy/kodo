@@ -1,0 +1,245 @@
+.page { min-height: 100vh; background: #F7F8FC; padding-bottom: 40rpx; }
+
+/* ====== 档案总览头 ====== */
+.archive-header { margin: 30rpx; border-radius: 24rpx; overflow: hidden; box-shadow: 0 4rpx 20rpx rgba(90,50,140,0.12); }
+.archive-header-bg {
+  background: #5B7FFF;
+  padding: 36rpx 32rpx 28rpx;
+  color: #FFF;
+}
+.archive-title { font-size: 36rpx; font-weight: bold; display: block; }
+.archive-subtitle { font-size: 24rpx; opacity: 0.85; margin-top: 8rpx; display: block; }
+
+.archive-metrics {
+  display: flex;
+  background: #FFF;
+  padding: 20rpx 0;
+}
+.archive-metric {
+  flex: 1;
+  text-align: center;
+  border-right: 2rpx solid #F0EEF4;
+}
+.archive-metric:last-child { border-right: none; }
+.archive-metric.highlight { background: #F8F6FF; }
+.archive-metric-num { font-size: 34rpx; font-weight: bold; color: #333; display: block; }
+.archive-metric-label { font-size: 22rpx; color: #999; margin-top: 4rpx; display: block; }
+.archive-metric.highlight .archive-metric-num { color: #7C5CFC; }
+
+/* ====== 学生档案网格 ====== */
+.archive-grid { padding: 0 24rpx; }
+
+.archive-card {
+  background: #FFF;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+  position: relative;
+  transition: all 0.2s;
+}
+.archive-card:active { transform: scale(0.98); }
+
+/* 头像区 */
+.archive-card-top { display: flex; align-items: center; }
+.archive-avatar {
+  width: 80rpx; height: 80rpx;
+  border-radius: 50%;
+  color: #FFF;
+  text-align: center;
+  line-height: 80rpx;
+  font-size: 34rpx;
+  font-weight: bold;
+  flex-shrink: 0;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
+}
+.archive-name-group { margin-left: 20rpx; flex: 1; }
+.archive-name { font-size: 32rpx; font-weight: bold; color: #333; display: block; }
+.archive-grade { font-size: 24rpx; color: #999; margin-top: 4rpx; display: block; }
+.archive-arrow { color: #CCC; font-size: 36rpx; padding: 8rpx; }
+
+/* 数据指标行 */
+.archive-data-row {
+  display: flex;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid #F5F3F7;
+  gap: 8rpx;
+}
+.archive-data-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  background: #F8F6FF;
+  border-radius: 12rpx;
+  padding: 12rpx 4rpx;
+}
+.archive-data-icon { font-size: 28rpx; }
+.archive-data-info { text-align: center; }
+.archive-data-value { font-size: 28rpx; font-weight: bold; color: #333; display: block; }
+.archive-data-label { font-size: 20rpx; color: #999; display: block; margin-top: 2rpx; }
+
+/* 进步条 */
+.archive-progress { margin-top: 16rpx; }
+.progress-label { display: flex; justify-content: space-between; font-size: 22rpx; color: #999; margin-bottom: 8rpx; }
+.progress-pct { color: #7C5CFC; }
+.progress-track {
+  height: 10rpx;
+  background: #F0EEF4;
+  border-radius: 10rpx;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: #5B7FFF;
+  border-radius: 10rpx;
+  transition: width 0.3s;
+}
+
+/* 最新动态 */
+.archive-update {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 16rpx;
+  padding-top: 14rpx;
+  border-top: 2rpx solid #F5F3F7;
+}
+.update-icon { font-size: 24rpx; flex-shrink: 0; }
+.update-text { font-size: 24rpx; color: #666; line-height: 1.4; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.archive-update.muted .update-text { color: #CCC; }
+
+/* ====== 详情模式 ====== */
+.back-bar { padding: 20rpx 30rpx; }
+.back-btn { font-size: 28rpx; color: #7C5CFC; }
+
+.detail-hero {
+  display: flex;
+  align-items: center;
+  padding: 0 30rpx 20rpx;
+  gap: 20rpx;
+}
+.detail-avatar {
+  width: 96rpx; height: 96rpx;
+  border-radius: 50%;
+  color: #FFF;
+  text-align: center;
+  line-height: 96rpx;
+  font-size: 40rpx;
+  font-weight: bold;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.1);
+}
+.detail-hero-name { font-size: 36rpx; font-weight: bold; color: #333; display: block; }
+.detail-hero-grade { font-size: 26rpx; color: #999; margin-top: 4rpx; display: block; }
+
+.detail-metrics {
+  display: flex; gap: 16rpx;
+  margin: 0 30rpx 20rpx;
+}
+.detail-metric-item {
+  flex: 1;
+  background: #FFF;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+}
+.dm-value { font-size: 38rpx; font-weight: bold; color: #7C5CFC; display: block; }
+.dm-label { font-size: 22rpx; color: #999; margin-top: 4rpx; display: block; }
+
+.detail-remark-card {
+  background: linear-gradient(135deg, #F8F6FF, #FFF);
+  margin: 0 30rpx 20rpx;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  border: 2rpx solid #EDE8FF;
+}
+.dr-label { font-size: 24rpx; color: #7C5CFC; font-weight: bold; display: block; margin-bottom: 8rpx; }
+.dr-text { font-size: 28rpx; color: #555; line-height: 1.5; display: block; }
+
+.action-row { padding: 0 30rpx; margin-bottom: 20rpx; }
+.action-row .btn-primary { font-size: 28rpx; }
+
+/* 时间线 */
+.section-header { padding: 10rpx 30rpx; }
+.section-title { font-size: 28rpx; font-weight: bold; color: #333; }
+.timeline { padding: 0 30rpx 30rpx; position: relative; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 45rpx;
+  top: 0;
+  bottom: 0;
+  width: 4rpx;
+  background: #EDE8FF;
+}
+.timeline-item { display: flex; margin-bottom: 20rpx; }
+.timeline-dot {
+  width: 24rpx; height: 24rpx;
+  border-radius: 50%;
+  background: #7C5CFC;
+  border: 4rpx solid #EDE8FF;
+  margin-top: 28rpx;
+  flex-shrink: 0;
+  z-index: 1;
+}
+.timeline-card {
+  flex: 1;
+  background: #FFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-left: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+}
+.tl-header { display: flex; align-items: center; }
+.tl-icon { font-size: 32rpx; margin-right: 12rpx; }
+.tl-title { font-size: 28rpx; font-weight: bold; }
+.tl-desc { font-size: 26rpx; color: #666; margin-top: 10rpx; display: block; }
+.tl-score { margin-top: 8rpx; font-size: 24rpx; color: #666; }
+.score-num { color: #7C5CFC; font-weight: bold; }
+.tl-date { font-size: 22rpx; color: #BBB; margin-top: 8rpx; display: block; }
+
+/* ====== 评语弹窗 ====== */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: flex-end;
+  z-index: 100;
+}
+.modal-content {
+  background: #FFF;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 40rpx 30rpx;
+  width: 100%;
+}
+.modal-title { font-size: 34rpx; font-weight: bold; text-align: center; display: block; }
+.modal-student { font-size: 26rpx; color: #666; text-align: center; display: block; margin: 10rpx 0 20rpx; }
+.remark-textarea {
+  width: 100%; height: 200rpx;
+  background: #F8F8F8;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+.mood-selector { margin-top: 20rpx; }
+.mood-label { font-size: 26rpx; color: #666; display: block; margin-bottom: 12rpx; }
+.mood-options { display: flex; flex-wrap: wrap; gap: 12rpx; }
+.mood-tag {
+  padding: 12rpx 24rpx;
+  border-radius: 20rpx;
+  font-size: 26rpx;
+  background: #F5F5F5;
+  color: #666;
+}
+.mood-tag.active { background: #7C5CFC; color: #FFF; }
+.modal-actions { display: flex; gap: 20rpx; margin-top: 30rpx; }
+.modal-btn { flex: 1; }
+
+/* 空状态 */
+.empty-state { text-align: center; padding: 80rpx 30rpx; }
+.empty-title { font-size: 28rpx; color: #999; display: block; }
+.empty-desc { font-size: 24rpx; color: #CCC; margin-top: 8rpx; display: block; }
+.empty-image { width: 240rpx; height: 240rpx; }

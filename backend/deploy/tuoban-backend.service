@@ -1,0 +1,28 @@
+# 托班管理系统 - systemd 服务
+# ============================
+# 使用方法：
+#   sudo cp /opt/tuoban/backend/deploy/tuoban-backend.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now tuoban-backend
+#   sudo systemctl status tuoban-backend
+
+[Unit]
+Description=Tuoban Backend API
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/tuoban/backend
+EnvironmentFile=/opt/tuoban/backend/.env
+ExecStart=/opt/tuoban/backend/.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+Restart=always
+RestartSec=3
+
+# 日志管理
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,94 @@
+<view class="page">
+  <!-- ====== 总览卡片 ====== -->
+  <view class="overview-card">
+    <view class="overview-title">📊 今日作业总览</view>
+    <view class="overview-attendance">
+      <text class="ov-att-icon">👦</text>
+      <text class="ov-att-text" wx:if="{{attendanceCount > 0}}">今日在托 <text class="ov-att-num">{{attendanceCount}}</text> / <text class="ov-att-total">{{totalStudents}}</text> 人</text>
+      <text class="ov-att-text" wx:else>在读 <text class="ov-att-total">{{totalStudents}}</text> 人（尚未签到）</text>
+    </view>
+    <view class="ov-att-names" wx:if="{{attendanceNames}}">
+      <text>{{attendanceNames}}</text>
+    </view>
+    <view class="ov-att-empty" wx:elif="{{!loading}}">
+      <text>暂无签到记录，签到后显示在托人数</text>
+    </view>
+
+    <!-- 科目统计 -->
+    <view class="subject-grid" wx:if="{{subjectStats.length > 0}}">
+      <view class="subject-cell" wx:for="{{subjectStats}}" wx:key="subject">
+        <text class="subj-icon">{{item.icon}}</text>
+        <text class="subj-name">{{item.subject}}</text>
+        <text class="subj-total">{{item.total}}条</text>
+        <view class="subj-bar">
+          <view class="subj-bar-inner bar-pending" style="width: {{item.pendingWidth}}%"></view>
+          <view class="subj-bar-inner bar-graded" style="width: {{item.gradedWidth}}%"></view>
+          <view class="subj-bar-inner bar-done" style="width: {{item.doneWidth}}%"></view>
+        </view>
+        <view class="subj-legend">
+          <text class="legend-dot dot-pending"></text>待批{{item.pending}}
+          <text class="legend-dot dot-graded" wx:if="{{item.graded > 0}}"></text>已批{{item.graded}}
+          <text class="legend-dot dot-done" wx:if="{{item.done > 0}}"></text>完成{{item.done}}
+        </view>
+      </view>
+    </view>
+    <view class="ov-empty" wx:elif="{{!loading}}">
+      <text>暂无作业记录</text>
+    </view>
+  </view>
+
+  <!-- 状态说明提示条 -->
+  <view class="status-hint-bar" bindtap="toggleStatusHint">
+    <text class="hint-icon">❓</text>
+    <text class="hint-text">待批改 / 已批改 / 已完成 的区别？</text>
+  </view>
+  <view class="status-hint-detail" wx:if="{{showStatusHint}}">
+    <text class="hint-line"><text class="hint-emoji">⏳</text> 待批改 — 学生做完交上来了，你还没批</text>
+    <text class="hint-line"><text class="hint-emoji">✅</text> 已批改 — 你批完了，也给孩子讲了，孩子拿回去改了</text>
+    <text class="hint-line"><text class="hint-emoji">🎉</text> 已完成 — 孩子改完拿回来，你检查确认没问题了</text>
+  </view>
+
+  <!-- 状态筛选 tabs -->
+  <view class="tabs">
+    <view class="tab {{activeTab === 'all' ? 'active' : ''}}" bindtap="switchTab" data-tab="all">全部</view>
+    <view class="tab {{activeTab === '待批改' ? 'active' : ''}}" bindtap="switchTab" data-tab="待批改">待批改</view>
+    <view class="tab {{activeTab === '已批改' ? 'active' : ''}}" bindtap="switchTab" data-tab="已批改">已批改</view>
+    <view class="tab {{activeTab === '已完成' ? 'active' : ''}}" bindtap="switchTab" data-tab="已完成">已完成</view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="loading-container" wx:if="{{loading}}"><text>加载中...</text></view>
+
+  <view class="list" wx:else>
+    <view wx:if="{{filteredList.length === 0}}">
+      <view class="empty-state">
+        <text>暂无作业记录</text>
+      </view>
+    </view>
+
+    <view class="card" wx:for="{{filteredList}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+      <view class="card-top">
+        <view>
+          <text class="card-student">{{item.studentName}}</text>
+          <text class="card-subject">{{item.subject}}</text>
+        </view>
+        <text class="card-status tag-{{item.statusClass}}">{{item.statusLabel}}</text>
+      </view>
+      <view class="card-body">
+        <text class="card-meta">{{item.homeworkType}} · {{item.date}}</text>
+        <text class="card-score" wx:if="{{item.score}}">{{item.score}}/10分</text>
+      </view>
+      <view class="card-operator" wx:if="{{item.operatorInfo}}">
+        <text class="op-text">{{item.operatorInfo}}</text>
+      </view>
+      <view class="card-photos" wx:if="{{item.donePhotoThumbs.length > 0}}">
+        <image class="card-photo-thumb" wx:for="{{item.donePhotoThumbs}}" wx:key="id" src="{{item.url}}" mode="aspectFill"></image>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新建按钮 -->
+  <view class="create-bar">
+    <view class="create-btn" bindtap="goCreate">✏️ 新建作业</view>
+  </view>
+</view>

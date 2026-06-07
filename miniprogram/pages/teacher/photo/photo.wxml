@@ -1,0 +1,102 @@
+<!-- 拍照页（单张拍摄 + 批量本地上传） -->
+<view class="page">
+
+  <!-- ===== 单张拍照模式 ===== -->
+  <block wx:if="{{!batchMode}}">
+    <view class="photo-area">
+      <view class="preview-container" wx:if="{{photoPath}}">
+        <image class="preview-image" src="{{photoPath}}" mode="aspectFit"></image>
+        <view class="preview-actions">
+          <button class="btn-secondary" bindtap="retake">重拍</button>
+          <button class="btn-primary" bindtap="uploadPhoto">下一步</button>
+        </view>
+      </view>
+
+      <view class="camera-placeholder" wx:else>
+        <text class="camera-icon">📸</text>
+        <text class="camera-text">点击下方按钮拍照</text>
+        <text class="camera-desc">拍完后关联学生或存入照片库</text>
+      </view>
+    </view>
+
+    <view class="action-bar" wx:if="{{!photoPath}}">
+      <button class="btn-primary take-btn" bindtap="takePhoto">
+        <text class="take-icon">📷</text>
+        拍照
+      </button>
+      <button class="btn-secondary album-btn" bindtap="chooseFromAlbum">
+        🖼️ 从相册选择
+      </button>
+    </view>
+
+    <!-- 批量上传入口 -->
+    <view class="batch-entry" wx:if="{{!photoPath}}">
+      <view class="batch-divider">
+        <text class="batch-divider-text">批量处理</text>
+      </view>
+      <button class="btn-outline batch-upload-btn" bindtap="batchUpload">
+        📤 本地上传（批量）
+      </button>
+      <text class="batch-hint">从相册选择最多9张，上传后到照片库统一处理</text>
+    </view>
+
+    <!-- 上传进度 -->
+    <view class="upload-progress" wx:if="{{uploading}}">
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{uploadProgress}}%;"></view>
+      </view>
+      <text class="progress-text">上传中... {{uploadProgress}}%</text>
+    </view>
+  </block>
+
+  <!-- ===== 批量本地上传模式 ===== -->
+  <block wx:if="{{batchMode}}">
+    <view class="batch-page">
+      <view class="batch-header">
+        <text class="batch-title">📤 本地上传</text>
+        <text class="batch-count">已选 {{selectedPhotos.length}} 张</text>
+      </view>
+
+      <!-- 缩略图网格 -->
+      <view class="batch-grid">
+        <view class="batch-grid-item" wx:for="{{selectedPhotos}}" wx:key="id" data-index="{{index}}">
+          <image class="batch-thumb" src="{{item.path}}" mode="aspectFill"></image>
+          <view class="batch-thumb-overlay" wx:if="{{item.uploaded}}">
+            <text class="batch-thumb-check">✓</text>
+          </view>
+          <view class="batch-remove-btn" bindtap="removeSelected" data-index="{{index}}" wx:if="{{!batchUploading}}">
+            <text>✕</text>
+          </view>
+        </view>
+
+        <!-- 添加更多 -->
+        <view class="batch-grid-item batch-add-more" bindtap="batchUpload" wx:if="{{!batchUploading && selectedPhotos.length < 9}}">
+          <text class="batch-add-icon">+</text>
+        </view>
+      </view>
+
+      <!-- 上传进度 -->
+      <view class="batch-progress-area" wx:if="{{batchUploading}}">
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: {{batchProgress}}%;"></view>
+        </view>
+        <text class="batch-progress-text">{{batchStatusText}}</text>
+      </view>
+
+      <!-- 完成状态 -->
+      <view class="batch-done" wx:if="{{uploadResults.length > 0 && !batchUploading}}">
+        <text class="batch-done-text">✅ {{uploadResults.length}} 张已上传到照片库</text>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="batch-actions">
+        <button class="btn-primary batch-action-btn" bindtap="doBatchUpload" disabled="{{batchUploading || selectedPhotos.length === 0}}">
+          {{batchUploading ? '上传中...' : '🚀 上传全部到照片库'}}
+        </button>
+        <button class="btn-secondary batch-action-btn" bindtap="cancelBatch" wx:if="{{!batchUploading}}">
+          取消
+        </button>
+      </view>
+    </view>
+  </block>
+</view>

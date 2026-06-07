@@ -1,0 +1,38 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/teacher/login/login",
+    "pages/teacher/dashboard/dashboard",
+    "pages/teacher/attendance/attendance",
+    "pages/teacher/photo/photo",
+    "pages/teacher/photolib/photolib",
+    "pages/teacher/student-picker/student-picker",
+    "pages/teacher/homework/list/homework-list",
+    "pages/teacher/homework/create/homework-create",
+    "pages/teacher/homework/detail/homework-detail",
+    "pages/teacher/student-list/student-list",
+    "pages/teacher/student-detail/student-detail",
+    "pages/parent/login/login",
+    "pages/parent/dashboard/dashboard",
+    "pages/parent/growth/growth",
+    "pages/parent/homework/homework",
+    "pages/teacher/growth/growth",
+    "pages/teacher/payment/payment",
+    "pages/teacher/meal/meal",
+    "pages/teacher/notices/notices",
+    "pages/teacher/settings/settings",
+    "pages/parent/photos/photos",
+    "pages/common/webview/webview",
+    "pages/common/about/about",
+    "pages/teacher/admin/admin"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#4A90D9",
+    "navigationBarTitleText": "智慧托班",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F5F5"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

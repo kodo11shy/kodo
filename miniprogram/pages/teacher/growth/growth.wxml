@@ -1,0 +1,196 @@
+<view class="page">
+
+  <!-- 总览模式 -->
+  <block wx:if="{{!showDetail}}">
+
+    <!-- 班级档案总览头 -->
+    <view class="archive-header">
+      <view class="archive-header-bg">
+        <text class="archive-title">📁 成长档案</text>
+        <text class="archive-subtitle">{{studentCount}} 名孩子的成长记录</text>
+      </view>
+      <view class="archive-metrics">
+        <view class="archive-metric">
+          <text class="archive-metric-num">{{totalHomework}}</text>
+          <text class="archive-metric-label">本月作业</text>
+        </view>
+        <view class="archive-metric">
+          <text class="archive-metric-num">{{totalRemarks}}</text>
+          <text class="archive-metric-label">老师评语</text>
+        </view>
+        <view class="archive-metric">
+          <text class="archive-metric-num">{{avgScore}}</text>
+          <text class="archive-metric-label">平均分</text>
+        </view>
+        <view class="archive-metric highlight">
+          <text class="archive-metric-num">{{studentCount}}</text>
+          <text class="archive-metric-label">在册学生</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载 -->
+    <view class="loading-container" wx:if="{{loading}}"><text>加载中...</text></view>
+
+    <!-- 学生档案网格 -->
+    <view class="archive-grid" wx:if="{{!loading && studentsWithGrowth.length > 0}}">
+
+      <view class="archive-card" wx:for="{{studentsWithGrowth}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+        <!-- 头像区 -->
+        <view class="archive-card-top">
+          <view class="archive-avatar" style="background: {{item.avatarColor}}">{{item.initial}}</view>
+          <view class="archive-name-group">
+            <text class="archive-name">{{item.name}}</text>
+            <text class="archive-grade">{{item.detailText}}</text>
+          </view>
+          <text class="archive-arrow">›</text>
+        </view>
+
+        <!-- 数据指标 -->
+        <view class="archive-data-row">
+          <view class="archive-data-item">
+            <text class="archive-data-icon">📚</text>
+            <view class="archive-data-info">
+              <text class="archive-data-value">{{item.hwCount}}</text>
+              <text class="archive-data-label">作业</text>
+            </view>
+          </view>
+          <view class="archive-data-item">
+            <text class="archive-data-icon">📝</text>
+            <view class="archive-data-info">
+              <text class="archive-data-value">{{item.rmCount}}</text>
+              <text class="archive-data-label">评语</text>
+            </view>
+          </view>
+          <view class="archive-data-item">
+            <text class="archive-data-icon">📅</text>
+            <view class="archive-data-info">
+              <text class="archive-data-value">{{item.attendedDays}}</text>
+              <text class="archive-data-label">出勤</text>
+            </view>
+          </view>
+          <view class="archive-data-item">
+            <text class="archive-data-icon">⭐</text>
+            <view class="archive-data-info">
+              <text class="archive-data-value">{{item.avgScoreStr}}</text>
+              <text class="archive-data-label">均分</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 进步条 -->
+        <view class="archive-progress">
+          <view class="progress-label">
+            <text>本月出勤</text>
+            <text class="progress-pct">{{item.attendedDays}}/22天</text>
+          </view>
+          <view class="progress-track">
+            <view class="progress-bar" style="width: {{item.attendedPct}}%"></view>
+          </view>
+        </view>
+
+        <!-- 最新动态 -->
+        <view class="archive-update" wx:if="{{item.latestRemark}}">
+          <text class="update-icon">💬</text>
+          <text class="update-text">{{item.latestRemark}}</text>
+        </view>
+        <view class="archive-update muted" wx:else>
+          <text class="update-icon">📌</text>
+          <text class="update-text">暂无最近动态</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && studentsWithGrowth.length === 0}}">
+      <image class="empty-image" src="/images/empty-students-v2.png" mode="aspectFit"></image>
+      <text class="empty-title">还没有成长档案</text>
+      <text class="empty-desc">学生签到、写作业、写评语后，档案会自动丰富起来</text>
+    </view>
+  </block>
+
+  <!-- 学生详情模式 -->
+  <block wx:if="{{showDetail}}">
+    <view class="back-bar" bindtap="backToList">
+      <text class="back-btn">‹ 返回档案总览</text>
+    </view>
+
+    <view class="detail-hero">
+      <view class="detail-avatar" style="background: {{selectedStudent.avatarColor}}">{{selectedStudent.initial}}</view>
+      <view class="detail-hero-info">
+        <text class="detail-hero-name">{{selectedStudent.name}}</text>
+        <text class="detail-hero-grade">{{selectedStudent.detailText}}</text>
+      </view>
+    </view>
+
+    <view class="detail-metrics">
+      <view class="detail-metric-item">
+        <text class="dm-value">{{attendedDays}}</text>
+        <text class="dm-label">出勤天数</text>
+      </view>
+      <view class="detail-metric-item">
+        <text class="dm-value">{{homeworkCount}}</text>
+        <text class="dm-label">本月作业</text>
+      </view>
+      <view class="detail-metric-item">
+        <text class="dm-value">{{remarkCount}}</text>
+        <text class="dm-label">评语数</text>
+      </view>
+    </view>
+
+    <view class="detail-remark-card" wx:if="{{overview && overview.latest_remark}}">
+      <text class="dr-label">💬 最新评语</text>
+      <text class="dr-text">{{overview.latest_remark}}</text>
+    </view>
+
+    <view class="action-row">
+      <button class="btn-primary" bindtap="openRemark">✏️ 写评语</button>
+    </view>
+
+    <view class="section-header">
+      <text class="section-title">📋 成长时间线</text>
+    </view>
+
+    <view class="timeline" wx:if="{{timeline.length > 0}}">
+      <view class="timeline-item" wx:for="{{timeline}}" wx:key="index">
+        <view class="timeline-dot"></view>
+        <view class="timeline-card">
+          <view class="tl-header">
+            <text class="tl-icon">{{item.icon}}</text>
+            <text class="tl-title">{{item.displayTitle}}</text>
+          </view>
+          <text class="tl-desc" wx:if="{{item.description}}">{{item.description}}</text>
+          <view class="tl-score" wx:if="{{item.score != null}}">
+            <text>评分 <text class="score-num">{{item.score}}/10</text></text>
+          </view>
+          <text class="tl-date">{{item.date}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:else>
+      <image class="empty-image" src="/images/empty-notices-v2.png" mode="aspectFit"></image>
+      <text>暂无成长记录</text>
+      <text class="empty-desc">写评语后，记录会出现在时间线中</text>
+    </view>
+  </block>
+
+  <!-- 评语弹窗（保持原有逻辑不变） -->
+  <view class="modal-overlay" wx:if="{{showRemarkInput}}" bindtap="closeRemark">
+    <view class="modal-content" catchtap="nop">
+      <text class="modal-title">✏️ 写评语</text>
+      <text class="modal-student" wx:if="{{selectedStudent}}">学生：{{selectedStudent.name}}</text>
+      <textarea class="remark-textarea" placeholder="记录孩子今天表现..." value="{{remarkContent}}" bindinput="onRemarkInput" maxlength="500" />
+      <view class="mood-selector">
+        <text class="mood-label">心情标签</text>
+        <view class="mood-options">
+          <view class="mood-tag {{item.className}}" wx:for="{{moodOptions}}" wx:key="mood" bindtap="selectMood" data-mood="{{item.mood}}">{{item.label}}</view>
+        </view>
+      </view>
+      <view class="modal-actions">
+        <button class="btn-secondary modal-btn" bindtap="closeRemark">取消</button>
+        <button class="btn-primary modal-btn" bindtap="submitRemark" loading="{{submitting}}" disabled="{{remarkSubmitDisabled}}">保存评语</button>
+      </view>
+    </view>
+  </view>
+</view>

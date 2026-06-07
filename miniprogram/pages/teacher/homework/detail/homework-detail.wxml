@@ -1,0 +1,106 @@
+<view class="page">
+  <view wx:if="{{!homework}}">
+    <view class="loading-container"><text>加载中...</text></view>
+  </view>
+  <view wx:else>
+    <view class="header-card">
+      <view class="header-top">
+        <text class="student-name">{{studentNameDisplay}}</text>
+        <text class="status-tag tag-{{statusClass}}">{{statusText}}</text>
+      </view>
+      <view class="header-meta">
+        <text>{{homeworkMetaText}}</text>
+        <text>{{homework.date}}</text>
+      </view>
+      <view class="header-score" wx:if="{{homework.score}}">
+        <text class="score-num">{{homework.score}}</text>
+        <text class="score-label">/ 10分</text>
+      </view>
+
+      <!-- 操作人信息 -->
+      <view class="audit-row" wx:if="{{auditVisible}}">
+        <text class="audit-line" wx:if="{{recordedByName}}">📸 提交：{{recordedByName}}</text>
+        <text class="audit-line" wx:if="{{gradedByName}}">✅ 批改：{{gradedByName}}<text wx:if="{{gradedAt}}" class="audit-time"> {{gradedAt}}</text></text>
+        <text class="audit-line" wx:if="{{correctedByName}}">🎉 改错：{{correctedByName}}<text wx:if="{{correctedAt}}" class="audit-time"> {{correctedAt}}</text></text>
+      </view>
+    </view>
+
+    <view class="step-section">
+      <view class="step-header">
+        <text class="step-num">①</text>
+        <text class="step-title">做完</text>
+        <text class="step-status done-status">✅ 已完成</text>
+      </view>
+      <view class="photo-scroll" wx:if="{{donePhotos.length > 0}}">
+        <image class="photo-thumb" wx:for="{{donePhotos}}" wx:key="id" src="{{item.url}}" mode="aspectFill" bindtap="previewPhotos" data-list="{{donePhotos}}" data-index="{{index}}"></image>
+      </view>
+    </view>
+
+    <view class="step-section">
+      <view class="step-header">
+        <text class="step-num">②</text>
+        <text class="step-title">批改</text>
+        <text class="step-status {{gradeStatusClass}}">{{gradeStatusText}}</text>
+      </view>
+      <view class="photo-scroll" wx:if="{{gradedPhotos.length > 0}}">
+        <image class="photo-thumb" wx:for="{{gradedPhotos}}" wx:key="id" src="{{item.url}}" mode="aspectFill" bindtap="previewPhotos" data-list="{{gradedPhotos}}" data-index="{{index}}"></image>
+      </view>
+      <view class="grade-form" wx:if="{{homework.status === '待批改'}}">
+        <view class="form-row">
+          <text class="form-label">评分（1-10）</text>
+          <view class="score-picker">
+            <view class="score-star {{item.active ? 'active' : ''}}" wx:for="{{scoreOptions}}" wx:key="value" bindtap="setScore" data-score="{{item.value}}">⭐</view>
+          </view>
+        </view>
+        <view class="form-row">
+          <text class="form-label">错题数</text>
+          <view class="error-input">
+            <text class="num-btn" bindtap="adjustError" data-delta="-1">−</text>
+            <text class="num-value">{{errorCount}}</text>
+            <text class="num-btn" bindtap="adjustError" data-delta="1">+</text>
+          </view>
+        </view>
+        <view class="photo-grid">
+          <view class="photo-cell" wx:for="{{gradePhotos}}" wx:key="index">
+            <image class="photo-thumb" src="{{item}}" mode="aspectFill"></image>
+            <text class="photo-del" bindtap="removeGradePhoto" data-index="{{index}}">✕</text>
+          </view>
+          <view class="photo-cell photo-add" wx:if="{{gradePhotos.length < 9}}" bindtap="addGradePhoto">+</view>
+        </view>
+        <view class="form-row">
+          <textarea class="textarea-field" placeholder="批改备注（选填）" value="{{gradeRemark}}" bindinput="onGradeRemarkInput" maxlength="200" />
+        </view>
+        <button class="btn-primary grade-btn" bindtap="submitGrade" disabled="{{!gradeCanSubmit}}">{{gradeSubmitText}}</button>
+      </view>
+      <view class="remark-text" wx:if="{{homework.status !== '待批改' && homework.remark}}"><text>{{homework.remark}}</text></view>
+    </view>
+
+    <view class="step-section" wx:if="{{homework.status !== '待批改'}}">
+      <view class="step-header">
+        <text class="step-num">③</text>
+        <text class="step-title">改错</text>
+        <text class="step-status {{correctStatusClass}}">{{correctStatusText}}</text>
+      </view>
+      <view class="photo-scroll" wx:if="{{correctedPhotos.length > 0}}">
+        <image class="photo-thumb" wx:for="{{correctedPhotos}}" wx:key="id" src="{{item.url}}" mode="aspectFill" bindtap="previewPhotos" data-list="{{correctedPhotos}}" data-index="{{index}}"></image>
+      </view>
+      <view class="grade-form" wx:if="{{homework.status === '已批改'}}">
+        <view class="photo-grid">
+          <view class="photo-cell" wx:for="{{correctPhotos}}" wx:key="index">
+            <image class="photo-thumb" src="{{item}}" mode="aspectFill"></image>
+            <text class="photo-del" bindtap="removeCorrectPhoto" data-index="{{index}}">✕</text>
+          </view>
+          <view class="photo-cell photo-add" wx:if="{{correctPhotos.length < 9}}" bindtap="addCorrectPhoto">+</view>
+        </view>
+        <view class="form-row">
+          <textarea class="textarea-field" placeholder="改错备注（选填）" value="{{correctRemark}}" bindinput="onCorrectRemarkInput" maxlength="200" />
+        </view>
+        <button class="btn-primary grade-btn" bindtap="submitCorrect" disabled="{{!correctCanSubmit}}">{{correctSubmitText}}</button>
+      </view>
+    </view>
+
+    <view class="bottom-bar" wx:if="{{homework.status === '已完成'}}">
+      <button class="btn-secondary" bindtap="goBackToList">返回列表</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,121 @@
+<!-- 老师工作台 v2 -->
+<view class="page-teacher page">
+  <!-- 背景装饰 -->
+  <view class="bg-accent"></view>
+
+  <!-- 顶部区域 -->
+  <view class="dash-header">
+    <view class="header-top">
+      <view class="header-info">
+        <text class="greeting">{{greeting}}，{{teacherName}}</text>
+        <text class="date-text">{{dateStr}}</text>
+      </view>
+      <view class="logout-btn" bindtap="doLogout">退出</view>
+    </view>
+    <view class="header-stats" bindtap="goAttendance">
+      <view class="stat-item">
+        <text class="stat-num">{{attendedCount}}</text>
+        <text class="stat-label">已签到</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">{{totalCount}}</text>
+        <text class="stat-label">总人数</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num stat-rate">{{attendanceRate}}%</text>
+        <text class="stat-label">出勤率</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 九宫格菜单 -->
+  <view class="grid-menu">
+    <view class="grid-item" bindtap="goPhoto">
+      <view class="grid-icon-wrap icon-camera-bg">
+        <image class="grid-icon" src="/images/icons/icon-camera.png" mode="aspectFit"></image>
+      </view>
+      <text class="grid-label">拍照</text>
+    </view>
+    <view class="grid-item" bindtap="goPhotoLib">
+      <view class="grid-icon-wrap icon-photolib-bg">
+        <text class="grid-icon-emoji">🖼️</text>
+      </view>
+      <text class="grid-label">照片库</text>
+    </view>
+    <view class="grid-item" bindtap="goAttendance">
+      <view class="grid-icon-wrap icon-checkin-bg">
+        <image class="grid-icon" src="/images/icons/icon-checkin.png" mode="aspectFit"></image>
+      </view>
+      <text class="grid-label">签到签退</text>
+    </view>
+    <view class="grid-item" bindtap="goHomework">
+      <view class="grid-icon-wrap icon-homework-bg">
+        <image class="grid-icon" src="/images/icons/icon-homework.png" mode="aspectFit"></image>
+      </view>
+      <text class="grid-label">作业</text>
+    </view>
+    <view class="grid-item" bindtap="goGrowth">
+      <view class="grid-icon-wrap icon-growth-bg">
+        <image class="grid-icon" src="/images/icons/icon-growth.png" mode="aspectFit"></image>
+      </view>
+      <text class="grid-label">成长档案</text>
+    </view>
+    <view class="grid-item" bindtap="goMeal">
+      <view class="grid-icon-wrap icon-meal-bg">
+        <image class="grid-icon" src="/images/icons/icon-meal.png" mode="aspectFit"></image>
+      </view>
+      <text class="grid-label">餐食</text>
+    </view>
+    <view class="grid-item" bindtap="goStudents">
+      <view class="grid-icon-wrap icon-students-bg">
+        <image class="grid-icon" src="/images/icons/icon-students.png" mode="aspectFit"></image>
+      </view>
+      <text class="grid-label">学生管理</text>
+    </view>
+    <view class="grid-item" bindtap="goPayment">
+      <view class="grid-icon-wrap icon-payment-bg">
+        <image class="grid-icon" src="/images/icons/icon-payment.png" mode="aspectFit"></image>
+      </view>
+      <text class="grid-label">收费</text>
+    </view>
+    <view class="grid-item" bindtap="goNotices">
+      <view class="grid-icon-wrap icon-notice-bg">
+        <image class="grid-icon" src="/images/icons/icon-notice.png" mode="aspectFit"></image>
+      </view>
+      <text class="grid-label">通知</text>
+    </view>
+    <view class="grid-item" bindtap="goSettings">
+      <view class="grid-icon-wrap icon-settings-bg">
+        <image class="grid-icon" src="/images/icons/icon-settings.png" mode="aspectFit"></image>
+      </view>
+      <text class="grid-label">设置</text>
+    </view>
+    <view class="grid-item" wx:if="{{isAdmin}}" bindtap="goAdmin">
+      <view class="grid-icon-wrap icon-admin-bg">
+        <image class="grid-icon" src="/images/icons/icon-settings.png" mode="aspectFit"></image>
+      </view>
+      <text class="grid-label">系统管理</text>
+      <text class="admin-badge">管理员</text>
+    </view>
+  </view>
+
+  <!-- 今日动态 -->
+  <view class="section-card">
+    <view class="section-head">
+      <text class="section-title">今日动态</text>
+      <text class="section-count" wx:if="{{recentActivities.length > 0}}">{{recentActivities.length}} 条</text>
+    </view>
+    <view class="dynamic-list">
+      <view class="dynamic-item" wx:for="{{recentActivities}}" wx:key="index">
+        <view class="dynamic-dot"></view>
+        <text class="dynamic-time">{{item.time}}</text>
+        <text class="dynamic-text">{{item.text}}</text>
+      </view>
+      <view class="empty-state-mini" wx:if="{{recentActivities.length === 0}}">
+        <text>暂无今日动态</text>
+      </view>
+    </view>
+  </view>
+</view>
