@@ -10880,3 +10880,53 @@ git push
 ```
 
 Obsidian 目录仍可保留为历史资料和联系单所在地，但代码开发主线应逐步迁到 GitHub 工作目录。
+
+---
+
+## Round 84：Claude Code 完成联系单剩余杂项 + GitHub 迁移扫尾
+
+**时间**：2026-06-08
+**执行方**：Claude Code
+**主题**：接手联系单中 GitHub 迁移的扫尾工作和清理任务
+
+### 已完成
+
+1. **GitHub CLI 登录成功**
+   - 修复代理问题：Clash Verge 监听端口为 7897（非默认 7890）
+   - 设 `HTTP_PROXY` / `HTTPS_PROXY` 后 `gh auth login --web` 成功
+   - 已登录账号 `kodo11shy`，scope 含 `repo` 权限
+
+2. **仓库目录整理**
+   - 文件夹名从 `kodo` → `托班智慧管理系统开发`
+   - 所有 `.md` 文档从根目录搬入 `docs/`（`git mv` 保留历史）
+   - `Codex-Claude协作联系单` 强制加入版本控制（虽在 `.gitignore` 中）
+   - 已提交并推送：`aefa6ca 项目整理：文档搬进 docs/，索引文件就绪，联系单入库`
+
+3. **清理 Obsidian 旧代码目录（按联系单要求）**
+   - `石不语札记/01 - 工作/托班管理系统/` → 全目录删除（代码已在 git repo）
+   - `石不语札记/01 - 工作/backend/` → 删除（空目录）
+   - `CC.pem` → 删除（敏感文件）
+   - `sync-conflict-*` → 删除（临时文件）
+   - `03 - 工具/石不语与AI/会话日志/` → 合并到 vault 根目录的会话日志
+
+4. **Obisidian 索引文件已建好**
+   - `01 - 工作/README.md` — 项目索引，指向 `E:\projects\` 各项目位置
+   - `01 - 工作/项目总览.md` — 个人导航页，含项目状态与 GitHub 链接
+
+5. **AI企业级知识库搭建项目搬迁**
+   - 从 `Obsidian/01 - 工作/工程咨询/AI企业级知识库搭建/` 复制到 `E:\projects\AI企业级知识库搭建/`
+
+### 当前状态
+
+```text
+E:\projects\
+├── 托班智慧管理系统开发\    ← 主项目（GitHub: kodo11shy/kodo）
+└── AI企业级知识库搭建\      ← 知识库方案项目
+```
+
+### 未完成/仍需后续跟进
+
+- 生产部署（等待 Hermes 回复域名和 SSH 信息）
+- AI 知识库项目中 `01-标书生成系统` 需填 API Key 后全功能验证（交接看板 H-001）
+
+*Claude Code 2026-06-08*
