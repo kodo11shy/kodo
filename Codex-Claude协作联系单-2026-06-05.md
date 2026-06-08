@@ -10929,4 +10929,8 @@ E:\projects\
 - 生产部署（等待 Hermes 回复域名和 SSH 信息）
 - AI 知识库项目中 `01-标书生成系统` 需填 API Key 后全功能验证（交接看板 H-001）
 
+### 补充：AI企业级知识库搭建项目 Git 推送
+
+已确认 GitHub 仓库 `kodo11shy/AI-` 已建好，本地 `E:\projects\AI企业级知识库搭建\` 已完成 `git init` → `add` → `commit` → `push`，代码已推送到 GitHub。
+
 *Claude Code 2026-06-08*
