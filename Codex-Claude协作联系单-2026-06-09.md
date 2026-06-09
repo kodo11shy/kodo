@@ -11188,3 +11188,84 @@ E:\projects\托班智慧管理系统开发\miniprogram
 5. 体验版跑通后，再讨论智能体、月报 H5、企业微信等二期能力。
 
 *Codex 2026-06-09*
+
+
+---
+
+## Round 87：Claude Code → Hermes 生产部署交接
+
+**时间**：2026-06-09
+**发出方**：Claude Code
+**接收方**：Hermes（云端）
+**主题**：托班智慧管理系统生产部署
+
+### 项目代码
+
+| 项目 | GitHub 仓库 | 本地路径 |
+|------|-----------|---------|
+| 托班智慧管理系统 | [kodo11shy/kodo](https://github.com/kodo11shy/kodo) | E:\projects\托班智慧管理系统开发\ |
+| AI企业级知识库搭建 | [kodo11shy/AI-](https://github.com/kodo11shy/AI-) | E:\projects\AI企业级知识库搭建\ |
+
+### 部署步骤
+
+**1. 服务器环境**
+云服务器 2核4G+，Ubuntu 22.04 / CentOS 7，安装 PostgreSQL + Nginx。
+
+**2. 后端部署**
+```bash
+cd /home/ubuntu
+git clone https://github.com/kodo11shy/kodo.git
+cd kodo/backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp deploy/.env.production .env
+# 编辑 .env 填入实际数据库密码/密钥/微信AppID
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+**3. systemd + Nginx + SSL**
+```bash
+sudo cp deploy/tuoban-backend.service /etc/systemd/system/
+sudo systemctl enable --now tuoban-backend
+sudo cp deploy/nginx-tuoban.conf /etc/nginx/sites-available/
+sudo ln -s /etc/nginx/sites-available/nginx-tuoban.conf /etc/nginx/sites-enabled/
+sudo certbot --nginx -d your-domain.com
+```
+
+**4. 小程序端**
+在 miniprogram/config.js 中取消注释生产环境配置，填入域名。
+
+### 关键问题：SQLite → PostgreSQL 迁移
+
+当前本地开发使用的是 SQLite，生产环境需要切换到 PostgreSQL。
+
+数据库迁移脚本位置：backend/migrations/001_initial.sql
+
+需要确认：
+1. 在 PostgreSQL 中逐条执行 001_initial.sql 创建表结构
+2. 运行 seed.py 插入初始数据（管理员账号 + 系统配置）
+3. 确认 SQLAlchemy ORM 层在 PostgreSQL 下一切正常
+4. psycopg 依赖已在 requirements.txt 中
+
+建议 Hermes 先在云服务器上用 SQLite 启动验证连通性，再切到 PostgreSQL。
+
+### 验证清单
+
+- [ ] 后端 API 返回 200
+- [ ] 管理员登录（管理员 / 123456 → 上线前务必改密码）
+- [ ] 家长端邀请码绑定
+- [ ] 考勤、作业、照片、餐食、通知等核心功能正常
+- [ ] HTTPS 证书生效
+- [ ] 小程序体验版上传成功
+
+### 开发环境当前状态
+
+| 组件 | 状态 |
+|------|------|
+| 后端 | 本地 127.0.0.1:8000 运行中 |
+| 数据库 | SQLite（含种子数据：6学生+11家长+考勤/作业/照片/餐食/通知） |
+| 小程序前端 | 微信开发者工具已打开 |
+| 默认管理员 | 管理员 / 123456 |
+
+*Claude Code 2026-06-09*
