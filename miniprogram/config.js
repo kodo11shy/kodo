@@ -11,19 +11,11 @@
  */
 const config = {
 
-  // -------- 开发环境（本机局域网） --------
-  apiBase: 'http://192.168.1.8:8000/api',
-  apiOrigin: 'http://192.168.1.8:8000',
-  apiFallbackBase: 'http://127.0.0.1:8000/api',
-  apiFallbackOrigin: 'http://127.0.0.1:8000',
-
   // -------- 生产环境（云服务器） --------
-  // 部署时取消注释下面两行，注释掉上面的开发配置
-  // apiBase: 'https://your-domain.com/api',
-  // apiOrigin: 'https://your-domain.com',
-  // fallback 可不配或配为同一地址
-  // apiFallbackBase: '',
-  // apiFallbackOrigin: '',
+  apiBase: 'https://ccrong.cloud/api',
+  apiOrigin: 'https://ccrong.cloud',
+  apiFallbackBase: 'https://ccrong.cloud/api',
+  apiFallbackOrigin: 'https://ccrong.cloud',
 
 }
 
