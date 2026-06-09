@@ -27,7 +27,7 @@
   "appid": "wxbade5ea9b2fce5db",
   "projectname": "智慧托班管理系统",
   "compileType": "miniprogram",
-  "libVersion": "2.19.6",
+  "libVersion": "3.16.1",
   "miniprogramRoot": ".",
   "packOptions": {
     "ignore": [],

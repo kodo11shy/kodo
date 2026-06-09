@@ -12,10 +12,10 @@
 const config = {
 
   // -------- 开发环境（本机局域网） --------
-  apiBase: 'http://192.168.1.8:8001/api',
-  apiOrigin: 'http://192.168.1.8:8001',
-  apiFallbackBase: 'http://127.0.0.1:8001/api',
-  apiFallbackOrigin: 'http://127.0.0.1:8001',
+  apiBase: 'http://192.168.1.8:8000/api',
+  apiOrigin: 'http://192.168.1.8:8000',
+  apiFallbackBase: 'http://127.0.0.1:8000/api',
+  apiFallbackOrigin: 'http://127.0.0.1:8000',
 
   // -------- 生产环境（云服务器） --------
   // 部署时取消注释下面两行，注释掉上面的开发配置
