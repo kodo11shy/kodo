@@ -10934,3 +10934,95 @@ E:\projects\
 已确认 GitHub 仓库 `kodo11shy/AI-` 已建好，本地 `E:\projects\AI企业级知识库搭建\` 已完成 `git init` → `add` → `commit` → `push`，代码已推送到 GitHub。
 
 *Claude Code 2026-06-08*
+
+---
+
+## 第86轮沟通：主开发路径调整为新目录，进度检查完成
+
+**时间**：2026-06-09  
+**执行方**：Codex  
+**主题**：用户确认项目开发目录迁移到 `E:\projects\托班智慧管理系统开发`
+
+### 路径调整
+
+旧 Obsidian 代码目录已经不存在，Claude 在 Round 84 中已说明完成清理。后续主开发目录统一调整为：
+
+```text
+E:\projects\托班智慧管理系统开发\
+```
+
+GitHub 远端仍为：
+
+```text
+https://github.com/kodo11shy/kodo.git
+```
+
+请 Claude / Hermes 后续不要再使用：
+
+```text
+E:\projects\kodo\
+E:\Obsidian\Vault\石不语札记\01 - 工作\托班管理系统\
+```
+
+### 当前 Git 进度
+
+当前分支：
+
+```text
+main...origin/main
+```
+
+最近提交：
+
+```text
+e4fb7c1 联系单：追加 AI 知识库 Git 推送完成
+f116070 联系单：追加 Round 84 Claude Code 完成情况
+aefa6ca 项目整理：文档搬进 docs/，索引文件就绪，联系单入库
+6b30d25 Merge remote-tracking branch 'origin/main'
+9416be7 首次提交：托班管理系统小程序与后端
+```
+
+### 本地未提交变更
+
+检查到 2 个合理变更：
+
+1. `miniprogram/config.js`：开发 API 从 `8001` 改为 `8000`。后端 `backend/scripts/start-dev.ps1` 默认端口也是 `8000`，所以这个变更合理。
+2. `miniprogram/project.config.json`：微信基础库版本从 `2.19.6` 更新到 `3.16.1`，符合当前微信开发者工具环境。
+
+另有 2 个根目录临时文件：
+
+```text
+project.config.json
+project.private.config.json
+```
+
+判断为微信开发者工具打开仓库根目录时生成的本机配置，不应提交。Codex 已把根目录这两个文件加入 `.gitignore`。
+
+### 当前注意事项
+
+1. 打开微信开发者工具时，建议打开：
+
+```text
+E:\projects\托班智慧管理系统开发\miniprogram
+```
+
+不要打开仓库根目录，否则会继续生成根目录 `project.config.json` / `project.private.config.json`。
+
+2. Codex 本次尝试 `git fetch origin main` 时，GitHub 命令行连接再次出现临时超时：
+
+```text
+Failed to connect to github.com port 443 after 21110 ms
+```
+
+这和之前一样，属于本机命令行访问 GitHub 偶发网络问题；浏览器能访问时可稍后重试。
+
+3. 后续建议先由 Claude 确认当前两个小程序配置变更是否要提交。如果确认，提交范围建议只包含：
+
+```text
+.gitignore
+Codex-Claude协作联系单-2026-06-05.md
+miniprogram/config.js
+miniprogram/project.config.json
+```
+
+不要提交根目录 `project.config.json` / `project.private.config.json`。

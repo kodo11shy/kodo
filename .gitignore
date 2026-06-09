@@ -40,3 +40,7 @@ Thumbs.db
 # Collaboration scratch
 Codex-Claude协作联系单-*.md
 *.sync-conflict-*.md
+
+# WeChat Developer Tools files generated when opening repository root
+/project.config.json
+/project.private.config.json
