@@ -10,6 +10,7 @@ from app.api.deps import get_current_teacher
 from app.core.config import settings
 from app.core.datetime import BEIJING_TZ, now_utc_naive
 from app.core.responses import fail, ok
+from app.core.uploads import public_upload_path
 from app.db.session import get_db
 from app.models import Photo, PhotoStudent, Student, Teacher
 from app.schemas.photo import (
@@ -48,8 +49,8 @@ def _delete_photo_file(photo: Photo) -> None:
 def _photo_out(photo: Photo) -> dict:
     return {
         "id": photo.id,
-        "file_path": photo.file_path,
-        "thumbnail": photo.thumbnail_path,
+        "file_path": public_upload_path(photo.file_path),
+        "thumbnail": public_upload_path(photo.thumbnail_path),
         "photo_type": photo.photo_type,
         "is_featured": photo.is_featured,
         "taken_at": photo.taken_at.isoformat() if photo.taken_at else None,
@@ -83,7 +84,7 @@ def upload_photo(
             size += len(chunk)
             output.write(chunk)
 
-    public_path = "/" + str(Path(settings.upload_root) / relative_dir / filename).replace("\\", "/")
+    public_path = public_upload_path(str(Path("uploads") / relative_dir / filename))
     photo = Photo(
         file_path=public_path,
         original_name=file.filename,
@@ -96,7 +97,7 @@ def upload_photo(
     db.commit()
     db.refresh(photo)
 
-    return ok({"photo_id": photo.id, "file_path": photo.file_path, "thumbnail": photo.thumbnail_path})
+    return ok({"photo_id": photo.id, "file_path": public_upload_path(photo.file_path), "thumbnail": public_upload_path(photo.thumbnail_path)})
 
 
 @router.get("")

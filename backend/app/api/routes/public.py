@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.datetime import beijing_date
 from app.core.responses import ok
+from app.core.uploads import public_upload_path
 from app.db.session import get_db
 from app.models import Notice, Photo, SystemConfig
 
@@ -131,8 +132,8 @@ def homepage(db: Session = Depends(get_db)):
             "featured_photos": [
                 {
                     "id": photo.id,
-                    "file_path": photo.file_path,
-                    "thumbnail": photo.thumbnail_path,
+                    "file_path": public_upload_path(photo.file_path),
+                    "thumbnail": public_upload_path(photo.thumbnail_path),
                     "remark": photo.remark,
                 }
                 for photo in featured_photos
