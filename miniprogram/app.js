@@ -29,12 +29,12 @@ App({
   },
 
   // 全局登录方法
-  login(password) {
+  login(phone, password) {
     return new Promise((resolve, reject) => {
       const send = (apiBase, retried = false) => wx.request({
         url: apiBase + '/auth/teacher/login',
         method: 'POST',
-        data: { password },
+        data: { phone, password },
         timeout: 15000,
         success: (res) => {
           if (res.data.code === 0) {

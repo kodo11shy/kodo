@@ -1,6 +1,6 @@
 import httpx
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_teacher
@@ -17,16 +17,21 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/teacher/login")
 def teacher_login(payload: TeacherLoginRequest, db: Session = Depends(get_db)):
-    query = select(Teacher).where(Teacher.is_active.is_(True))
-    if payload.phone:
-        query = query.where(Teacher.phone == payload.phone)
+    login_id = (payload.phone or "").strip()
+    if not login_id:
+        return fail("请输入账号或手机号", code=40000, status_code=400)
+
+    query = select(Teacher).where(
+        Teacher.is_active.is_(True),
+        or_(Teacher.phone == login_id, Teacher.name == login_id),
+    )
     teachers = db.execute(query).scalars().all()
     teacher = next(
         (item for item in teachers if verify_password(payload.password, item.login_password)),
         None,
     )
     if teacher is None:
-        return fail("密码错误", code=40001, status_code=401)
+        return fail("账号或密码错误", code=40001, status_code=401)
 
     token = create_token(
         subject=f"teacher:{teacher.id}",

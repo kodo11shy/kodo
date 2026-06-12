@@ -2,8 +2,8 @@ from pydantic import BaseModel, Field
 
 
 class TeacherLoginRequest(BaseModel):
+    phone: str | None = Field(default=None, max_length=50)
     password: str = Field(min_length=1)
-    phone: str | None = None
 
 
 class TeacherOut(BaseModel):

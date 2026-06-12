@@ -17,6 +17,19 @@ Page({
     parentBindings: [],
     // 学生
     students: [],
+    // 新增学生表单
+    showStudentForm: false,
+    studentFormName: '',
+    studentFormGender: '',
+    studentFormGrade: '',
+    studentFormSchoolName: '',
+    studentFormSchoolClass: '',
+    studentFormParent1Name: '',
+    studentFormParent1Relation: '',
+    studentFormParent1Phone: '',
+    studentFormLoading: false,
+    studentFormCanSave: false,
+    studentFormSaveText: '保存',
     // 新建/编辑老师表单
     showForm: false,
     formEditId: null,
@@ -51,7 +64,11 @@ Page({
     })
   },
 
-  onLoad() {
+  onLoad(options) {
+    const validTabs = ['teachers', 'homework-config', 'parents', 'students']
+    if (options && validTabs.includes(options.tab)) {
+      this.setData({ activeTab: options.tab })
+    }
     this.loadTeachers()
     this.loadHomeworkConfig()
     this.loadStudents()
@@ -66,6 +83,17 @@ Page({
       ...next,
       formCanSave: !!name && !loading,
       formSaveText: loading ? '保存中...' : '保存'
+    })
+  },
+
+  _setStudentFormState(extra) {
+    const next = extra || {}
+    const name = next.studentFormName !== undefined ? next.studentFormName : this.data.studentFormName
+    const loading = next.studentFormLoading !== undefined ? next.studentFormLoading : this.data.studentFormLoading
+    this.setData({
+      ...next,
+      studentFormCanSave: !!(name || '').trim() && !loading,
+      studentFormSaveText: loading ? '保存中...' : '保存'
     })
   },
 
@@ -109,6 +137,7 @@ Page({
         const teachers = (data.teachers || []).map(t => ({
           id: t.id,
           name: t.name,
+          phone: t.phone || '',
           role: t.role,
           subject: t.subject || '',
           teacherDesc: (t.role === 'admin' ? '管理员' : (t.subject ? t.subject + '老师' : '老师')) +
@@ -428,6 +457,79 @@ Page({
       this.loadParentBindings()
     }).catch(() => {
       util.showError('解绑失败')
+    })
+  },
+
+  // ======== 学生管理 ========
+
+  showAddStudent() {
+    this._setStudentFormState({
+      showStudentForm: true,
+      studentFormName: '',
+      studentFormGender: '',
+      studentFormGrade: '',
+      studentFormSchoolName: '',
+      studentFormSchoolClass: '',
+      studentFormParent1Name: '',
+      studentFormParent1Relation: '',
+      studentFormParent1Phone: '',
+      studentFormLoading: false
+    })
+  },
+
+  closeStudentForm() {
+    if (this.data.studentFormLoading) return
+    this.setData({ showStudentForm: false })
+  },
+
+  onStudentFormName(e) { this._setStudentFormState({ studentFormName: e.detail.value }) },
+  onStudentFormGender(e) { this.setData({ studentFormGender: e.detail.value }) },
+  onStudentFormGrade(e) { this.setData({ studentFormGrade: e.detail.value }) },
+  onStudentFormSchoolName(e) { this.setData({ studentFormSchoolName: e.detail.value }) },
+  onStudentFormSchoolClass(e) { this.setData({ studentFormSchoolClass: e.detail.value }) },
+  onStudentFormParent1Name(e) { this.setData({ studentFormParent1Name: e.detail.value }) },
+  onStudentFormParent1Relation(e) { this.setData({ studentFormParent1Relation: e.detail.value }) },
+  onStudentFormParent1Phone(e) { this.setData({ studentFormParent1Phone: e.detail.value }) },
+
+  saveStudent() {
+    if (this.data.studentFormLoading) return
+    const name = (this.data.studentFormName || '').trim()
+    if (!name) { util.showError('请输入学生姓名'); return }
+
+    const parentName = (this.data.studentFormParent1Name || '').trim()
+    const parentRelation = (this.data.studentFormParent1Relation || '').trim()
+    const parentPhone = (this.data.studentFormParent1Phone || '').trim()
+    if ((parentName || parentRelation || parentPhone) && (!parentName || !parentRelation || !parentPhone)) {
+      util.showError('家长信息需填写姓名、关系和电话')
+      return
+    }
+
+    const data = {
+      name,
+      gender: (this.data.studentFormGender || '').trim() || null,
+      grade: (this.data.studentFormGrade || '').trim() || null,
+      school_name: (this.data.studentFormSchoolName || '').trim() || null,
+      school_class: (this.data.studentFormSchoolClass || '').trim() || null
+    }
+    if (parentName && parentRelation && parentPhone) {
+      data.parent1_name = parentName
+      data.parent1_relation = parentRelation
+      data.parent1_phone = parentPhone
+    }
+
+    this._setStudentFormState({ studentFormLoading: true })
+    api.request({
+      url: '/students',
+      method: 'POST',
+      data
+    }).then(() => {
+      wx.showToast({ title: '新增成功', icon: 'success' })
+      this._setStudentFormState({ showStudentForm: false, studentFormLoading: false })
+      this.loadStudents()
+      this.loadParentBindings()
+    }).catch(err => {
+      this._setStudentFormState({ studentFormLoading: false })
+      util.showError((err && err.message) || '新增失败')
     })
   },
 

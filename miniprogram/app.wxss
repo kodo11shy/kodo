@@ -103,6 +103,7 @@ page {
 /* 输入框 */
 .input-field {
   background-color: #FFFFFF;
+  color: #333333;
   border-radius: 18rpx;
   padding: 24rpx 30rpx;
   font-size: 30rpx;

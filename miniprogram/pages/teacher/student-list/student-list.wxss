@@ -43,6 +43,13 @@
   margin-top: 6rpx;
 }
 
+.mini-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
+
 .mini-action {
   color: #5B7FFF;
   background: #EEF6FF;
@@ -353,4 +360,108 @@
   font-size: 24rpx;
   color: #9AA3B5;
   margin-top: 8rpx;
+}
+
+.empty-action {
+  width: 220rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  margin-top: 24rpx;
+  padding: 0;
+  border: none;
+  border-radius: 14rpx;
+  background: #5B7FFF;
+  color: #FFFFFF;
+  font-size: 26rpx;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.form-dialog {
+  width: 580rpx;
+  max-height: 86vh;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 34rpx 30rpx 26rpx;
+  box-sizing: border-box;
+}
+
+.form-title {
+  display: block;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2F3A4C;
+  margin-bottom: 24rpx;
+}
+
+.form-scroll {
+  max-height: 720rpx;
+}
+
+.form-section-title {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #5B7FFF;
+  margin: 8rpx 0 14rpx;
+}
+
+.form-group {
+  margin-bottom: 18rpx;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8rpx;
+  font-size: 24rpx;
+  color: #7B8496;
+}
+
+.form-input {
+  width: 100%;
+  height: 76rpx;
+  padding: 0 22rpx;
+  box-sizing: border-box;
+  border-radius: 14rpx;
+  background: #F5F7FA;
+  color: #2F3A4C;
+  font-size: 27rpx;
+}
+
+.form-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.form-actions button {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+}
+
+.btn-primary {
+  border: none;
+  background: #5B7FFF;
+  color: #FFFFFF;
+}
+
+.btn-secondary {
+  border: none;
+  background: #F0F2F5;
+  color: #7B8496;
 }

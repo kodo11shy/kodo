@@ -18,7 +18,19 @@ Page({
     issueCount: 0,
     issueSummary: [],
     emptyTitle: '还没有学生',
-    emptyDesc: '请先录入学生和家长信息'
+    emptyDesc: '请先录入学生和家长信息',
+    showStudentForm: false,
+    studentFormName: '',
+    studentFormGender: '',
+    studentFormGrade: '',
+    studentFormSchoolName: '',
+    studentFormSchoolClass: '',
+    studentFormParent1Name: '',
+    studentFormParent1Relation: '',
+    studentFormParent1Phone: '',
+    studentFormLoading: false,
+    studentFormCanSave: false,
+    studentFormSaveText: '保存'
   },
 
   onLoad() {
@@ -57,6 +69,17 @@ Page({
       this.setData({ allStudents: [], students: [] })
     }).finally(() => {
       this.setData({ loading: false })
+    })
+  },
+
+  _setStudentFormState(extra) {
+    const next = extra || {}
+    const name = next.studentFormName !== undefined ? next.studentFormName : this.data.studentFormName
+    const loading = next.studentFormLoading !== undefined ? next.studentFormLoading : this.data.studentFormLoading
+    this.setData({
+      ...next,
+      studentFormCanSave: !!(name || '').trim() && !loading,
+      studentFormSaveText: loading ? '保存中...' : '保存'
     })
   },
 
@@ -196,6 +219,74 @@ Page({
   },
 
   goAdd() {
-    wx.showToast({ title: '请在系统管理中添加学生', icon: 'none' })
-  }
+    this._setStudentFormState({
+      showStudentForm: true,
+      studentFormName: '',
+      studentFormGender: '',
+      studentFormGrade: '',
+      studentFormSchoolName: '',
+      studentFormSchoolClass: '',
+      studentFormParent1Name: '',
+      studentFormParent1Relation: '',
+      studentFormParent1Phone: '',
+      studentFormLoading: false
+    })
+  },
+
+  closeStudentForm() {
+    if (this.data.studentFormLoading) return
+    this.setData({ showStudentForm: false })
+  },
+
+  onStudentFormName(e) { this._setStudentFormState({ studentFormName: e.detail.value }) },
+  onStudentFormGender(e) { this.setData({ studentFormGender: e.detail.value }) },
+  onStudentFormGrade(e) { this.setData({ studentFormGrade: e.detail.value }) },
+  onStudentFormSchoolName(e) { this.setData({ studentFormSchoolName: e.detail.value }) },
+  onStudentFormSchoolClass(e) { this.setData({ studentFormSchoolClass: e.detail.value }) },
+  onStudentFormParent1Name(e) { this.setData({ studentFormParent1Name: e.detail.value }) },
+  onStudentFormParent1Relation(e) { this.setData({ studentFormParent1Relation: e.detail.value }) },
+  onStudentFormParent1Phone(e) { this.setData({ studentFormParent1Phone: e.detail.value }) },
+
+  saveStudent() {
+    if (this.data.studentFormLoading) return
+    const name = (this.data.studentFormName || '').trim()
+    if (!name) { util.showError('请输入学生姓名'); return }
+
+    const parentName = (this.data.studentFormParent1Name || '').trim()
+    const parentRelation = (this.data.studentFormParent1Relation || '').trim()
+    const parentPhone = (this.data.studentFormParent1Phone || '').trim()
+    if ((parentName || parentRelation || parentPhone) && (!parentName || !parentRelation || !parentPhone)) {
+      util.showError('家长信息需填写姓名、关系和电话')
+      return
+    }
+
+    const data = {
+      name,
+      gender: (this.data.studentFormGender || '').trim() || null,
+      grade: (this.data.studentFormGrade || '').trim() || null,
+      school_name: (this.data.studentFormSchoolName || '').trim() || null,
+      school_class: (this.data.studentFormSchoolClass || '').trim() || null
+    }
+    if (parentName && parentRelation && parentPhone) {
+      data.parent1_name = parentName
+      data.parent1_relation = parentRelation
+      data.parent1_phone = parentPhone
+    }
+
+    this._setStudentFormState({ studentFormLoading: true })
+    api.request({
+      url: '/students',
+      method: 'POST',
+      data
+    }).then(() => {
+      wx.showToast({ title: '新增成功', icon: 'success' })
+      this._setStudentFormState({ showStudentForm: false, studentFormLoading: false })
+      this.loadOverview()
+    }).catch(err => {
+      this._setStudentFormState({ studentFormLoading: false })
+      util.showError((err && err.message) || '新增失败')
+    })
+  },
+
+  nop() {}
 })

@@ -11,11 +11,11 @@
  */
 const config = {
 
-  // -------- 开发环境（本机） --------
-  apiBase: 'http://127.0.0.1:8000/api',
-  apiOrigin: 'http://127.0.0.1:8000',
-  apiFallbackBase: 'http://127.0.0.1:8000/api',
-  apiFallbackOrigin: 'http://127.0.0.1:8000',
+  // -------- 生产环境（云服务器） --------
+  apiBase: 'https://ccrong.cloud/api',
+  apiOrigin: 'https://ccrong.cloud',
+  apiFallbackBase: 'https://ccrong.cloud/api',
+  apiFallbackOrigin: 'https://ccrong.cloud',
 
 }
 

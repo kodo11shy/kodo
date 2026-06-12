@@ -4,12 +4,16 @@
     <view class="login-header">
       <text class="login-icon">👩‍🏫</text>
       <text class="login-title">老师登录</text>
-      <text class="login-desc">请输入管理密码</text>
+      <text class="login-desc">请输入账号/手机号和密码</text>
     </view>
 
     <view class="login-form">
       <view class="input-group">
-        <input class="password-input" type="{{showPassword ? 'text' : 'password'}}" placeholder="请输入密码" value="{{password}}" bindinput="onPasswordInput" maxlength="20" confirm-type="done" bindconfirm="doLogin" />
+        <input class="login-input" type="text" placeholder="请输入账号或手机号" value="{{phone}}" bindinput="onPhoneInput" maxlength="50" confirm-type="next" />
+      </view>
+
+      <view class="input-group">
+        <input class="login-input" type="{{showPassword ? 'text' : 'password'}}" placeholder="请输入密码" value="{{password}}" bindinput="onPasswordInput" maxlength="20" confirm-type="done" bindconfirm="doLogin" />
         <text class="toggle-btn" bindtap="togglePassword">
           {{showPassword ? '🙈' : '👁️'}}
         </text>
@@ -19,7 +23,7 @@
         <text>{{errorMsg}}</text>
       </view>
 
-      <button class="btn-primary login-btn" bindtap="doLogin" loading="{{loading}}" disabled="{{loading || !password}}">
+      <button class="btn-primary login-btn" bindtap="doLogin" loading="{{loading}}" disabled="{{loading || !phone || !password}}">
         {{loading ? '登录中...' : '登 录'}}
       </button>
     </view>

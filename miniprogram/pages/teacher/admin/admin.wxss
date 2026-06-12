@@ -262,6 +262,22 @@
   border-radius: 16rpx;
 }
 
+.student-form-dialog {
+  max-height: 86vh;
+}
+
+.student-form-scroll {
+  max-height: 720rpx;
+}
+
+.form-section-title {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #5B7FFF;
+  margin: 8rpx 0 14rpx;
+}
+
 .btn-secondary {
   background: #F0F2F5;
   color: #7B8496;

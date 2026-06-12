@@ -91,8 +91,19 @@ const uploadFile = (filePath) => {
  */
 const imageUrl = (filePath) => {
   if (!filePath) return ''
-  if (filePath.startsWith('http')) return filePath
-  return app.globalData.apiOrigin + filePath
+  let normalized = String(filePath).trim().replace(/\\/g, '/')
+  if (normalized.startsWith('http')) return normalized
+
+  const uploadIndex = normalized.indexOf('/uploads/')
+  if (uploadIndex >= 0) {
+    normalized = normalized.slice(uploadIndex)
+  } else if (normalized.startsWith('uploads/')) {
+    normalized = '/' + normalized
+  } else if (!normalized.startsWith('/')) {
+    normalized = '/' + normalized
+  }
+
+  return app.globalData.apiOrigin + normalized
 }
 
 module.exports = {

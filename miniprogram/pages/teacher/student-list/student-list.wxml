@@ -5,7 +5,10 @@
         <text class="overview-title">班级概况</text>
         <text class="overview-subtitle">学生档案、到班和家长绑定状态</text>
       </view>
-      <view class="mini-action" bindtap="goAttendance">签到</view>
+      <view class="mini-actions">
+        <view class="mini-action" bindtap="goAdd">录入</view>
+        <view class="mini-action" bindtap="goAttendance">签到</view>
+      </view>
     </view>
     <view class="metric-grid">
       <view class="metric-item">
@@ -94,5 +97,52 @@
     <image class="empty-image" src="/images/empty-students-v2.png" mode="aspectFit"></image>
     <text class="empty-title">{{emptyTitle}}</text>
     <text class="empty-desc">{{emptyDesc}}</text>
+    <button class="empty-action" bindtap="goAdd">录入学生</button>
+  </view>
+
+  <view class="modal-overlay" wx:if="{{showStudentForm}}" bindtap="closeStudentForm">
+    <view class="form-dialog" catchtap="nop">
+      <text class="form-title">录入学生</text>
+      <scroll-view class="form-scroll" scroll-y>
+        <text class="form-section-title">学生信息</text>
+        <view class="form-group">
+          <text class="form-label">学生姓名</text>
+          <input class="form-input" placeholder="输入学生姓名" value="{{studentFormName}}" bindinput="onStudentFormName" maxlength="50" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">性别</text>
+          <input class="form-input" placeholder="男 / 女" value="{{studentFormGender}}" bindinput="onStudentFormGender" maxlength="10" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">年级</text>
+          <input class="form-input" placeholder="例如：幼小衔接 / 一年级" value="{{studentFormGrade}}" bindinput="onStudentFormGrade" maxlength="30" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">学校</text>
+          <input class="form-input" placeholder="输入学校名称" value="{{studentFormSchoolName}}" bindinput="onStudentFormSchoolName" maxlength="80" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">班级</text>
+          <input class="form-input" placeholder="输入学校班级" value="{{studentFormSchoolClass}}" bindinput="onStudentFormSchoolClass" maxlength="50" />
+        </view>
+        <text class="form-section-title">家长信息（选填）</text>
+        <view class="form-group">
+          <text class="form-label">家长姓名</text>
+          <input class="form-input" placeholder="输入家长姓名" value="{{studentFormParent1Name}}" bindinput="onStudentFormParent1Name" maxlength="50" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">关系</text>
+          <input class="form-input" placeholder="妈妈 / 爸爸 / 其他" value="{{studentFormParent1Relation}}" bindinput="onStudentFormParent1Relation" maxlength="20" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">家长电话</text>
+          <input class="form-input" placeholder="输入手机号" value="{{studentFormParent1Phone}}" bindinput="onStudentFormParent1Phone" type="number" maxlength="20" />
+        </view>
+      </scroll-view>
+      <view class="form-actions">
+        <button class="btn-secondary" bindtap="closeStudentForm">取消</button>
+        <button class="btn-primary" bindtap="saveStudent" loading="{{studentFormLoading}}" disabled="{{!studentFormCanSave}}">{{studentFormSaveText}}</button>
+      </view>
+    </view>
   </view>
 </view>

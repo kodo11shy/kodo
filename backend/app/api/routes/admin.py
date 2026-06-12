@@ -2,6 +2,7 @@ import secrets
 import string
 
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -158,6 +159,110 @@ def disable_teacher(
     db.commit()
     return ok({"teacher_id": teacher.id, "is_active": False})
 
+
+class ResetConfirmRequest(BaseModel):
+    confirm: str
+
+
+@router.post("/reset")
+def reset_all_data(
+    payload: ResetConfirmRequest,
+    db: Session = Depends(get_db),
+    current_admin: Teacher = Depends(get_current_admin),
+):
+    """清空测试/运行数据，只保留当前管理员账号和系统配置。"""
+    if payload.confirm != "RESET":
+        return fail('请传入 {"confirm": "RESET"} 确认清空操作', code=40009, status_code=400)
+
+    from app.core.homework_rules import HOMEWORK_SUBJECTS_JSON
+    from app.models import (
+        AttendanceRecord,
+        AuthorizedPickup,
+        HomeworkPhoto,
+        HomeworkRecord,
+        MealPhoto,
+        MealRecord,
+        MealStudentNote,
+        Notice,
+        Parent,
+        ParentBinding,
+        PaymentRecord,
+        Photo,
+        PhotoStudent,
+        Student,
+        StudentHealth,
+        StudentParent,
+        SystemConfig,
+        TeacherRemark,
+    )
+
+    deleted_counts: dict[str, int] = {}
+    delete_models = [
+        HomeworkPhoto,
+        HomeworkRecord,
+        MealStudentNote,
+        MealPhoto,
+        MealRecord,
+        PhotoStudent,
+        Photo,
+        AttendanceRecord,
+        ParentBinding,
+        PaymentRecord,
+        TeacherRemark,
+        Notice,
+        AuthorizedPickup,
+        StudentHealth,
+        StudentParent,
+        Student,
+        Parent,
+    ]
+
+    try:
+        for model in delete_models:
+            deleted_counts[model.__tablename__] = db.query(model).delete(synchronize_session=False)
+
+        deleted_counts["teachers"] = (
+            db.query(Teacher)
+            .filter(Teacher.id != current_admin.id)
+            .delete(synchronize_session=False)
+        )
+
+        current_admin.role = "admin"
+        current_admin.is_active = True
+        current_admin.subject = None
+        current_admin.phone = None
+        current_admin.wechat_openid = None
+        current_admin.updated_at = now_utc_naive()
+
+        subject_config = db.execute(
+            select(SystemConfig).where(SystemConfig.config_key == "homework_subjects")
+        ).scalar_one_or_none()
+        if subject_config is None:
+            db.add(
+                SystemConfig(
+                    config_key="homework_subjects",
+                    config_value=HOMEWORK_SUBJECTS_JSON,
+                    description="作业科目列表（固定：语文、数学）",
+                    updated_at=now_utc_naive(),
+                )
+            )
+        else:
+            subject_config.config_value = HOMEWORK_SUBJECTS_JSON
+            subject_config.description = "作业科目列表（固定：语文、数学）"
+            subject_config.updated_at = now_utc_naive()
+
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+    return ok(
+        {
+            "message": "所有数据已清空，系统已重置为初始状态",
+            "kept_admin_id": current_admin.id,
+            "deleted_counts": deleted_counts,
+        }
+    )
 
 @router.get("/parent-bindings")
 def list_parent_bindings(
