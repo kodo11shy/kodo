@@ -20,16 +20,25 @@ Page({
     unifiedFeeList: [],
     showFeeForm: false,
     editingItem: null,     // 当前编辑的 unifiedFeeList 项（用于定位）
-    feeForm: { name: '', amount: '', unit: '元/月', description: '' }
+    feeForm: { name: '', amount: '', unit: '元/月', description: '' },
+    loginModeOptions: [
+      { value: 'always', label: '每次都输入' },
+      { value: 'duration', label: '限时免输入' },
+      { value: 'remember', label: '长期记住' }
+    ],
+    loginModeIndex: 1,
+    teacherInfo: {}
   },
 
   onLoad() {
+    const app = getApp()
+    this.setData({ teacherInfo: app.globalData.userInfo || {} })
     this.loadConfig()
   },
 
   loadConfig() {
     this.setData({ loading: true })
-    const keys = 'school_name,welcome_message,tuition_fee,meal_fee,material_fee,fee_custom_items,contact_wechat,contact_phone'
+    const keys = 'school_name,welcome_message,tuition_fee,meal_fee,material_fee,fee_custom_items,contact_wechat,contact_phone,teacher_login_mode,teacher_login_remember_hours'
     api.request({ url: '/config', data: { keys } })
       .then((data) => {
         // 把 fee_custom_items 拆分为标准覆盖项 + 纯自定义项
@@ -46,12 +55,15 @@ Page({
           fee_custom_items: '',
           contact_wechat: '',
           contact_phone: '',
+          teacher_login_mode: 'duration',
+          teacher_login_remember_hours: '2',
           ...data
         }
 
         this.setData({
           config: { ...normalizedConfig },
           originalConfig: { ...normalizedConfig },
+          loginModeIndex: this.getLoginModeIndex(normalizedConfig.teacher_login_mode),
           standardOverrides,
           originalStandardOverrides: JSON.parse(JSON.stringify(standardOverrides)),
           customFees,
@@ -73,6 +85,11 @@ Page({
     } catch {
       return []
     }
+  },
+
+  getLoginModeIndex(mode) {
+    const index = this.data.loginModeOptions.findIndex(item => item.value === mode)
+    return index >= 0 ? index : 1
   },
 
   // ── 统一收费列表 ──
@@ -130,6 +147,30 @@ Page({
     }
   },
 
+  onLoginModeChange(e) {
+    const index = parseInt(e.detail.value, 10)
+    const option = this.data.loginModeOptions[index] || this.data.loginModeOptions[1]
+    this.setData({
+      loginModeIndex: index,
+      'config.teacher_login_mode': option.value,
+      saved: false
+    }, () => {
+      this.setData({ hasUnsavedChanges: this.hasChanges() })
+    })
+  },
+
+  onRememberHoursChange(e) {
+    let value = parseInt(e.detail.value, 10)
+    if (!value || value < 1) value = 1
+    if (value > 720) value = 720
+    this.setData({
+      'config.teacher_login_remember_hours': String(value),
+      saved: false
+    }, () => {
+      this.setData({ hasUnsavedChanges: this.hasChanges() })
+    })
+  },
+
   saveConfig() {
     // 合并标准覆盖项 + 纯自定义项
     const mergedCustomFees = [...this.data.standardOverrides, ...this.data.customFees]
@@ -143,6 +184,11 @@ Page({
       method: 'PUT',
       data: { values: dataToSave }
     }).then(() => {
+      const app = getApp()
+      app.setLoginPolicy({
+        teacher_login_mode: dataToSave.teacher_login_mode,
+        teacher_login_remember_hours: dataToSave.teacher_login_remember_hours
+      })
       util.showSuccess('保存成功')
       this.setData({
         saved: true,
@@ -173,7 +219,9 @@ Page({
       c.meal_fee !== o.meal_fee ||
       c.material_fee !== o.material_fee ||
       c.contact_wechat !== o.contact_wechat ||
-      c.contact_phone !== o.contact_phone
+      c.contact_phone !== o.contact_phone ||
+      c.teacher_login_mode !== o.teacher_login_mode ||
+      c.teacher_login_remember_hours !== o.teacher_login_remember_hours
 
     const overridesChanged = JSON.stringify(this.data.standardOverrides) !== JSON.stringify(this.data.originalStandardOverrides)
     const feesChanged = JSON.stringify(this.data.customFees) !== JSON.stringify(this.data.originalCustomFees)
@@ -320,6 +368,27 @@ Page({
           const app = getApp()
           app.logout()
         }
+      }
+    })
+  },
+
+  bindTeacherWechat() {
+    const app = getApp()
+    wx.showModal({
+      title: '绑定微信登录',
+      content: '绑定后，这个微信可以直接登录老师端。',
+      success: (res) => {
+        if (!res.confirm) return
+        util.showLoading('绑定中...')
+        app.bindCurrentTeacherWechat()
+          .then(() => {
+            util.showSuccess('绑定成功')
+            this.setData({ teacherInfo: { ...(this.data.teacherInfo || {}), wechat_bound: true } })
+          })
+          .catch((err) => {
+            util.showError(err.message || '绑定失败')
+          })
+          .finally(() => wx.hideLoading())
       }
     })
   },

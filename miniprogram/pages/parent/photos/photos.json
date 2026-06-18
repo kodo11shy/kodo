@@ -1,5 +1,6 @@
 {
   "usingComponents": {},
   "navigationBarTitleText": "照片墙",
+  "navigationBarBackgroundColor": "#FF8C5A",
   "enablePullDownRefresh": true
 }

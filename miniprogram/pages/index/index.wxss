@@ -385,12 +385,14 @@
 .notice-modal {
   background: #FFF;
   border-radius: 32rpx;
-  width: 640rpx;
+  width: 86vw;
+  max-width: 640rpx;
   max-height: 75vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 20rpx 60rpx rgba(0,0,0,0.15);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .notice-modal-title {
@@ -421,6 +423,8 @@
   padding: 24rpx 32rpx;
   max-height: 50vh;
   overflow-y: auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .notice-modal-content {
@@ -428,7 +432,11 @@
   color: #4A4A5A;
   line-height: 1.8;
   white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: break-word;
   display: block;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .notice-modal-footer {
@@ -442,6 +450,42 @@
   color: #5B7FFF;
   font-weight: 600;
   padding: 8rpx 48rpx;
+}
+
+/* 加载与错误态 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  color: #B1B8C7;
+  font-size: 28rpx;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 60rpx;
+}
+
+.error-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.error-text {
+  font-size: 32rpx;
+  color: #7B8496;
+  font-weight: bold;
+}
+
+.error-desc {
+  font-size: 26rpx;
+  color: #B1B8C7;
+  margin-top: 12rpx;
 }
 
 /* 半透明遮罩 */

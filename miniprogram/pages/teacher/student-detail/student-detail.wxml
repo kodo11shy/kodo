@@ -50,20 +50,20 @@
         <!-- 编辑模式 -->
         <block wx:if="{{editMode}}">
           <view class="edit-form">
-            <view class="form-group"><text class="form-label">姓名</text><input class="input-field" value="{{editForm.name}}" bindinput="onEditField" data-field="name" /></view>
-            <view class="form-group"><text class="form-label">性别</text><input class="input-field" value="{{editForm.gender}}" bindinput="onEditField" data-field="gender" /></view>
-            <view class="form-group"><text class="form-label">年级</text><input class="input-field" value="{{editForm.grade}}" bindinput="onEditField" data-field="grade" /></view>
-            <view class="form-group"><text class="form-label">学校</text><input class="input-field" value="{{editForm.school_name}}" bindinput="onEditField" data-field="school_name" /></view>
-            <view class="form-group"><text class="form-label">班级</text><input class="input-field" value="{{editForm.school_class}}" bindinput="onEditField" data-field="school_class" /></view>
-            <view class="form-group"><text class="form-label">接送方式</text><input class="input-field" value="{{editForm.pickup_method}}" bindinput="onEditField" data-field="pickup_method" /></view>
-            <view class="form-group"><text class="form-label">地址</text><input class="input-field" value="{{editForm.address}}" bindinput="onEditField" data-field="address" /></view>
-            <view class="form-group"><text class="form-label">兴趣</text><input class="input-field" value="{{editForm.interests}}" bindinput="onEditField" data-field="interests" /></view>
-            <view class="form-group"><text class="form-label">性格</text><input class="input-field" value="{{editForm.personality}}" bindinput="onEditField" data-field="personality" /></view>
-            <view class="form-group"><text class="form-label">薄弱科目</text><input class="input-field" value="{{editForm.weak_subjects}}" bindinput="onEditField" data-field="weak_subjects" /></view>
-            <view class="form-group"><text class="form-label">备注</text><textarea class="input-field edit-textarea" value="{{editForm.notes}}" bindinput="onEditField" data-field="notes" /></view>
-            <view class="form-actions">
-              <button class="btn-secondary" bindtap="cancelEdit">取消</button>
-              <button class="btn-primary" bindtap="saveEdit">保存</button>
+            <view class="detail-field"><text class="detail-label">姓名</text><input class="detail-input" value="{{editForm.name}}" bindinput="onEditField" data-field="name" /></view>
+            <view class="detail-field"><text class="detail-label">性别</text><input class="detail-input" value="{{editForm.gender}}" bindinput="onEditField" data-field="gender" /></view>
+            <view class="detail-field"><text class="detail-label">年级</text><input class="detail-input" value="{{editForm.grade}}" bindinput="onEditField" data-field="grade" /></view>
+            <view class="detail-field"><text class="detail-label">学校</text><input class="detail-input" value="{{editForm.school_name}}" bindinput="onEditField" data-field="school_name" /></view>
+            <view class="detail-field"><text class="detail-label">班级</text><input class="detail-input" value="{{editForm.school_class}}" bindinput="onEditField" data-field="school_class" /></view>
+            <view class="detail-field"><text class="detail-label">接送方式</text><input class="detail-input" value="{{editForm.pickup_method}}" bindinput="onEditField" data-field="pickup_method" /></view>
+            <view class="detail-field"><text class="detail-label">地址</text><input class="detail-input" value="{{editForm.address}}" bindinput="onEditField" data-field="address" /></view>
+            <view class="detail-field"><text class="detail-label">兴趣</text><input class="detail-input" value="{{editForm.interests}}" bindinput="onEditField" data-field="interests" /></view>
+            <view class="detail-field"><text class="detail-label">性格</text><input class="detail-input" value="{{editForm.personality}}" bindinput="onEditField" data-field="personality" /></view>
+            <view class="detail-field"><text class="detail-label">薄弱科目</text><input class="detail-input" value="{{editForm.weak_subjects}}" bindinput="onEditField" data-field="weak_subjects" /></view>
+            <view class="detail-field"><text class="detail-label">备注</text><textarea class="detail-input detail-textarea" value="{{editForm.notes}}" bindinput="onEditField" data-field="notes" /></view>
+            <view class="detail-actions">
+              <button class="detail-btn cancel" bindtap="cancelEdit">取消</button>
+              <button class="detail-btn primary" bindtap="saveEdit">保存</button>
             </view>
           </view>
         </block>
@@ -136,23 +136,29 @@
       </view>
 
       <!-- ======== 接送授权人编辑弹窗 ======== -->
-      <view class="modal-overlay" wx:if="{{showPickupEditor}}" bindtap="closePickupEditor">
-        <view class="modal-content modal-large" catchtap="nop">
-          <text class="modal-title">编辑接送授权人</text>
-          <view class="pickup-edit-list">
-            <view class="pickup-edit-row" wx:for="{{editPickups}}" wx:key="index">
-              <view class="pickup-edit-fields">
-                <input class="input-field pick-field" placeholder="姓名" value="{{item.name}}" bindinput="onPickupField" data-field="name" data-index="{{index}}" />
-                <input class="input-field pick-field" placeholder="关系" value="{{item.relation}}" bindinput="onPickupField" data-field="relation" data-index="{{index}}" />
-                <input class="input-field pick-field" placeholder="电话" value="{{item.phone}}" bindinput="onPickupField" data-field="phone" data-index="{{index}}" />
-              </view>
-              <text class="remove-btn" bindtap="removePickupRow" data-index="{{index}}" wx:if="{{editPickups.length > 1}}">删除</text>
-            </view>
+      <view class="pickup-sheet-overlay" wx:if="{{showPickupEditor}}" bindtap="closePickupEditor">
+        <view class="pickup-sheet" catchtap="nop">
+          <view class="pickup-sheet-head">
+            <text class="pickup-sheet-title">编辑接送授权人</text>
+            <text class="pickup-sheet-close" bindtap="closePickupEditor">×</text>
           </view>
-          <button class="btn-secondary add-row-btn" bindtap="addPickupRow">+ 添加一行</button>
-          <view class="modal-actions">
-            <button class="btn-secondary modal-btn" bindtap="closePickupEditor">取消</button>
-            <button class="btn-primary modal-btn" bindtap="savePickups">保存</button>
+          <scroll-view class="pickup-sheet-body" scroll-y enhanced show-scrollbar="{{false}}">
+            <view class="pickup-edit-list">
+              <view class="pickup-edit-row" wx:for="{{editPickups}}" wx:key="index">
+                <view class="pickup-row-head">
+                  <text class="pickup-row-title">授权人 {{index + 1}}</text>
+                  <text class="pickup-remove-btn" bindtap="removePickupRow" data-index="{{index}}" wx:if="{{editPickups.length > 1}}">删除</text>
+                </view>
+                <input class="pickup-input" placeholder="姓名" value="{{item.name}}" bindinput="onPickupField" data-field="name" data-index="{{index}}" />
+                <input class="pickup-input" placeholder="关系" value="{{item.relation}}" bindinput="onPickupField" data-field="relation" data-index="{{index}}" />
+                <input class="pickup-input" placeholder="电话" value="{{item.phone}}" bindinput="onPickupField" data-field="phone" data-index="{{index}}" />
+              </view>
+            </view>
+            <button class="pickup-add-btn" bindtap="addPickupRow">+ 添加一行</button>
+          </scroll-view>
+          <view class="pickup-sheet-actions">
+            <button class="pickup-sheet-btn cancel" bindtap="closePickupEditor">取消</button>
+            <button class="pickup-sheet-btn primary" bindtap="savePickups">保存</button>
           </view>
         </view>
       </view>

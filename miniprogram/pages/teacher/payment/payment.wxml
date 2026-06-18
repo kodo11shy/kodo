@@ -120,62 +120,71 @@
     </view>
   </block>
 
-  <view class="modal-overlay" wx:if="{{showAddPayment}}" bindtap="closeAddPayment">
-    <view class="modal-content modal-large" catchtap="nop">
-      <text class="modal-title">记一笔</text>
-
-      <view class="form-group">
-        <text class="form-label">学生</text>
-        <picker bindchange="selectStudent" range="{{students}}" range-key="name">
-          <view class="picker-field">{{selectedStudentName}}</view>
-        </picker>
+  <view class="payment-modal-overlay" wx:if="{{showAddPayment}}" bindtap="closeAddPayment">
+    <view class="payment-sheet" catchtap="nop">
+      <view class="payment-sheet-head">
+        <text class="payment-sheet-title">记一笔</text>
+        <text class="payment-sheet-close" bindtap="closeAddPayment">×</text>
       </view>
 
-      <view class="form-group">
-        <text class="form-label">费用项目</text>
-        <picker bindchange="selectFeeType" range="{{feeTypes}}">
-          <view class="picker-field">{{addForm.fee_type}}</view>
-        </picker>
-      </view>
-
-      <view class="form-group">
-        <text class="form-label">金额</text>
-        <input class="input-field" type="digit" placeholder="0.00" value="{{addForm.amount}}" bindinput="onFormField" data-field="amount" />
-      </view>
-
-      <view class="form-row">
-        <view class="form-group half">
-          <text class="form-label">开始日期</text>
-          <input class="input-field" type="text" placeholder="2026-06-01" value="{{addForm.period_start}}" bindinput="onFormField" data-field="period_start" />
+      <scroll-view class="payment-sheet-body" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="payment-field">
+          <text class="payment-label">学生</text>
+          <picker bindchange="selectStudent" range="{{students}}" range-key="name">
+            <view class="payment-picker">{{selectedStudentName}}</view>
+          </picker>
         </view>
-        <view class="form-group half">
-          <text class="form-label">结束日期</text>
-          <input class="input-field" type="text" placeholder="2026-06-30" value="{{addForm.period_end}}" bindinput="onFormField" data-field="period_end" />
+
+        <view class="payment-field">
+          <text class="payment-label">费用项目</text>
+          <picker bindchange="selectFeeType" range="{{feeTypes}}">
+            <view class="payment-picker">{{addForm.fee_type}}</view>
+          </picker>
         </view>
-      </view>
 
-      <view class="form-group">
-        <text class="form-label">缴费状态</text>
-        <picker bindchange="selectPaymentStatus" range="{{paymentStatuses}}">
-          <view class="picker-field">{{addForm.status}}</view>
-        </picker>
-      </view>
+        <view class="payment-field">
+          <text class="payment-label">金额</text>
+          <input class="payment-input" type="digit" placeholder="0.00" value="{{addForm.amount}}" bindinput="onFormField" data-field="amount" />
+        </view>
 
-      <view class="form-group">
-        <text class="form-label">支付方式</text>
-        <picker bindchange="selectPaymentMethod" range="{{paymentMethods}}">
-          <view class="picker-field">{{addForm.payment_method}}</view>
-        </picker>
-      </view>
+        <view class="payment-row">
+          <view class="payment-field payment-half">
+            <text class="payment-label">开始日期</text>
+            <picker mode="date" value="{{addForm.period_start}}" bindchange="onFormField" data-field="period_start">
+              <view class="payment-picker">{{addForm.period_start || '选择日期'}}</view>
+            </picker>
+          </view>
+          <view class="payment-field payment-half">
+            <text class="payment-label">结束日期</text>
+            <picker mode="date" value="{{addForm.period_end}}" bindchange="onFormField" data-field="period_end">
+              <view class="payment-picker">{{addForm.period_end || '选择日期'}}</view>
+            </picker>
+          </view>
+        </view>
 
-      <view class="form-group">
-        <text class="form-label">备注</text>
-        <input class="input-field" placeholder="备注..." value="{{addForm.remark}}" bindinput="onFormField" data-field="remark" />
-      </view>
+        <view class="payment-field">
+          <text class="payment-label">缴费状态</text>
+          <picker bindchange="selectPaymentStatus" range="{{paymentStatuses}}">
+            <view class="payment-picker">{{addForm.status}}</view>
+          </picker>
+        </view>
 
-      <view class="modal-actions">
-        <button class="btn-secondary modal-btn" bindtap="closeAddPayment">取消</button>
-        <button class="btn-primary modal-btn" bindtap="submitPayment" loading="{{submitting}}" disabled="{{submitting}}">保存</button>
+        <view class="payment-field">
+          <text class="payment-label">支付方式</text>
+          <picker bindchange="selectPaymentMethod" range="{{paymentMethods}}">
+            <view class="payment-picker">{{addForm.payment_method}}</view>
+          </picker>
+        </view>
+
+        <view class="payment-field">
+          <text class="payment-label">备注</text>
+          <input class="payment-input" placeholder="备注..." value="{{addForm.remark}}" bindinput="onFormField" data-field="remark" />
+        </view>
+      </scroll-view>
+
+      <view class="payment-sheet-actions">
+        <button class="payment-sheet-btn cancel" bindtap="closeAddPayment">取消</button>
+        <button class="payment-sheet-btn save" bindtap="submitPayment" loading="{{submitting}}" disabled="{{submitting}}">保存</button>
       </view>
     </view>
   </view>

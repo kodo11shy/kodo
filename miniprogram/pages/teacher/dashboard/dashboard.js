@@ -11,6 +11,7 @@ Page({
     attendedCount: 0,
     attendanceRate: 0,
     recentActivities: [],
+    attendanceError: false,
     isAdmin: false
   },
 
@@ -78,12 +79,13 @@ Page({
         })
       })
       .catch(() => {
-        // 接口不通时用静态数据
+        // 接口不通时显示空数据，避免误导老师
         this.setData({
-          totalCount: 20,
+          totalCount: 0,
           attendedCount: 0,
           attendanceRate: 0,
-          recentActivities: []
+          recentActivities: [],
+          attendanceError: true
         })
       })
   },

@@ -1,15 +1,19 @@
-// 家长端作业查看（只读）
+// 家长端作业查看（只读）— 按日期查看
 const api = require('../../../utils/api')
 const util = require('../../../utils/util')
 
-const FIXED_HOMEWORK_SUBJECTS = ['语文', '数学']
+const FIXED_HOMEWORK_SUBJECTS = (() => {
+  try { return getApp().globalData.homeworkSubjects || ['语文', '数学'] } catch(e) { return ['语文', '数学'] }
+})()
 
 Page({
   data: {
     studentId: 0,
     studentName: '',
     records: [],
-    loading: false
+    filteredList: [],
+    loading: false,
+    selectedDate: '',
   },
 
   onLoad(options) {
@@ -31,8 +35,10 @@ Page({
           .filter(item => FIXED_HOMEWORK_SUBJECTS.includes(item.subject))
           .map((item) => {
           const photos = item.photos || {}
+          const rawDate = item.date || item.homework_date || ''
           return {
             ...item,
+            date: rawDate.substring(0, 10),
             homeworkTypeText: item.homework_type || '作业',
             statusClass: this.getStatusClass(item.status),
             statusIcon: this.getStatusText(item.status),
@@ -44,9 +50,31 @@ Page({
           }
         })
         this.setData({ records })
+        this._applyFilter()
       })
       .catch(() => util.showError('加载失败'))
       .finally(() => this.setData({ loading: false }))
+  },
+
+  _applyFilter() {
+    const selDate = this.data.selectedDate
+    let filtered = this.data.records
+    if (selDate) {
+      filtered = filtered.filter(r => r.date === selDate)
+    }
+    this.setData({ filteredList: filtered })
+  },
+
+  // 日期选择
+  onDateChange(e) {
+    const date = e.detail.value
+    this.setData({ selectedDate: date })
+    this._applyFilter()
+  },
+
+  selectAll() {
+    this.setData({ selectedDate: '' })
+    this._applyFilter()
   },
 
   getStatusClass(status) {
@@ -77,7 +105,6 @@ Page({
     }
   },
 
-  // 长按保存作业照片
   saveHomeworkPhoto(e) {
     const url = e.currentTarget.dataset.src
     if (!url) return
@@ -95,5 +122,4 @@ Page({
       complete: () => wx.hideLoading()
     })
   },
-  // 图片 URL 在 loadData 中预处理，避免 WXML 调用函数。
 })

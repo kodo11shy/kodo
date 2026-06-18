@@ -92,22 +92,24 @@
   </view>
 
   <!-- 补签弹窗 -->
-  <view class="modal-overlay" wx:if="{{showMakeup}}" bindtap="cancelMakeup">
-    <view class="modal-content" catchtap="nop">
-      <text class="modal-icon">📝</text>
-      <text class="modal-title">补签</text>
-      <text class="modal-desc">学生：{{makeupStudent.name}}</text>
-      <view class="makeup-form">
-        <text class="form-label">时间</text>
-        <picker mode="time" value="{{makeupTime}}" bindchange="onMakeupTimeChange">
-          <view class="picker-value">{{makeupTime}}</view>
-        </picker>
-        <text class="form-label">原因</text>
-        <input class="input-field" placeholder="请输入补签原因" value="{{makeupReason}}" bindinput="onMakeupReasonInput" />
+  <view class="makeup-sheet-overlay" wx:if="{{showMakeup}}" bindtap="cancelMakeup">
+    <view class="makeup-sheet" catchtap="nop">
+      <view class="makeup-sheet-head">
+        <text class="makeup-sheet-title">补签</text>
+        <text class="makeup-sheet-close" bindtap="cancelMakeup">×</text>
       </view>
-      <view class="modal-actions">
-        <button class="btn-secondary modal-btn" bindtap="cancelMakeup">取消</button>
-        <button class="btn-primary modal-btn" bindtap="confirmMakeup">确认补签</button>
+      <view class="makeup-sheet-body">
+        <text class="makeup-student">学生：{{makeupStudent.name}}</text>
+        <text class="makeup-label">时间</text>
+        <picker mode="time" value="{{makeupTime}}" bindchange="onMakeupTimeChange">
+          <view class="makeup-picker">{{makeupTime}}</view>
+        </picker>
+        <text class="makeup-label">原因</text>
+        <input class="makeup-input" placeholder="请输入补签原因" value="{{makeupReason}}" bindinput="onMakeupReasonInput" />
+      </view>
+      <view class="makeup-sheet-actions">
+        <button class="makeup-sheet-btn cancel" bindtap="cancelMakeup">取消</button>
+        <button class="makeup-sheet-btn primary" bindtap="confirmMakeup">确认补签</button>
       </view>
     </view>
   </view>

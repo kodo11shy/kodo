@@ -195,87 +195,155 @@
 }
 
 /* 表单弹窗 */
-.form-dialog {
-  background: #FFF;
+.admin-sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36rpx 0;
+  box-sizing: border-box;
+  background: rgba(18, 24, 38, 0.58);
+}
+
+.admin-sheet {
+  width: 88vw;
+  max-width: 660rpx;
+  max-height: 86vh;
+  background: #FFFFFF;
   border-radius: 28rpx;
-  width: 580rpx;
-  padding: 36rpx 32rpx 28rpx;
+  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20rpx 60rpx rgba(16, 26, 52, 0.24);
 }
 
-.form-title {
-  font-size: 32rpx;
-  font-weight: bold;
+.admin-teacher-sheet,
+.admin-reset-sheet {
+  max-width: 620rpx;
+}
+
+.admin-sheet-head {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx 30rpx 22rpx;
+  border-bottom: 2rpx solid #EEF1F6;
+}
+
+.admin-sheet-title {
+  font-size: 34rpx;
+  font-weight: 700;
   color: #2F3A4C;
-  display: block;
+}
+
+.admin-sheet-close {
+  width: 58rpx;
+  height: 58rpx;
+  line-height: 54rpx;
   text-align: center;
-  margin-bottom: 28rpx;
+  border-radius: 50%;
+  background: #F2F4F8;
+  color: #697386;
+  font-size: 40rpx;
 }
 
-.form-hint {
-  font-size: 26rpx;
-  color: #7B8496;
-  display: block;
-  text-align: center;
-  margin-bottom: 20rpx;
-}
-
-.form-group {
-  margin-bottom: 20rpx;
-}
-
-.form-label {
-  font-size: 24rpx;
-  color: #7B8496;
-  display: block;
-  margin-bottom: 8rpx;
-}
-
-.form-input {
-  background: #F5F7FA;
-  border-radius: 14rpx;
-  padding: 20rpx 24rpx;
-  font-size: 28rpx;
-  color: #2F3A4C;
-  width: 100%;
+.admin-sheet-body {
+  max-height: calc(86vh - 190rpx);
+  padding: 24rpx 30rpx 8rpx;
   box-sizing: border-box;
 }
 
-.form-picker {
-  background: #F5F7FA;
-  border-radius: 14rpx;
-  padding: 20rpx 24rpx;
-  font-size: 28rpx;
-  color: #2F3A4C;
+.admin-reset-sheet .admin-sheet-body {
+  padding-bottom: 24rpx;
 }
 
-.form-actions {
-  display: flex;
-  gap: 16rpx;
-  margin-top: 28rpx;
-}
-
-.form-actions button {
-  flex: 1;
-  height: 80rpx;
-  line-height: 80rpx;
-  font-size: 28rpx;
-  border-radius: 16rpx;
-}
-
-.student-form-dialog {
-  max-height: 86vh;
-}
-
-.student-form-scroll {
-  max-height: 720rpx;
-}
-
-.form-section-title {
+.admin-form-section-title {
   display: block;
   font-size: 24rpx;
   font-weight: 700;
   color: #5B7FFF;
   margin: 8rpx 0 14rpx;
+}
+
+.admin-field {
+  margin-bottom: 22rpx;
+  min-width: 0;
+}
+
+.admin-label {
+  display: block;
+  margin-bottom: 10rpx;
+  font-size: 25rpx;
+  color: #6F788A;
+}
+
+.admin-input,
+.admin-picker {
+  width: 100%;
+  height: 76rpx;
+  min-height: 76rpx;
+  line-height: 76rpx;
+  padding: 0 22rpx;
+  box-sizing: border-box;
+  border-radius: 14rpx;
+  border: 2rpx solid #E5EAF2;
+  background: #FFFFFF;
+  color: #2F3A4C;
+  font-size: 27rpx;
+}
+
+.admin-form-hint {
+  display: block;
+  font-size: 26rpx;
+  color: #6F788A;
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: 22rpx;
+}
+
+.admin-sheet-actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 18rpx;
+  padding: 20rpx 30rpx 26rpx;
+  background: #FFFFFF;
+  border-top: 2rpx solid #EEF1F6;
+}
+
+.admin-sheet-btn {
+  flex: 1;
+  height: 82rpx;
+  line-height: 82rpx;
+  padding: 0;
+  border: none;
+  border-radius: 18rpx;
+  font-size: 29rpx;
+  font-weight: 700;
+}
+
+.admin-sheet-btn::after {
+  border: none;
+}
+
+.admin-sheet-btn.cancel {
+  background: #F0F2F6;
+  color: #697386;
+}
+
+.admin-sheet-btn.primary {
+  background: #5B7FFF;
+  color: #FFFFFF;
+}
+
+.admin-sheet-btn[disabled] {
+  opacity: 0.5;
 }
 
 .btn-secondary {
@@ -352,18 +420,4 @@
   padding: 16rpx 20rpx;
   font-size: 26rpx;
   color: #2F3A4C;
-}
-
-/* 遮罩 */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
 }

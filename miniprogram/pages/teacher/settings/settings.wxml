@@ -29,6 +29,35 @@
       </view>
     </view>
 
+    <!-- 登录设置 -->
+    <view class="section-card">
+      <text class="card-title">登录设置</text>
+      <view class="field-row">
+        <text class="field-label">老师登录</text>
+        <picker mode="selector" range="{{loginModeOptions}}" range-key="label" value="{{loginModeIndex}}" bindchange="onLoginModeChange">
+          <view class="field-picker">{{loginModeOptions[loginModeIndex].label}}</view>
+        </picker>
+      </view>
+      <view class="field-row" wx:if="{{config.teacher_login_mode === 'duration'}}">
+        <text class="field-label">免输时长</text>
+        <view class="field-inline">
+          <input class="field-input small-input" type="number" value="{{config.teacher_login_remember_hours}}" bindinput="onRememberHoursChange" />
+          <text class="field-unit">小时</text>
+        </view>
+      </view>
+      <view class="login-note" wx:if="{{config.teacher_login_mode === 'always'}}">每次进入老师端都要重新输入账号密码。</view>
+      <view class="login-note" wx:if="{{config.teacher_login_mode === 'duration'}}">登录后在设定时间内免重复输入账号密码，最长可设 720 小时。</view>
+      <view class="login-note" wx:if="{{config.teacher_login_mode === 'remember'}}">当前设备会长期记住老师登录状态，手动退出后失效。</view>
+
+      <view class="wechat-bind-row">
+        <view>
+          <text class="wechat-bind-title">老师微信登录</text>
+          <text class="wechat-bind-desc">{{teacherInfo.wechat_bound ? '当前老师账号已绑定微信' : '绑定后可直接使用微信登录老师端'}}</text>
+        </view>
+        <button class="bind-btn" bindtap="bindTeacherWechat">{{teacherInfo.wechat_bound ? '重新绑定' : '绑定微信'}}</button>
+      </view>
+    </view>
+
     <!-- 收费标准 -->
     <view class="section-card">
       <text class="card-title">💰 收费标准</text>
@@ -80,34 +109,39 @@
   </block>
 
   <!-- 收费项目编辑弹窗 -->
-  <view class="modal-overlay" wx:if="{{showFeeForm}}" bindtap="closeFeeForm">
-    <view class="modal-content" catchtap="nop">
-      <text class="modal-title">{{editingItem ? '编辑收费项目' : '添加收费项目'}}</text>
-
-      <view class="form-group">
-        <text class="form-label">项目名称</text>
-        <input class="input-field" placeholder="如：托管费、课外班、校车费" value="{{feeForm.name}}" bindinput="onFeeFieldChange" data-field="name" />
+  <view class="fee-sheet-overlay" wx:if="{{showFeeForm}}" bindtap="closeFeeForm">
+    <view class="fee-sheet" catchtap="nop">
+      <view class="fee-sheet-head">
+        <text class="fee-sheet-title">{{editingItem ? '编辑收费项目' : '添加收费项目'}}</text>
+        <text class="fee-sheet-close" bindtap="closeFeeForm">×</text>
       </view>
 
-      <view class="form-row">
-        <view class="form-group half">
-          <text class="form-label">金额</text>
-          <input class="input-field" type="digit" placeholder="800" value="{{feeForm.amount}}" bindinput="onFeeFieldChange" data-field="amount" />
+      <view class="fee-sheet-body">
+        <view class="fee-field">
+          <text class="fee-label">项目名称</text>
+          <input class="fee-input" placeholder="如：托管费、课外班、校车费" value="{{feeForm.name}}" bindinput="onFeeFieldChange" data-field="name" />
         </view>
-        <view class="form-group half">
-          <text class="form-label">单位</text>
-          <input class="input-field" placeholder="元/月" value="{{feeForm.unit}}" bindinput="onFeeFieldChange" data-field="unit" />
+
+        <view class="fee-row">
+          <view class="fee-field fee-half">
+            <text class="fee-label">金额</text>
+            <input class="fee-input" type="digit" placeholder="800" value="{{feeForm.amount}}" bindinput="onFeeFieldChange" data-field="amount" />
+          </view>
+          <view class="fee-field fee-half">
+            <text class="fee-label">单位</text>
+            <input class="fee-input" placeholder="元/月" value="{{feeForm.unit}}" bindinput="onFeeFieldChange" data-field="unit" />
+          </view>
+        </view>
+
+        <view class="fee-field">
+          <text class="fee-label">说明（选填）</text>
+          <input class="fee-input" placeholder="如：课后兴趣班、每月校车接送" value="{{feeForm.description}}" bindinput="onFeeFieldChange" data-field="description" />
         </view>
       </view>
 
-      <view class="form-group">
-        <text class="form-label">说明（选填）</text>
-        <input class="input-field" placeholder="如：课后兴趣班、每月校车接送" value="{{feeForm.description}}" bindinput="onFeeFieldChange" data-field="description" />
-      </view>
-
-      <view class="modal-actions">
-        <button class="btn-secondary modal-btn" bindtap="closeFeeForm">取消</button>
-        <button class="btn-primary modal-btn" bindtap="saveFeeItem">确定</button>
+      <view class="fee-sheet-actions">
+        <button class="fee-sheet-btn cancel" bindtap="closeFeeForm">取消</button>
+        <button class="fee-sheet-btn primary" bindtap="saveFeeItem">确定</button>
       </view>
     </view>
   </view>

@@ -1,5 +1,22 @@
 .page { min-height: 100vh; background: #FFFAF7; }
 
+/* ====== 日期选择器 ====== */
+.date-picker-bar {
+  display: flex; gap: 16rpx;
+  padding: 20rpx 30rpx; background: #FFF;
+  border-bottom: 2rpx solid #F0F2F5; margin-bottom: 20rpx;
+}
+.dp-btn {
+  flex: 1; text-align: center;
+  padding: 16rpx 0; border-radius: 12rpx;
+  font-size: 26rpx; color: #7B8496;
+  background: #FFF5F0; border: 2rpx solid transparent;
+}
+.dp-btn.active {
+  background: #FFE8DC; color: #FF8C5A; font-weight: 600;
+  border-color: #FF8C5A;
+}
+
 /* 作业卡片 */
 .hw-list { padding: 0 30rpx 30rpx; }
 .hw-card {

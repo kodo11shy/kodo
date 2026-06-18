@@ -14,7 +14,9 @@ Page({
     featuredPhotos: [],
     isLoggedIn: false,
     showNoticeModal: false,
-    selectedNotice: null
+    selectedNotice: null,
+    loading: false,
+    loadError: false
   },
 
   onLoad() {
@@ -33,9 +35,11 @@ Page({
   },
 
   loadHomepage() {
+    this.setData({ loading: true, loadError: false })
     api.request({ url: '/public/homepage' })
       .then((data) => {
         this.setData({
+          loading: false,
           schoolName: data.school_name || '智慧托班',
           welcomeMessage: data.welcome_message || '用心陪伴每一个孩子',
           contactWechat: data.contact_wechat || '',
@@ -67,7 +71,9 @@ Page({
           }))
         })
       })
-      .catch(() => {})
+      .catch(() => {
+        this.setData({ loading: false, loadError: true })
+      })
   },
 
   goTeacherLogin() {

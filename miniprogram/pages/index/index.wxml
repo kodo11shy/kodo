@@ -1,6 +1,21 @@
 <!-- 首页（对外展示·家长信任型） -->
 <view class="page">
 
+  <!-- 加载态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 加载失败态 -->
+  <view class="error-container" wx:elif="{{loadError}}">
+    <text class="error-icon">😵</text>
+    <text class="error-text">加载失败</text>
+    <text class="error-desc">请检查网络后重试</text>
+    <button class="btn-primary" bindtap="loadHomepage" style="width:auto;padding:20rpx 60rpx;margin-top:30rpx;">重新加载</button>
+  </view>
+
+  <!-- ====== 主内容（非加载/错误态时显示） ====== -->
+  <block wx:else>
   <!-- ====== 1. 氛围大图 + 机构名 ====== -->
   <view class="hero">
     <image class="hero-image" src="/images/banner-home-v2.png" mode="aspectFill"></image>
@@ -91,6 +106,8 @@
   <view class="footer">
     <text class="footer-text">{{schoolName}} © 2026</text>
   </view>
+
+  </block>
 
   <!-- 通知详情弹窗 -->
   <view class="modal-overlay" wx:if="{{showNoticeModal}}" bindtap="closeNotice">

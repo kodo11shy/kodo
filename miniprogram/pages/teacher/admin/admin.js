@@ -2,7 +2,9 @@
 const api = require('../../../utils/api')
 const util = require('../../../utils/util')
 
-const FIXED_HOMEWORK_SUBJECTS = ['语文', '数学']
+const FIXED_HOMEWORK_SUBJECTS = (() => {
+  try { return getApp().globalData.homeworkSubjects || ['语文', '数学'] } catch(e) { return ['语文', '数学'] }
+})()
 
 Page({
   data: {
@@ -39,7 +41,7 @@ Page({
     formRoleIndex: 0,
     roleOptions: ['老师', '管理员'],
     formSubjectIndex: 0,
-    formSubjectOptions: ['不限（管理员）', ...FIXED_HOMEWORK_SUBJECTS],
+    formSubjectOptions: FIXED_HOMEWORK_SUBJECTS,
     formLoading: false,
     formCanSave: false,
     formSaveText: '保存',
@@ -161,7 +163,7 @@ Page({
         this.setData({
           homeworkSubjects: FIXED_HOMEWORK_SUBJECTS,
           homeworkTypes: types,
-          formSubjectOptions: ['不限（管理员）', ...FIXED_HOMEWORK_SUBJECTS]
+          formSubjectOptions: FIXED_HOMEWORK_SUBJECTS
         })
       })
       .catch(() => {
@@ -254,7 +256,13 @@ Page({
   onFormName(e) { this._setFormState({ formName: e.detail.value }) },
   onFormPhone(e) { this.setData({ formPhone: e.detail.value }) },
   onFormPassword(e) { this.setData({ formPassword: e.detail.value }) },
-  onFormRole(e) { this.setData({ formRoleIndex: e.detail.value }) },
+  onFormRole(e) {
+    const roleIndex = Number(e.detail.value)
+    this.setData({
+      formRoleIndex: roleIndex,
+      formSubjectIndex: roleIndex === 1 ? 0 : this.data.formSubjectIndex
+    })
+  },
   onFormSubject(e) { this.setData({ formSubjectIndex: e.detail.value }) },
 
   closeForm() { this.setData({ showForm: false }) },
@@ -262,8 +270,7 @@ Page({
   _getSubjectValue() {
     const idx = this.data.formSubjectIndex
     const options = this.data.formSubjectOptions
-    // 索引0 = "不限（管理员）"
-    return idx > 0 && idx < options.length ? options[idx] : null
+    return idx >= 0 && idx < options.length ? options[idx] : options[0] || null
   },
 
   saveTeacher() {
@@ -271,7 +278,12 @@ Page({
     if (!name) { util.showError('请输入姓名'); return }
 
     const role = this.data.formRoleIndex === 1 ? 'admin' : 'teacher'
-    const subject = this._getSubjectValue()
+    const subject = role === 'admin' ? null : this._getSubjectValue()
+
+    if (role === 'teacher' && !subject) {
+      util.showError('请选择学科')
+      return
+    }
 
     if (this.data.formEditId) {
       this._setFormState({ formLoading: true })

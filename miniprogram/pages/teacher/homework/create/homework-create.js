@@ -3,7 +3,9 @@ const app = getApp()
 const api = require('../../../../utils/api')
 const util = require('../../../../utils/util')
 
-const FIXED_HOMEWORK_SUBJECTS = ['语文', '数学']
+const FIXED_HOMEWORK_SUBJECTS = (() => {
+  try { return getApp().globalData.homeworkSubjects || ['语文', '数学'] } catch(e) { return ['语文', '数学'] }
+})()
 
 Page({
   data: {

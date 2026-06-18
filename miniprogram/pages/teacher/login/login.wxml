@@ -26,6 +26,12 @@
       <button class="btn-primary login-btn" bindtap="doLogin" loading="{{loading}}" disabled="{{loading || !phone || !password}}">
         {{loading ? '登录中...' : '登 录'}}
       </button>
+
+      <button class="wechat-login-btn" bindtap="doWechatLogin" loading="{{wechatLoading}}" disabled="{{wechatLoading || loading}}">
+        {{wechatLoading ? '微信登录中...' : '微信登录'}}
+      </button>
+
+      <text class="policy-tip" wx:if="{{policyText}}">{{policyText}}</text>
     </view>
 
     <view class="login-footer">

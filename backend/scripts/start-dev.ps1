@@ -16,7 +16,7 @@ $env:DATABASE_URL = "sqlite:///./tuoban_dev.db"
 $env:TOKEN_SECRET = "dev-test-secret"
 $env:AUTO_CREATE_TABLES = "true"
 
-$Port = if ($env:PORT) { [int]$env:PORT } else { 8000 }
+$Port = 8001
 
 function Stop-PortListener {
   param([int]$Port)
@@ -62,10 +62,7 @@ function Test-PortBusy {
 
 Stop-PortListener -Port $Port
 if (Test-PortBusy -Port $Port) {
-  $fallbackPort = $Port + 1
-  Write-Host "Port $Port is still busy. Falling back to port $fallbackPort."
-  $Port = $fallbackPort
-  Stop-PortListener -Port $Port
+  throw "Port $Port is still busy. Please close the existing backend process and retry."
 }
 
 Write-Host "Starting backend on http://0.0.0.0:$Port"

@@ -64,6 +64,8 @@ def seed_default_config(db: Session) -> None:
         ("welcome_message", "用心陪伴每一个孩子", "欢迎语"),
         ("contact_wechat", "", "联系微信号"),
         ("contact_phone", "", "联系电话"),
+        ("teacher_login_mode", "duration", "老师端登录保持方式：always/duration/remember"),
+        ("teacher_login_remember_hours", "2", "老师端限时免登录小时数"),
         ("homework_subjects", HOMEWORK_SUBJECTS_JSON, "作业科目列表（固定：语文、数学）"),
         ("homework_types", '["课堂作业","家庭作业","练习题","背诵","其他"]', "作业类型列表（JSON 数组）"),
     ]

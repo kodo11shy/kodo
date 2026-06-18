@@ -191,6 +191,10 @@ Page({
     this.setData({ 'form.is_pinned': !this.data.form.is_pinned })
   },
 
+  clearEndDate() {
+    this.setData({ 'form.display_end': '' })
+  },
+
   submitNotice() {
     if (!this.data.form.title.trim()) { util.showError('请输入标题'); return }
     if (!this.data.form.content.trim()) { util.showError('请输入内容'); return }

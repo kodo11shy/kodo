@@ -156,7 +156,7 @@
   <view class="modal-overlay" wx:if="{{showTagPicker}}" bindtap="cancelTagPicker">
     <view class="tag-picker" catchtap="nop">
       <text class="tag-picker-title">修改标签</text>
-      <text class="tag-picker-hint">标签仅在此照片库中显示，不修改照片属性</text>
+      <text class="tag-picker-hint">标签会保存到照片资料，其他设备也会同步显示</text>
       <view class="tag-picker-options">
         <view class="tag-picker-option {{item.className}}"
           wx:for="{{tagOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="selectTag">

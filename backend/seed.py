@@ -61,7 +61,7 @@ from app.models import (
 
 # ── 数据库连接 ──────────────────────────────────────────────
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg://postgres:postgres@127.0.0.1:5432/tuoban")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./tuoban_dev.db")
 
 # SQLite 开发模式
 SQLITE_PATH = BACKEND_ROOT / "tuoban_dev.db"
@@ -70,6 +70,8 @@ USE_SQLITE = os.getenv("APP_ENV", "development") == "development" or "--sqlite" 
 if USE_SQLITE or "--sqlite" in sys.argv:
     if DATABASE_URL.startswith("sqlite"):
         db_url = DATABASE_URL
+        if db_url == "sqlite:///./tuoban_dev.db":
+            db_url = f"sqlite:///{SQLITE_PATH.as_posix()}"
     else:
         db_url = f"sqlite:///{SQLITE_PATH.as_posix()}"
     connect_args = {"check_same_thread": False}
@@ -345,14 +347,14 @@ def seed(db: Session, force: bool = False):
 
         # 家长
         p_list = []
-        for pd in PARENTS_DATA.get(sd["name"], []):
+        for parent_index, pd in enumerate(PARENTS_DATA.get(sd["name"], []), start=1):
             parent = Parent(
                 name=pd["name"],
                 relation=pd["relation"],
                 phone=pd["phone"],
                 is_primary=pd["is_primary"],
                 is_emergency=pd["is_emergency"],
-                invite_code=f"TB{student.id}{random.randint(100,999)}",
+                invite_code=f"TB{student.id:02d}{parent_index:02d}",
             )
             db.add(parent)
             db.flush()

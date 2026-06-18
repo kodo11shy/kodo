@@ -10,9 +10,6 @@
     <view class="ov-att-names" wx:if="{{attendanceNames}}">
       <text>{{attendanceNames}}</text>
     </view>
-    <view class="ov-att-empty" wx:elif="{{!loading}}">
-      <text>暂无签到记录，签到后显示在托人数</text>
-    </view>
 
     <!-- 科目统计 -->
     <view class="subject-grid" wx:if="{{subjectStats.length > 0}}">
@@ -32,9 +29,6 @@
         </view>
       </view>
     </view>
-    <view class="ov-empty" wx:elif="{{!loading}}">
-      <text>暂无作业记录</text>
-    </view>
   </view>
 
   <!-- 状态说明提示条 -->
@@ -46,6 +40,16 @@
     <text class="hint-line"><text class="hint-emoji">⏳</text> 待批改 — 学生做完交上来了，你还没批</text>
     <text class="hint-line"><text class="hint-emoji">✅</text> 已批改 — 你批完了，也给孩子讲了，孩子拿回去改了</text>
     <text class="hint-line"><text class="hint-emoji">🎉</text> 已完成 — 孩子改完拿回来，你检查确认没问题了</text>
+  </view>
+
+  <!-- ====== 日期选择器 ====== -->
+  <view class="date-picker-bar">
+    <view class="dp-btn {{selectedDate === '' ? 'active' : ''}}" bindtap="selectAll">📋 全部</view>
+    <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange">
+      <view class="dp-btn {{selectedDate ? 'active' : ''}}">
+        <text>{{selectedDate ? '📅 ' + selectedDate : '📅 选择日期'}}</text>
+      </view>
+    </picker>
   </view>
 
   <!-- 状态筛选 tabs -->
@@ -62,7 +66,8 @@
   <view class="list" wx:else>
     <view wx:if="{{filteredList.length === 0}}">
       <view class="empty-state">
-        <text>暂无作业记录</text>
+        <text wx:if="{{selectedDate}}">📭 {{selectedDate}} 暂无作业记录</text>
+        <text wx:else>📭 暂无作业记录</text>
       </view>
     </view>
 

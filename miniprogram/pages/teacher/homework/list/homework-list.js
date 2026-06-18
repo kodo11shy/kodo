@@ -1,4 +1,4 @@
-// 作业列表页 — 总览所有作业，按状态筛选
+// 作业列表页 — 按日期查看总览
 const app = getApp()
 const api = require('../../../../utils/api')
 const util = require('../../../../utils/util')
@@ -6,7 +6,9 @@ const util = require('../../../../utils/util')
 const SUBJECT_ICONS = {
   '语文': '📖', '数学': '🔢',
 }
-const FIXED_HOMEWORK_SUBJECTS = ['语文', '数学']
+const FIXED_HOMEWORK_SUBJECTS = (() => {
+  try { return getApp().globalData.homeworkSubjects || ['语文', '数学'] } catch(e) { return ['语文', '数学'] }
+})()
 
 Page({
   data: {
@@ -15,20 +17,17 @@ Page({
     records: [],
     filteredList: [],
     studentMap: {},
-    // 当前老师信息
     teacherSubject: '',
     isAdmin: false,
-    // 总览数据
     totalStudents: 0,
     attendanceCount: 0,
     attendanceNames: '',
     subjectStats: [],
-    // 状态说明
     showStatusHint: false,
+    selectedDate: '',
   },
 
   onLoad() {
-    // 读取当前老师信息
     const userInfo = app.globalData.userInfo || {}
     this.setData({
       teacherSubject: userInfo.subject || '',
@@ -58,7 +57,6 @@ Page({
         const list = data.students || data || []
         list.forEach(s => { map[s.id] = s.name })
         this.setData({ studentMap: map })
-        // 重新格式化已有记录（更新学生姓名）
         if (this.data.records.length > 0) {
           const records = this.data.records.map(r => this._formatRecord(r))
           this.setData({ records })
@@ -88,7 +86,6 @@ Page({
     if (refresh) this.setData({ records: [] })
     this.setData({ loading: true })
 
-    // 构造请求参数：非管理员老师只拉自己学科的作业
     const params = { page: 1, page_size: 100 }
     if (!this.data.isAdmin && this.data.teacherSubject) {
       params.subject = this.data.teacherSubject
@@ -150,7 +147,6 @@ Page({
       }
     }
 
-    // 构建操作人信息
     let operatorInfo = ''
     if (r.status === '已批改' && r.graded_by_name) {
       operatorInfo = `批改：${r.graded_by_name}`
@@ -160,6 +156,10 @@ Page({
       if (r.corrected_at) operatorInfo += ` ${util.formatTime(r.corrected_at)}`
       if (r.graded_by_name) operatorInfo = `批改：${r.graded_by_name} | 改错：${r.corrected_by_name}`
     }
+
+    // 取 date 字段的日期部分（兼容 "2026-06-09T..." 和 "2026-06-09" 两种格式）
+    const rawDate = r.date || r.homework_date || ''
+    const dateStr = rawDate.substring(0, 10)
 
     return {
       id: r.id,
@@ -174,7 +174,7 @@ Page({
       errorCount: r.error_count,
       accuracy: r.accuracy,
       remark: r.remark,
-      date: r.date || '',
+      date: dateStr,
       completedAt: r.completed_at,
       photos,
       donePhotoThumbs: (photos.done || []).slice(0, 4),
@@ -182,13 +182,30 @@ Page({
     }
   },
 
+  // ── 同时按日期 + 状态筛选 ──
   _applyFilter() {
     const tab = this.data.activeTab
+    const selDate = this.data.selectedDate
     let filtered = this.data.records
+    // 按日期筛选
+    if (selDate) {
+      filtered = filtered.filter(r => r.date === selDate)
+    }
+    // 按状态筛选
     if (tab !== 'all') {
-      filtered = this.data.records.filter(r => r.status === tab)
+      filtered = filtered.filter(r => r.status === tab)
     }
     this.setData({ filteredList: filtered })
+  },
+
+  onDateChange(e) {
+    this.setData({ selectedDate: e.detail.value })
+    this._applyFilter()
+  },
+
+  selectAll() {
+    this.setData({ selectedDate: '' })
+    this._applyFilter()
   },
 
   switchTab(e) {

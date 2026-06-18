@@ -249,35 +249,56 @@ Page({
         const key = 'tempFiles.' + group
         this.setData({ [key]: [...(this.data.tempFiles[group] || []), ...files] })
         this._refreshFormPhotoGroups()
-        this._uploadGroupPhotos(group, files)
       }
     })
-  },
-
-  _uploadGroupPhotos(group, files) {
-    util.showLoading('上传照片...')
-    Promise.all(files.map(f => api.uploadFile(f)))
-      .then((results) => {
-        const ids = results.map(r => r.photo_id)
-        const key = 'form.photo_ids.' + group
-        this.setData({ [key]: [...(this.data.form.photo_ids[group] || []), ...ids] })
-      })
-      .catch(() => util.showError('部分照片上传失败'))
-      .finally(() => wx.hideLoading())
   },
 
   removeGroupPhoto(e) {
     const group = e.currentTarget.dataset.group
     const idx = parseInt(e.currentTarget.dataset.index)
     const files = [...(this.data.tempFiles[group] || [])]
-    const ids = [...(this.data.form.photo_ids[group] || [])]
     files.splice(idx, 1)
-    ids.splice(idx, 1)
     this.setData({
       ['tempFiles.' + group]: files,
-      ['form.photo_ids.' + group]: ids
+      ['form.photo_ids.' + group]: []
     })
     this._refreshFormPhotoGroups()
+  },
+
+  _emptyPhotoIds() {
+    return PHOTO_GROUPS.reduce((acc, group) => {
+      acc[group.key] = []
+      return acc
+    }, {})
+  },
+
+  _uploadMealPhotos() {
+    const photoIds = this._emptyPhotoIds()
+    const uploadedIds = []
+    let chain = Promise.resolve()
+
+    PHOTO_GROUPS.forEach((group) => {
+      const files = this.data.tempFiles[group.key] || []
+      files.forEach((filePath) => {
+        chain = chain.then(() => api.uploadFile(filePath)).then((result) => {
+          if (result && result.photo_id) {
+            photoIds[group.key].push(result.photo_id)
+            uploadedIds.push(result.photo_id)
+          }
+        })
+      })
+    })
+
+    return chain.then(() => ({ photoIds, uploadedIds }))
+  },
+
+  _rollbackUploadedPhotos(uploadedIds) {
+    if (!uploadedIds || uploadedIds.length === 0) return Promise.resolve()
+    return api.request({
+      url: '/photos/batch',
+      method: 'POST',
+      data: { operation: 'delete', photo_ids: uploadedIds }
+    }).catch(() => null)
   },
 
   submitMeal() {
@@ -285,17 +306,35 @@ Page({
       util.showError('请填写菜单')
       return
     }
+    let uploadedIds = []
     this.setData({ submitting: true })
-    api.request({
-      url: '/meals',
-      method: 'POST',
-      data: this.data.form
-    }).then(() => {
-      util.showSuccess('保存成功')
-      this.setData({ showForm: false })
-      this.loadRecords()
-    }).catch((err) => {
-      util.showError(err.message || '保存失败')
-    }).finally(() => this.setData({ submitting: false }))
+    util.showLoading('保存中...')
+    this._uploadMealPhotos()
+      .then((result) => {
+        uploadedIds = result.uploadedIds
+        return api.request({
+          url: '/meals',
+          method: 'POST',
+          data: {
+            ...this.data.form,
+            photo_ids: result.photoIds
+          }
+        })
+      })
+      .then(() => {
+        uploadedIds = []
+        wx.hideLoading()
+        util.showSuccess('保存成功')
+        this.setData({ showForm: false, 'form.photo_ids': this._emptyPhotoIds() })
+        this.loadRecords()
+      })
+      .catch((err) => {
+        wx.hideLoading()
+        this._rollbackUploadedPhotos(uploadedIds)
+        util.showError(err.message || '保存失败')
+      })
+      .finally(() => {
+        this.setData({ submitting: false })
+      })
   }
 })

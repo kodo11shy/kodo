@@ -26,6 +26,68 @@
   color: #2F3A4C;
   padding: 8rpx 0;
 }
+.field-picker {
+  min-width: 220rpx;
+  text-align: right;
+  font-size: 28rpx;
+  color: #2F3A4C;
+  padding: 8rpx 0;
+}
+.field-inline {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10rpx;
+}
+.small-input {
+  flex: none;
+  width: 120rpx;
+}
+.field-unit {
+  font-size: 26rpx;
+  color: #7B8496;
+}
+.login-note {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  line-height: 1.5;
+  color: #7B8496;
+}
+.wechat-bind-row {
+  margin-top: 22rpx;
+  padding-top: 22rpx;
+  border-top: 2rpx solid #ECEFF5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+.wechat-bind-title {
+  display: block;
+  font-size: 27rpx;
+  font-weight: 600;
+  color: #2F3A4C;
+}
+.wechat-bind-desc {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 23rpx;
+  color: #7B8496;
+  line-height: 1.4;
+}
+.bind-btn {
+  flex-shrink: 0;
+  min-width: 150rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  padding: 0 22rpx;
+  border-radius: 14rpx;
+  background: #F1F8F3;
+  color: #1F8F4D;
+  border: 2rpx solid #BFE7CC;
+  font-size: 25rpx;
+}
 
 /* 统一收费列表 */
 .fee-list {
@@ -141,30 +203,90 @@
 .logout-text { color: #D84A3A; }
 
 /* 弹窗样式 */
-.modal-overlay {
+.fee-sheet-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.4);
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 100;
+  justify-content: center;
+  padding: 36rpx 0;
+  box-sizing: border-box;
+  background: rgba(18, 24, 38, 0.58);
 }
-.modal-content {
-  background: #FFF;
-  border-radius: 32rpx;
-  padding: 40rpx 30rpx;
-  width: 600rpx;
-  max-height: 80vh;
-  overflow-y: auto;
+.fee-sheet {
+  width: 88vw;
+  max-width: 660rpx;
+  max-height: 84vh;
+  background: #FFFFFF;
+  border-radius: 28rpx;
+  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20rpx 60rpx rgba(16, 26, 52, 0.24);
 }
-.modal-title { font-size: 34rpx; font-weight: bold; color: #2F3A4C; display: block; margin-bottom: 30rpx; text-align: center; }
-.form-group { margin-bottom: 24rpx; }
-.form-label { font-size: 26rpx; color: #7B8496; display: block; margin-bottom: 10rpx; }
-.form-row { display: flex; gap: 20rpx; }
-.form-group.half { flex: 1; }
-.modal-actions { display: flex; gap: 20rpx; margin-top: 30rpx; }
-.modal-btn { flex: 1; font-size: 28rpx; }
+.fee-sheet-head {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx 30rpx 22rpx;
+  border-bottom: 2rpx solid #EEF1F6;
+}
+.fee-sheet-title { font-size: 34rpx; font-weight: bold; color: #2F3A4C; display: block; }
+.fee-sheet-close {
+  width: 58rpx;
+  height: 58rpx;
+  line-height: 54rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: #F2F4F8;
+  color: #697386;
+  font-size: 40rpx;
+}
+.fee-sheet-body {
+  padding: 26rpx 30rpx 6rpx;
+  box-sizing: border-box;
+}
+.fee-field { margin-bottom: 24rpx; min-width: 0; }
+.fee-label { font-size: 26rpx; color: #7B8496; display: block; margin-bottom: 10rpx; }
+.fee-row { display: flex; gap: 20rpx; }
+.fee-half { flex: 1; min-width: 0; }
+.fee-input {
+  width: 100%;
+  height: 76rpx;
+  line-height: 76rpx;
+  min-height: 76rpx;
+  padding: 0 22rpx;
+  border-radius: 14rpx;
+  border: 2rpx solid #E5EAF2;
+  box-sizing: border-box;
+  background: #FFFFFF;
+  color: #2F3A4C;
+  font-size: 27rpx;
+  text-align: left;
+}
+.fee-sheet-actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 18rpx;
+  padding: 20rpx 30rpx 26rpx;
+  border-top: 2rpx solid #EEF1F6;
+}
+.fee-sheet-btn {
+  flex: 1;
+  height: 82rpx;
+  line-height: 82rpx;
+  padding: 0;
+  border: none;
+  border-radius: 18rpx;
+  font-size: 29rpx;
+  font-weight: 700;
+}
+.fee-sheet-btn::after { border: none; }
+.fee-sheet-btn.cancel { background: #F0F2F6; color: #697386; }
+.fee-sheet-btn.primary { background: #5B7FFF; color: #FFFFFF; }

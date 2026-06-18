@@ -102,37 +102,297 @@
   border-radius: 20rpx;
 }
 
-/* 弹窗 */
-.form-group { margin-bottom: 24rpx; }
-.form-label { font-size: 26rpx; color: #666; margin-bottom: 8rpx; display: block; }
-.textarea-field { height: 120rpx; padding: 20rpx; }
-.picker-field {
-  background: #F8F8F8;
-  border-radius: 12rpx;
-  padding: 20rpx 30rpx;
-  font-size: 28rpx;
-  border: 2rpx solid #E8E8E8;
+/* 餐食表单底部面板 */
+.meal-sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(18, 24, 38, 0.58);
+  z-index: 1000;
+  padding: 36rpx 0;
+  box-sizing: border-box;
+}
+
+.meal-sheet {
+  width: 88vw;
+  max-width: 660rpx;
+  max-height: 86vh;
+  background: #FFFFFF;
+  border-radius: 30rpx;
+  box-shadow: 0 20rpx 60rpx rgba(16, 26, 52, 0.24);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.meal-sheet-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 30rpx 20rpx;
+  border-bottom: 2rpx solid #EEF1F6;
+}
+
+.meal-sheet-title {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #2F3A4C;
+  line-height: 1.25;
+}
+
+.meal-sheet-subtitle {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 23rpx;
+  color: #8B94A7;
+}
+
+.meal-sheet-close {
+  width: 64rpx;
+  height: 64rpx;
+  line-height: 58rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: #F2F4F8;
+  color: #697386;
+  font-size: 44rpx;
+  flex-shrink: 0;
+}
+
+.meal-sheet-body {
+  max-height: calc(86vh - 198rpx);
+  box-sizing: border-box;
+  padding: 22rpx 30rpx 18rpx;
+}
+
+.form-section {
+  margin-bottom: 22rpx;
+  padding: 22rpx;
+  border-radius: 18rpx;
+  background: #F8FAFD;
+  border: 2rpx solid #EEF1F6;
+}
+
+.last-section {
+  margin-bottom: 10rpx;
+}
+
+.form-section-title {
+  display: block;
+  margin-bottom: 16rpx;
+  font-size: 25rpx;
+  font-weight: 700;
+  color: #2F3A4C;
+}
+
+.section-headline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-hint {
+  font-size: 22rpx;
+  color: #9AA3B5;
+}
+
+.form-two-col {
+  display: flex;
+  gap: 16rpx;
+}
+
+.meal-field {
+  margin-bottom: 18rpx;
+}
+
+.meal-field:last-child {
+  margin-bottom: 0;
+}
+
+.meal-field.compact {
+  flex: 1;
+  min-width: 0;
+}
+
+.meal-label {
+  display: block;
+  margin-bottom: 8rpx;
+  font-size: 23rpx;
+  color: #7B8496;
+}
+
+.meal-picker,
+.meal-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 14rpx;
+  border: 2rpx solid #E5EAF2;
+  background: #FFFFFF;
+  color: #2F3A4C;
+  font-size: 27rpx;
+}
+
+.meal-picker {
+  height: 76rpx;
+  line-height: 76rpx;
+  padding: 0 20rpx;
+}
+
+.meal-textarea {
+  min-height: 112rpx;
+  padding: 18rpx 20rpx;
+  line-height: 1.45;
+}
+
+.menu-textarea {
+  height: 128rpx;
+}
+
+.remark-textarea {
+  height: 112rpx;
+}
+
+.note-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.note-field {
+  display: flex;
+  align-items: center;
+  min-height: 76rpx;
+  background: #FFFFFF;
+  border: 2rpx solid #E5EAF2;
+  border-radius: 14rpx;
+  padding: 0 18rpx;
+  box-sizing: border-box;
+}
+
+.note-label {
+  width: 86rpx;
+  flex-shrink: 0;
+  color: #5B7FFF;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.note-input {
+  flex: 1;
+  min-width: 0;
+  height: 74rpx;
+  color: #2F3A4C;
+  font-size: 26rpx;
 }
 
 /* 照片分组 */
-.photo-groups { }
-.photo-group { margin-bottom: 20rpx; padding: 16rpx; background: #F8F8F8; border-radius: 12rpx; }
-.photo-group-header { display: flex; justify-content: space-between; align-items: center; }
-.photo-group-label { font-size: 24rpx; color: #666; }
-.photo-add-btn { font-size: 24rpx; color: #5B7FFF; padding: 8rpx; }
-.photo-thumbs { display: flex; flex-wrap: wrap; gap: 8rpx; margin-top: 10rpx; }
-.thumb-wrap { position: relative; }
-.thumb { width: 120rpx; height: 120rpx; border-radius: 8rpx; background: #DDD; }
+.compact-groups {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14rpx;
+}
+
+.photo-group {
+  min-width: 0;
+  padding: 16rpx;
+  background: #FFFFFF;
+  border: 2rpx solid #E5EAF2;
+  border-radius: 16rpx;
+}
+
+.photo-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.photo-group-label {
+  min-width: 0;
+  font-size: 23rpx;
+  color: #596276;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.photo-add-btn {
+  flex-shrink: 0;
+  font-size: 23rpx;
+  color: #5B7FFF;
+  padding: 4rpx 0 4rpx 12rpx;
+}
+
+.photo-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 12rpx;
+}
+
+.thumb-wrap {
+  position: relative;
+}
+
+.thumb {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 10rpx;
+  background: #EEF1F6;
+}
+
 .thumb-remove {
   position: absolute;
   top: -8rpx;
   right: -8rpx;
-  background: rgba(0,0,0,0.5);
-  color: #FFF;
   width: 32rpx;
   height: 32rpx;
-  border-radius: 50%;
+  line-height: 29rpx;
   text-align: center;
-  line-height: 32rpx;
-  font-size: 20rpx;
+  border-radius: 50%;
+  background: rgba(47, 58, 76, 0.82);
+  color: #FFFFFF;
+  font-size: 24rpx;
+}
+
+.meal-sheet-actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 18rpx;
+  padding: 18rpx 30rpx 24rpx;
+  background: #FFFFFF;
+  border-top: 2rpx solid #EEF1F6;
+}
+
+.sheet-btn {
+  flex: 1;
+  height: 82rpx;
+  line-height: 82rpx;
+  border-radius: 18rpx;
+  font-size: 29rpx;
+  font-weight: 700;
+  padding: 0;
+  border: none;
+}
+
+.cancel-btn {
+  background: #F0F2F6;
+  color: #697386;
+}
+
+.save-btn {
+  background: #5B7FFF;
+  color: #FFFFFF;
+}
+
+.save-btn[disabled] {
+  opacity: 0.6;
 }

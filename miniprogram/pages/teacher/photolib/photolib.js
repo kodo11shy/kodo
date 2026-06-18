@@ -165,15 +165,15 @@ Page({
   },
 
   _formatPhoto(p) {
-    const localTags = this._getLocalTags()
-    const localTag = localTags[p.id]
+    const photoType = p.photo_type || 'general'
+    const localTag = photoType === 'general' ? '' : photoType
     return {
       id: p.id,
       url: api.imageUrl(p.file_path),
       filePath: p.file_path,
-      photoType: p.photo_type,
-      photoTypeLabel: localTag ? this._typeLabel(localTag) : (this._typeLabel(p.photo_type) || ''),
-      localTag: localTag || '',
+      photoType,
+      photoTypeLabel: this._typeLabel(photoType) || '',
+      localTag,
       isFeatured: p.is_featured || false,
       takenAt: p.taken_at ? util.formatDate(p.taken_at) : '',
       remark: p.remark || '',
@@ -196,23 +196,6 @@ Page({
       hasMore: newPhotos.length >= this.data.pageSize,
       refreshing: false
     })
-  },
-
-  _getLocalTags() {
-    if (this._localTagsCache) return this._localTagsCache
-    try {
-      this._localTagsCache = wx.getStorageSync('photolib_tags') || {}
-    } catch (e) {
-      this._localTagsCache = {}
-    }
-    return this._localTagsCache
-  },
-
-  _saveLocalTags(tags) {
-    try {
-      wx.setStorageSync('photolib_tags', tags)
-      this._localTagsCache = tags
-    } catch (e) { util.showError('标签保存失败') }
   },
 
   // ======== 筛选切换 ========
@@ -341,7 +324,7 @@ Page({
     this.setData({
       showTagPicker: true,
       tagPickerPhoto: photo,
-      tagOptions: this._buildTagOptions(photo.localTag)
+      tagOptions: this._buildTagOptions(photo.photoType || 'general')
     })
   },
 
@@ -359,19 +342,25 @@ Page({
     const tagKey = e.currentTarget.dataset.key
     const photo = this.data.tagPickerPhoto
     if (!photo) return
-    const tags = this._getLocalTags()
-    if (tagKey === '') { delete tags[photo.id] }
-    else { tags[photo.id] = tagKey }
-    this._saveLocalTags(tags)
-    const photos = this.data.photos.map(p => {
-      if (p.id === photo.id) {
-        p.localTag = tagKey
-        p.photoTypeLabel = tagKey ? this._typeLabel(tagKey) : (this._typeLabel(p.photoType) || '')
-      }
-      return p
-    })
-    this.setData({ photos, showTagPicker: false, tagPickerPhoto: null })
-    wx.showToast({ title: tagKey ? '已设为' + this._typeLabel(tagKey) : '已清除标签', icon: 'success' })
+    const photoType = tagKey || 'general'
+    api.request({
+      url: '/photos/' + photo.id,
+      method: 'PUT',
+      data: { photo_type: photoType }
+    }).then((data) => {
+      const savedType = data.photo?.photo_type || photoType
+      const localTag = savedType === 'general' ? '' : savedType
+      const photos = this.data.photos.map(p => {
+        if (p.id === photo.id) {
+          p.photoType = savedType
+          p.localTag = localTag
+          p.photoTypeLabel = this._typeLabel(savedType) || ''
+        }
+        return p
+      })
+      this.setData({ photos, showTagPicker: false, tagPickerPhoto: null })
+      wx.showToast({ title: tagKey ? '已设为' + this._typeLabel(savedType) : '已清除标签', icon: 'success' })
+    }).catch((err) => util.showError(err.message || '标签保存失败'))
   },
 
   cancelTagPicker() {

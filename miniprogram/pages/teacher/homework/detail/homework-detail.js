@@ -1,8 +1,6 @@
 const api = require('../../../../utils/api')
 const util = require('../../../../utils/util')
 
-const FIXED_HOMEWORK_SUBJECTS = ['语文', '数学']
-
 Page({
   data: {
     homework: null,
@@ -53,14 +51,16 @@ Page({
 
   loadHomework(id) {
     util.showLoading('加载中...')
-    api.request({ url: '/homework', data: { page_size: 50 } })
+    // 用列表接口查询：后端已按 ALLOWED_HOMEWORK_SUBJECTS 过滤，
+    // 前端不再重复过滤，通过 id 在结果中匹配
+    api.request({ url: '/homework', data: { page_size: 100 } })
       .then((data) => {
-        const records = (data.records || []).filter(item => FIXED_HOMEWORK_SUBJECTS.includes(item.subject))
+        const records = data.records || []
         const hw = records.find(r => r.id == id)
         if (hw) {
           this.setHomework(hw)
         } else {
-          util.showError('未找到作业')
+          util.showError('未找到该作业记录')
         }
       })
       .catch(() => util.showError('加载失败'))

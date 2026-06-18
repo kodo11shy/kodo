@@ -48,6 +48,23 @@
 
 .ov-empty { font-size: 24rpx; color: #B1B8C7; text-align: center; padding: 20rpx 0; }
 
+/* ====== 日期选择器 ====== */
+.date-picker-bar {
+  display: flex; gap: 16rpx;
+  padding: 20rpx 24rpx; background: #FFF;
+  border-bottom: 2rpx solid #F0F2F5;
+}
+.dp-btn {
+  flex: 1; text-align: center;
+  padding: 16rpx 0; border-radius: 12rpx;
+  font-size: 26rpx; color: #7B8496;
+  background: #F7F8FC; border: 2rpx solid transparent;
+}
+.dp-btn.active {
+  background: #EEF1FF; color: #5B7FFF; font-weight: 600;
+  border-color: #5B7FFF;
+}
+
 /* ====== 状态说明 ====== */
 .status-hint-bar { display: flex; align-items: center; padding: 16rpx 24rpx; background: #FFF8F0; gap: 8rpx; }
 .hint-icon { font-size: 24rpx; }

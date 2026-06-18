@@ -2,7 +2,9 @@
 const api = require('../../../utils/api')
 const util = require('../../../utils/util')
 
-const FIXED_HOMEWORK_SUBJECTS = ['语文', '数学']
+const FIXED_HOMEWORK_SUBJECTS = (() => {
+  try { return getApp().globalData.homeworkSubjects || ['语文', '数学'] } catch(e) { return ['语文', '数学'] }
+})()
 
 Page({
   data: {
@@ -56,7 +58,6 @@ Page({
         })
         if (list.length > 0) {
           this.loadStudentTimeline(list[this.data.currentIndex])
-          this.loadTodayMeal()
         }
       })
       .catch((err) => {
@@ -86,6 +87,61 @@ Page({
 
   // 加载当前孩子的成长时间线（取照片和评语）
   loadStudentTimeline(student) {
+    if (!student || !student.id) return
+    api.request({ url: '/parent/dashboard/today', data: { student_id: student.id } })
+      .then((data) => {
+        this.applyTodayOverview(data)
+      })
+      .catch(() => {
+        this.loadStudentTimelineFallback(student)
+      })
+  },
+
+  applyTodayOverview(data) {
+    const student = data.student || this.data.currentStudent
+    const attendance = data.attendance_today || {}
+    const latestPhotos = (data.latest_photos || []).map((photo) => ({
+      id: photo.id,
+      url: api.imageUrl(photo.file_path || photo.thumbnail)
+    })).filter(item => item.url)
+
+    const homework = data.homework_today
+    const statusMap = { '待批改': 'waiting', '已批改': 'graded', '已完成': 'done' }
+    const latestHomework = homework ? {
+      id: homework.id,
+      subject: homework.subject,
+      statusLabel: homework.status || '作业',
+      statusClass: statusMap[homework.status] || 'waiting',
+      remark: homework.remark ? homework.remark.slice(0, 40) : '',
+      date: homework.date || ''
+    } : null
+
+    const remark = data.latest_remark
+    const latestRemark = remark ? {
+      content: remark.content || '',
+      mood_tag: remark.mood_tag || '',
+      date: remark.date || ''
+    } : null
+
+    const currentStudent = student ? {
+      ...(this.data.currentStudent || {}),
+      ...student,
+      initial: student.initial || ((student.name || '').slice(0, 1)),
+      gradeText: student.grade || (this.data.currentStudent && this.data.currentStudent.gradeText) || '—',
+      checkinTime: attendance.checkin_time || (this.data.currentStudent && this.data.currentStudent.checkinTime) || '',
+      checkoutTime: attendance.checkout_time || (this.data.currentStudent && this.data.currentStudent.checkoutTime) || ''
+    } : this.data.currentStudent
+
+    this.setData({
+      currentStudent,
+      todayPhotos: latestPhotos,
+      todayMeal: data.meal_today || null,
+      latestHomework,
+      latestRemark
+    })
+  },
+
+  loadStudentTimelineFallback(student) {
     // 最新作业
     api.request({ url: '/parent/homework/' + student.id, data: { page: 1, page_size: 5 } })
       .then((data) => {
@@ -142,6 +198,8 @@ Page({
         }
       })
       .catch(() => {})
+
+    this.loadTodayMeal()
   },
 
   // 加载最新餐食

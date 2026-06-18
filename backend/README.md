@@ -25,7 +25,7 @@ backend/
 .\scripts\start-dev.ps1
 ```
 
-该脚本会使用 SQLite 本地联调数据库，并在 `http://localhost:8000` 启动后端。
+该脚本会使用 SQLite 本地联调数据库 `tuoban_dev.db`，并固定在 `http://127.0.0.1:8001` / `http://192.168.1.8:8001` 启动后端。
 
 手动启动：
 
@@ -35,12 +35,12 @@ python -m venv .venv
 .\\.venv\\Scripts\\Activate.ps1
 pip install -r requirements.txt
 Copy-Item .env.example .env
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
 ```
 
 默认会根据 `DATABASE_URL` 自动建表，并在 teachers 表为空时创建默认管理员。
 
-如果本机暂时没有 PostgreSQL，可在 `.env` 中临时改用 SQLite 联调：
+本地开发统一使用 SQLite 联调库，不再混用 `tuoban.db`：
 
 ```text
 DATABASE_URL=sqlite:///./tuoban_dev.db

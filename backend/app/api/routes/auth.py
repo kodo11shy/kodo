@@ -9,10 +9,56 @@ from app.core.datetime import now_utc_naive
 from app.core.responses import fail, ok
 from app.core.security import create_token, verify_password
 from app.db.session import get_db
-from app.models import Parent, ParentBinding, Student, StudentParent, Teacher
+from app.models import Parent, ParentBinding, Student, StudentParent, SystemConfig, Teacher
 from app.schemas.auth import ParentBindRequest, TeacherBindWechatRequest, TeacherLoginRequest, WechatSessionRequest
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+def _teacher_login_payload(teacher: Teacher) -> dict:
+    token = create_token(
+        subject=f"teacher:{teacher.id}",
+        extra={"teacher_id": teacher.id, "role": teacher.role},
+    )
+    return {
+        "token": token,
+        "teacher": {
+            "id": teacher.id,
+            "name": teacher.name,
+            "role": teacher.role,
+            "subject": teacher.subject,
+            "wechat_bound": bool(teacher.wechat_openid),
+        },
+    }
+
+
+def _login_policy(db: Session) -> dict:
+    keys = ("teacher_login_mode", "teacher_login_remember_hours")
+    rows = db.execute(
+        select(SystemConfig).where(SystemConfig.config_key.in_(keys))
+    ).scalars().all()
+    values = {row.config_key: row.config_value for row in rows}
+
+    mode = values.get("teacher_login_mode") or "duration"
+    if mode not in {"always", "duration", "remember"}:
+        mode = "duration"
+
+    hours_raw = values.get("teacher_login_remember_hours") or "2"
+    try:
+        hours = int(hours_raw)
+    except (TypeError, ValueError):
+        hours = 2
+    hours = max(1, min(hours, 24 * 30))
+
+    return {
+        "teacher_login_mode": mode,
+        "teacher_login_remember_hours": hours,
+    }
+
+
+@router.get("/login-policy")
+def login_policy(db: Session = Depends(get_db)):
+    return ok(_login_policy(db))
 
 
 @router.post("/teacher/login")
@@ -33,22 +79,7 @@ def teacher_login(payload: TeacherLoginRequest, db: Session = Depends(get_db)):
     if teacher is None:
         return fail("账号或密码错误", code=40001, status_code=401)
 
-    token = create_token(
-        subject=f"teacher:{teacher.id}",
-        extra={"teacher_id": teacher.id, "role": teacher.role},
-    )
-    return ok(
-        {
-            "token": token,
-            "teacher": {
-                "id": teacher.id,
-                "name": teacher.name,
-                "role": teacher.role,
-                "subject": teacher.subject,
-                "wechat_bound": bool(teacher.wechat_openid),
-            },
-        }
-    )
+    return ok(_teacher_login_payload(teacher))
 
 
 @router.post("/wechat/session")
@@ -103,6 +134,19 @@ def teacher_bind_wechat(
     current_teacher.updated_at = now_utc_naive()
     db.commit()
     return ok({"teacher_id": current_teacher.id, "wechat_bound": True})
+
+
+@router.post("/teacher/wechat-login")
+def teacher_wechat_login(payload: TeacherBindWechatRequest, db: Session = Depends(get_db)):
+    teacher = db.execute(
+        select(Teacher).where(
+            Teacher.wechat_openid == payload.openid,
+            Teacher.is_active.is_(True),
+        )
+    ).scalar_one_or_none()
+    if teacher is None:
+        return fail("当前微信尚未绑定老师账号，请先用账号密码登录后绑定", code=40104, status_code=401)
+    return ok(_teacher_login_payload(teacher))
 
 
 @router.post("/parent/bind")

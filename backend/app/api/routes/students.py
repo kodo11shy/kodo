@@ -106,6 +106,7 @@ def student_detail_out(db: Session, student: Student) -> dict:
 def list_students(
     status: str = Query(default="在读"),
     keyword: str | None = Query(default=None),
+    include_details: bool = Query(default=False),
     db: Session = Depends(get_db),
     current_teacher: Teacher = Depends(get_current_teacher),
 ):
@@ -123,6 +124,11 @@ def list_students(
         )
 
     students = db.execute(query.order_by(Student.id)).scalars().all()
+
+    if include_details:
+        # 一次查询返回完整数据（含家长、接送人、健康），消除前端 N+1 请求
+        return ok({"students": [student_detail_out(db, student) for student in students]})
+
     return ok({"students": [student_summary(student) for student in students]})
 
 

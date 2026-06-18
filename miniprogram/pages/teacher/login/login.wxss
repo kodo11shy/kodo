@@ -91,6 +91,30 @@
   opacity: 0.5;
 }
 
+.wechat-login-btn {
+  margin-top: 20rpx;
+  height: 86rpx;
+  line-height: 86rpx;
+  font-size: 30rpx;
+  border-radius: 14rpx;
+  background: #F1F8F3;
+  color: #1F8F4D;
+  border: 2rpx solid #BFE7CC;
+}
+
+.wechat-login-btn[disabled] {
+  opacity: 0.5;
+}
+
+.policy-tip {
+  display: block;
+  margin-top: 20rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #7B8496;
+  line-height: 1.5;
+}
+
 .login-footer {
   text-align: center;
   margin-top: 40rpx;

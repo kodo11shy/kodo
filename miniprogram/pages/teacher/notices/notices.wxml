@@ -88,49 +88,60 @@
   </view>
 
   <!-- 通知编辑弹窗 -->
-  <view class="modal-overlay" wx:if="{{showForm}}" bindtap="closeForm">
-    <view class="modal-content modal-large" catchtap="nop">
-      <text class="modal-title">{{formTitle}}</text>
-
-      <view class="form-group">
-        <text class="form-label">标题</text>
-        <input class="input-field" placeholder="通知标题" value="{{form.title}}" bindinput="onFormField" data-field="title" />
+  <view class="notice-sheet-overlay" wx:if="{{showForm}}" bindtap="closeForm">
+    <view class="notice-sheet" catchtap="nop">
+      <view class="notice-sheet-head">
+        <text class="notice-sheet-title">{{formTitle}}</text>
+        <text class="notice-sheet-close" bindtap="closeForm">×</text>
       </view>
 
-      <view class="form-group">
-        <text class="form-label">内容</text>
-        <textarea class="input-field textarea-field" placeholder="通知内容" value="{{form.content}}" bindinput="onFormField" data-field="content" />
-      </view>
-
-      <view class="form-group">
-        <text class="form-label">类型</text>
-        <picker bindchange="selectNoticeType" range="{{noticeTypes}}">
-          <view class="picker-field">{{form.notice_type}}</view>
-        </picker>
-      </view>
-
-      <view class="form-group">
-        <text class="form-label">置顶</text>
-        <view class="toggle-row">
-          <switch checked="{{form.is_pinned}}" bindchange="togglePinned" />
-          <text wx:if="{{form.is_pinned}}" class="tag tag-red">已置顶</text>
+      <scroll-view class="notice-sheet-body" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="notice-field">
+          <text class="notice-label">标题</text>
+          <input class="notice-control" placeholder="通知标题" value="{{form.title}}" bindinput="onFormField" data-field="title" />
         </view>
-      </view>
 
-      <view class="form-row">
-        <view class="form-group half">
-          <text class="form-label">开始显示</text>
-          <input class="input-field" type="text" placeholder="2026-06-01" value="{{form.display_start}}" bindinput="onFormField" data-field="display_start" />
+        <view class="notice-field">
+          <text class="notice-label">内容</text>
+          <textarea class="notice-control notice-textarea" placeholder="通知内容" value="{{form.content}}" bindinput="onFormField" data-field="content" />
         </view>
-        <view class="form-group half">
-          <text class="form-label">结束显示</text>
-          <input class="input-field" type="text" placeholder="留空长期" value="{{form.display_end}}" bindinput="onFormField" data-field="display_end" />
-        </view>
-      </view>
 
-      <view class="modal-actions">
-        <button class="btn-secondary modal-btn" bindtap="closeForm">取消</button>
-        <button class="btn-primary modal-btn" bindtap="submitNotice" loading="{{submitting}}" disabled="{{submitting}}">{{formSubmitText}}</button>
+        <view class="notice-field">
+          <text class="notice-label">类型</text>
+          <picker bindchange="selectNoticeType" range="{{noticeTypes}}">
+            <view class="notice-picker">{{form.notice_type}}</view>
+          </picker>
+        </view>
+
+        <view class="notice-field">
+          <text class="notice-label">置顶</text>
+          <view class="notice-toggle">
+            <switch checked="{{form.is_pinned}}" bindchange="togglePinned" />
+            <text wx:if="{{form.is_pinned}}" class="tag tag-red">已置顶</text>
+            <text wx:else class="notice-toggle-hint">普通通知</text>
+          </view>
+        </view>
+
+        <view class="notice-row">
+          <view class="notice-field notice-half">
+            <text class="notice-label">开始显示</text>
+            <picker mode="date" value="{{form.display_start}}" bindchange="onFormField" data-field="display_start">
+              <view class="notice-picker">{{form.display_start || '选择日期'}}</view>
+            </picker>
+          </view>
+          <view class="notice-field notice-half">
+            <text class="notice-label">结束显示</text>
+            <picker mode="date" value="{{form.display_end}}" bindchange="onFormField" data-field="display_end">
+              <view class="notice-picker">{{form.display_end || '长期'}}</view>
+            </picker>
+            <text class="notice-clear-date" wx:if="{{form.display_end}}" bindtap="clearEndDate">设为长期</text>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="notice-sheet-actions">
+        <button class="notice-sheet-btn cancel" bindtap="closeForm">取消</button>
+        <button class="notice-sheet-btn primary" bindtap="submitNotice" loading="{{submitting}}" disabled="{{submitting}}">{{formSubmitText}}</button>
       </view>
     </view>
   </view>

@@ -176,20 +176,23 @@
   </block>
 
   <!-- 评语弹窗（保持原有逻辑不变） -->
-  <view class="modal-overlay" wx:if="{{showRemarkInput}}" bindtap="closeRemark">
-    <view class="modal-content" catchtap="nop">
-      <text class="modal-title">✏️ 写评语</text>
-      <text class="modal-student" wx:if="{{selectedStudent}}">学生：{{selectedStudent.name}}</text>
-      <textarea class="remark-textarea" placeholder="记录孩子今天表现..." value="{{remarkContent}}" bindinput="onRemarkInput" maxlength="500" />
-      <view class="mood-selector">
+  <view class="remark-sheet-overlay" wx:if="{{showRemarkInput}}" bindtap="closeRemark">
+    <view class="remark-sheet" catchtap="nop">
+      <view class="remark-sheet-head">
+        <text class="remark-sheet-title">写评语</text>
+        <text class="remark-sheet-close" bindtap="closeRemark">×</text>
+      </view>
+      <view class="remark-sheet-body">
+        <text class="remark-student" wx:if="{{selectedStudent}}">学生：{{selectedStudent.name}}</text>
+        <textarea class="remark-input" placeholder="记录孩子今天表现..." value="{{remarkContent}}" bindinput="onRemarkInput" maxlength="500" />
         <text class="mood-label">心情标签</text>
         <view class="mood-options">
           <view class="mood-tag {{item.className}}" wx:for="{{moodOptions}}" wx:key="mood" bindtap="selectMood" data-mood="{{item.mood}}">{{item.label}}</view>
         </view>
       </view>
-      <view class="modal-actions">
-        <button class="btn-secondary modal-btn" bindtap="closeRemark">取消</button>
-        <button class="btn-primary modal-btn" bindtap="submitRemark" loading="{{submitting}}" disabled="{{remarkSubmitDisabled}}">保存评语</button>
+      <view class="remark-sheet-actions">
+        <button class="remark-sheet-btn cancel" bindtap="closeRemark">取消</button>
+        <button class="remark-sheet-btn primary" bindtap="submitRemark" loading="{{submitting}}" disabled="{{remarkSubmitDisabled}}">保存评语</button>
       </view>
     </view>
   </view>

@@ -43,27 +43,19 @@ Page({
 
   loadOverview() {
     this.setData({ loading: true })
-    const params = { status: '在读' }
+    const params = { status: '在读', include_details: true }
     if (this.data.keyword) params.keyword = this.data.keyword
 
     Promise.all([
       api.request({ url: '/students', data: params }),
       api.request({ url: '/attendance/today' }).catch(() => ({ checked_in: [], total: 0 }))
     ]).then(([studentData, attendanceData]) => {
-      const basicStudents = studentData.students || studentData || []
+      const students = studentData.students || studentData || []
       const checkedIn = attendanceData.checked_in || []
       const checkedInIds = checkedIn.map(item => item.student_id || item.id)
 
-      return Promise.all(
-        basicStudents.map(student =>
-          api.request({ url: '/students/' + student.id })
-            .then(detail => ({ ...student, ...detail }))
-            .catch(() => student)
-        )
-      ).then(details => {
-        const students = details.map(item => this._buildStudentRow(item, checkedInIds))
-        this._setOverview(students, checkedInIds.length)
-      })
+      const rows = students.map(item => this._buildStudentRow(item, checkedInIds))
+      this._setOverview(rows, checkedInIds.length)
     }).catch(() => {
       util.showError('加载失败')
       this.setData({ allStudents: [], students: [] })

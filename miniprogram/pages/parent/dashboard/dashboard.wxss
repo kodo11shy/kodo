@@ -345,16 +345,32 @@
 .notice-modal {
   background: #FFF;
   border-radius: 28rpx;
-  width: 580rpx;
+  width: 86vw;
+  max-width: 620rpx;
   max-height: 70vh;
   padding: 36rpx 32rpx 28rpx;
   box-shadow: 0 20rpx 60rpx rgba(0,0,0,0.2);
+  box-sizing: border-box;
 }
 .notice-modal-title { font-size: 32rpx; font-weight: bold; color: #2F3A4C; display: block; text-align: center; }
 .notice-modal-type { font-size: 22rpx; color: #FF8C5A; display: block; text-align: center; margin-top: 8rpx; }
 .notice-modal-divider { height: 2rpx; background: #F0F2F5; margin: 20rpx 0; }
-.notice-modal-body { max-height: 40vh; }
-.notice-modal-content { font-size: 28rpx; color: #4A5568; line-height: 1.7; display: block; }
+.notice-modal-body {
+  max-height: 40vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+.notice-modal-content {
+  font-size: 28rpx;
+  color: #4A5568;
+  line-height: 1.7;
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  width: 100%;
+  box-sizing: border-box;
+}
 .notice-modal-footer { text-align: center; margin-top: 28rpx; }
 .notice-close-btn { font-size: 28rpx; color: #FF8C5A; font-weight: 600; padding: 10rpx 40rpx; }
 
