@@ -49,40 +49,60 @@ const request = (options) => {
 
 /**
  * 上传文件封装（用于拍照上传）
+ * 自动压缩图片后再上传，减少传输时间和服务器存储
  */
+const compressImage = (filePath) => {
+  return new Promise((resolve) => {
+    if (!wx.compressImage) {
+      resolve(filePath)
+      return
+    }
+    wx.compressImage({
+      src: filePath,
+      quality: 80,
+      success: (res) => resolve(res.tempFilePath),
+      fail: () => resolve(filePath)  // 压缩失败则使用原图
+    })
+  })
+}
+
 const uploadFile = (filePath) => {
   return new Promise((resolve, reject) => {
-    const token = app.globalData.token
-    const upload = (apiBase, retried = false) => wx.uploadFile({
-      url: apiBase + '/photos/upload',
-      filePath: filePath,
-      name: 'file',
-      header: {
-        'Authorization': 'Bearer ' + token
-      },
-      success: (res) => {
-        try {
-          const data = JSON.parse(res.data)
-          if (data.code === 0) {
-            resolve(data.data)
-          } else {
-            reject(new Error(data.message || '上传失败'))
+    // 先压缩，再上传
+    compressImage(filePath).then((compressedPath) => {
+      const token = app.globalData.token
+      const upload = (apiBase, retried = false) => wx.uploadFile({
+        url: apiBase + '/photos/upload',
+        filePath: compressedPath,
+        name: 'file',
+        timeout: 60000,
+        header: {
+          'Authorization': 'Bearer ' + token
+        },
+        success: (res) => {
+          try {
+            const data = JSON.parse(res.data)
+            if (data.code === 0) {
+              resolve(data.data)
+            } else {
+              reject(new Error(data.message || '上传失败'))
+            }
+          } catch (e) {
+            reject(new Error('上传返回格式错误'))
           }
-        } catch (e) {
-          reject(new Error('上传返回格式错误'))
+        },
+        fail: (err) => {
+          console.error('上传请求失败', apiBase + '/photos/upload', err)
+          if (!retried && app.globalData.apiFallbackBase && apiBase !== app.globalData.apiFallbackBase) {
+            upload(app.globalData.apiFallbackBase, true)
+            return
+          }
+          reject(new Error('上传失败：' + err.errMsg))
         }
-      },
-      fail: (err) => {
-        console.error('上传请求失败', apiBase + '/photos/upload', err)
-        if (!retried && app.globalData.apiFallbackBase && apiBase !== app.globalData.apiFallbackBase) {
-          upload(app.globalData.apiFallbackBase, true)
-          return
-        }
-        reject(new Error('上传失败：' + err.errMsg))
-      }
-    })
+      })
 
-    upload(app.globalData.apiBase)
+      upload(app.globalData.apiBase)
+    })
   })
 }
 
