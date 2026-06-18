@@ -24,6 +24,7 @@ from app.schemas.photo import (
 router = APIRouter(prefix="/photos", tags=["photos"])
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
+STUDENT_REQUIRED_PHOTO_TYPES = {"homework"}
 
 
 def _delete_photo_file(photo: Photo) -> None:
@@ -56,6 +57,17 @@ def _photo_out(photo: Photo) -> dict:
         "taken_at": photo.taken_at.isoformat() if photo.taken_at else None,
         "remark": photo.remark,
     }
+
+
+def _validate_student_ids(db: Session, student_ids: list[int]) -> tuple[set[int], list[int]]:
+    if not student_ids:
+        return set(), []
+    students = db.execute(
+        select(Student).where(Student.id.in_(student_ids), Student.is_active.is_(True))
+    ).scalars().all()
+    valid_ids = {student.id for student in students}
+    missing_ids = [student_id for student_id in student_ids if student_id not in valid_ids]
+    return valid_ids, missing_ids
 
 
 @router.post("/upload")
@@ -208,11 +220,9 @@ def batch_associate(
     photos = db.execute(select(Photo).where(Photo.id.in_(payload.photo_ids))).scalars().all()
     if not photos:
         return fail("未找到任何照片", code=40402, status_code=404)
-    students = db.execute(
-        select(Student).where(Student.id.in_(payload.student_ids), Student.is_active.is_(True))
-    ).scalars().all()
-    valid_ids = {s.id for s in students}
-    missing = [sid for sid in payload.student_ids if sid not in valid_ids]
+    if payload.photo_type in STUDENT_REQUIRED_PHOTO_TYPES and not payload.student_ids:
+        return fail("作业照片需要选择学生", code=40002, status_code=400)
+    _, missing = _validate_student_ids(db, payload.student_ids)
     if missing:
         return fail(f"学生不存在: {missing}", code=40401, status_code=404)
 
@@ -220,7 +230,7 @@ def batch_associate(
     count = 0
     for photo in photos:
         photo.photo_type = payload.photo_type
-        if payload.remark:
+        if payload.remark is not None:
             photo.remark = payload.remark
         existing = set(
             db.execute(
@@ -262,12 +272,10 @@ def associate_photo(
     photo = db.get(Photo, photo_id)
     if photo is None:
         return fail("照片不存在", code=40402, status_code=404)
+    if payload.photo_type in STUDENT_REQUIRED_PHOTO_TYPES and not payload.student_ids:
+        return fail("作业照片需要选择学生", code=40002, status_code=400)
 
-    students = db.execute(
-        select(Student).where(Student.id.in_(payload.student_ids), Student.is_active.is_(True))
-    ).scalars().all()
-    valid_student_ids = {student.id for student in students}
-    missing_ids = [student_id for student_id in payload.student_ids if student_id not in valid_student_ids]
+    _, missing_ids = _validate_student_ids(db, payload.student_ids)
     if missing_ids:
         return fail(f"学生不存在: {missing_ids}", code=40401, status_code=404)
 
@@ -322,4 +330,3 @@ def delete_photo(
     db.delete(photo)
     db.commit()
     return ok({"ok": True})
-

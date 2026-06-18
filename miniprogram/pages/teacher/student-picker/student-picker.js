@@ -2,6 +2,37 @@
 const api = require('../../../utils/api')
 const util = require('../../../utils/util')
 
+const PHOTO_TYPE_META = {
+  activity: {
+    requiresStudent: false,
+    studentLabel: '关联学生（可选）',
+    typeHint: '家长会、讲座等公共活动可直接保存',
+    confirmText: '保存为活动照片',
+    emptyMessage: ''
+  },
+  homework: {
+    requiresStudent: true,
+    studentLabel: '关联学生（必选）',
+    typeHint: '作业照片需要关联学生',
+    confirmText: '确认保存',
+    emptyMessage: '作业照片需要先选择学生'
+  },
+  meal: {
+    requiresStudent: false,
+    studentLabel: '关联学生（可选）',
+    typeHint: '餐食照片可直接保存，也可关联孩子',
+    confirmText: '保存为餐食照片',
+    emptyMessage: ''
+  },
+  daily: {
+    requiresStudent: false,
+    studentLabel: '关联学生（可选）',
+    typeHint: '不选学生时保存到日常照片库',
+    confirmText: '保存为日常照片',
+    emptyMessage: ''
+  }
+}
+
 Page({
   data: {
     photoId: 0,
@@ -14,7 +45,13 @@ Page({
     photoUrl: '',
     photoType: 'activity',
     remark: '',
-    saving: false
+    saving: false,
+    requiresStudent: false,
+    studentLabel: PHOTO_TYPE_META.activity.studentLabel,
+    typeHint: PHOTO_TYPE_META.activity.typeHint,
+    confirmText: PHOTO_TYPE_META.activity.confirmText,
+    confirmBlocked: false,
+    emptyStudentMessage: ''
   },
 
   onLoad(options) {
@@ -29,7 +66,7 @@ Page({
       photoUrl: api.imageUrl(photoPath),
       batchPhotoIds,
       isBatch: batchPhotoIds.length > 0
-    })
+    }, () => this.updateArchiveMeta())
     this.loadStudents()
   },
 
@@ -56,7 +93,10 @@ Page({
   switchMode(e) {
     const mode = e.currentTarget.dataset.mode
     const selectedIds = mode === 'single' && this.data.selectedIds.length > 1 ? [this.data.selectedIds[0]] : this.data.selectedIds
-    this.setData({ mode, selectedIds }, () => this.refreshSelectedState())
+    this.setData({ mode, selectedIds }, () => {
+      this.refreshSelectedState()
+      this.updateArchiveMeta()
+    })
   },
 
   toggleStudent(e) {
@@ -74,11 +114,14 @@ Page({
         selected.push(id)
       }
     }
-    this.setData({ selectedIds: selected }, () => this.refreshSelectedState())
+    this.setData({ selectedIds: selected }, () => {
+      this.refreshSelectedState()
+      this.updateArchiveMeta()
+    })
   },
 
   setType(e) {
-    this.setData({ photoType: e.currentTarget.dataset.type })
+    this.setData({ photoType: e.currentTarget.dataset.type }, () => this.updateArchiveMeta())
   },
 
   onRemarkInput(e) {
@@ -94,9 +137,22 @@ Page({
     this.setData({ students })
   },
 
+  updateArchiveMeta() {
+    const meta = PHOTO_TYPE_META[this.data.photoType] || PHOTO_TYPE_META.daily
+    const confirmBlocked = meta.requiresStudent && this.data.selectedIds.length === 0
+    this.setData({
+      requiresStudent: meta.requiresStudent,
+      studentLabel: meta.studentLabel,
+      typeHint: meta.typeHint,
+      confirmText: meta.confirmText,
+      confirmBlocked,
+      emptyStudentMessage: meta.emptyMessage
+    })
+  },
+
   confirmAssociate() {
-    if (this.data.selectedIds.length === 0) {
-      util.showError('请先选择照片中的学生')
+    if (this.data.confirmBlocked) {
+      util.showError(this.data.emptyStudentMessage || '请先选择照片中的学生')
       return
     }
     this.setData({ saving: true })

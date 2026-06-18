@@ -147,6 +147,7 @@ YYYY-MM-DD-003
 | T-010 | 隐私政策/用户协议链接占位 | P2 | 用户 | 需用户确认 | Claude Code 替换链接 | 当前可能仍指向 `tuoban.example.com` |
 | T-011 | 餐食记录从五餐打卡改为每日一条 | P0/P1 | Codex | 已完成 | Claude Code 真机复测并重新上传体验版 | 已支持今日餐食、历史列表、照片外显、照片库选择、学生关联、家长端展示 |
 | T-012 | 照片选择学生确认按钮无反馈 | P1 | Codex | 已完成 | Claude Code 真机复测并重新上传体验版 | 未选学生时给出提示；修复学生 ID 类型不一致导致选中态不稳定的问题 |
+| T-013 | 公共活动照片无需强制关联学生 | P1 | Codex | 已完成 | Claude Code 真机复测并重新上传体验版 | 活动/餐食/日常照片可空学生保存；作业照片仍强制选择学生 |
 
 ## 4. 今日变更记录
 
@@ -562,6 +563,48 @@ YYYY-MM-DD-003
 
 需要用户确认：
 - 重新上传体验版后，请确认该按钮是否恢复可用。
+
+### 2026-06-18-013：公共活动照片无需强制关联学生
+
+需求理解：
+- 活动照片不一定属于某个孩子，例如家长见面会、讲座、开放日等，不应被“必须选择学生”卡住。
+- 孩子相关照片仍应支持关联学生，并进入孩子档案/家长端照片墙。
+
+修改内容：
+- 后端照片关联请求 `student_ids` 改为允许空数组。
+- 单张照片关联和批量照片关联在 `student_ids=[]` 时，只保存照片分类和备注，不写入 `photo_students`。
+- 后端保留作业照片保护：`photo_type=homework` 时仍必须选择学生。
+- 老师端照片选择页从“这是谁的照片？”调整为“照片归档”。
+- 分类前置：先选择活动/作业/餐食/日常，再按分类决定学生是否必选。
+- 活动、餐食、日常照片可不选学生直接保存；作业照片不选学生会提示“作业照片需要先选择学生”。
+
+修改文件：
+- `backend/app/schemas/photo.py`
+- `backend/app/api/routes/photos.py`
+- `miniprogram/pages/teacher/student-picker/student-picker.js`
+- `miniprogram/pages/teacher/student-picker/student-picker.wxml`
+- `miniprogram/pages/teacher/student-picker/student-picker.wxss`
+
+验证结果：
+- 已执行 `python -m py_compile backend/app/schemas/photo.py backend/app/api/routes/photos.py`，通过。
+- 已执行 `node --check miniprogram/pages/teacher/student-picker/student-picker.js`，通过。
+- 已用 FastAPI TestClient 验证：
+  - 单张活动照片 `student_ids=[]` 保存成功。
+  - 批量活动照片 `student_ids=[]` 保存成功，`new_associations=0`。
+  - 作业照片 `student_ids=[]` 被后端拒绝，返回“作业照片需要选择学生”。
+  - 空学生活动照片不会写入 `photo_students`。
+
+当前状态：
+- 本地代码已完成，等待重新上传体验版后真机验证。
+
+需要 Claude Code 处理：
+- 重新上传体验版后，真机验证活动照片不选学生可保存。
+- 真机验证作业照片不选学生会提示并阻止保存。
+- 真机验证选中学生后的日常/餐食照片仍可正常关联到孩子。
+
+需要用户确认：
+- 公共活动照片是否需要后续进入“首页精彩瞬间/班级活动相册”，本轮暂不扩展。
+- 体验版重新上传后，请确认家长见面会、讲座这类照片可正常保存。
 
 ## 5. 今日收尾备注
 

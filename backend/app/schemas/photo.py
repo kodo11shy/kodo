@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 
 
 class PhotoAssociateRequest(BaseModel):
-    student_ids: list[int] = Field(min_length=1)
+    student_ids: list[int] = Field(default_factory=list)
     photo_type: str = "general"
     remark: str | None = None
 
@@ -24,6 +24,6 @@ class PhotoBatchOperation(BaseModel):
 
 class PhotoBatchAssociate(BaseModel):
     photo_ids: list[int] = Field(min_length=1)
-    student_ids: list[int] = Field(min_length=1)
+    student_ids: list[int] = Field(default_factory=list)
     photo_type: str = "general"
     remark: str | None = None

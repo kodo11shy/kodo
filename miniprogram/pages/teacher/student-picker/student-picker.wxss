@@ -57,6 +57,30 @@
 }
 
 /* 学生网格 */
+.student-section {
+  padding: 8rpx 30rpx 0;
+}
+
+.student-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.student-heading .section-label {
+  margin-bottom: 0;
+}
+
+.student-heading .mode-bar {
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.student-heading .mode-tab {
+  padding: 10rpx 28rpx;
+}
+
 .student-grid {
   display: flex;
   flex-wrap: wrap;
