@@ -135,7 +135,7 @@ YYYY-MM-DD-003
 
 | ID | 任务 | 优先级 | 负责人 | 状态 | 需要对方处理 | 备注 |
 |----|------|--------|--------|------|--------------|------|
-| T-001 | 生产 API 持续可用性验证 | P0 | Codex | 阻塞 | 用户/Hermes 确认云端部署 | `/api/health` 正常，但 `/api/auth/login-policy`、`/api/auth/teacher/wechat-login` 仍 404，云端不是最新代码 |
+| T-001 | 生产 API 持续可用性验证 | P0 | Codex | 阻塞 | Hermes 完整部署并重启云端后端 | `/api/health`、家长 mock session、家长首页接口可用；但 `/api/auth/login-policy`、`/api/auth/teacher/wechat-login` 仍 404，尚不能确认最新后端已完整部署并重启 |
 | T-002 | 微信公众平台合法域名确认 | P0 | 用户 | 需用户确认 | Codex 记录结果 | request/uploadFile/downloadFile 需包含 `https://ccrong.cloud` |
 | T-003 | 4.3 接口清单验证 | P1 | Codex | 已完成 | 无 | 32/32 已实现 |
 | T-004 | 餐食记录照片提交前上传导致孤立照片 | P1 | Codex | 已完成 | Claude Code 真机复测餐食表单 | 已改为提交餐食时上传，保存失败时回滚已上传照片 |
@@ -327,6 +327,117 @@ YYYY-MM-DD-003
 
 需要用户确认：
 - 如后续再次遇到 GitHub 443 连接重置，可先检查本机网络/代理/VPN，再重试 `git push origin main`。
+
+### 2026-06-18-008：家长端体验闭环检查
+
+完成内容：
+- 确认 GPT 给出的方案总体符合当前体验版目标：真实微信绑定可作为正式上线方向，但体验版必须优先保证家长可通过稳定 `mock_openid` 完成邀请码绑定并进入家长端。
+- 确认当前绑定模式为体验版测试绑定：本地 `backend/.env` 为 `WECHAT_MOCK_LOGIN=true`，云端 `POST /api/auth/wechat/session` 实测返回 `mock=true`。
+- 确认小程序家长登录页已调用 `wx.login()`，并通过 `getApp().getWechatOpenid()` 传入稳定保存在本机 storage 的 `mockOpenid`。
+- 确认绑定成功后会保存 `parent_token`、`userType=parent`、`studentIds`，并跳转 `/pages/parent/dashboard/dashboard`。
+- 确认家长端页面均已注册：家长登录、家长首页、成长档案、作业记录、照片墙。
+- 将家长首页改为优先使用 `GET /api/parent/dashboard/today`，让首页按当前孩子展示今日照片、餐食、作业和老师评语；如接口失败，保留旧的 `/parent/homework/{id}`、`/parent/growth/{id}`、`/meals` 兜底。
+- 新增《体验版家长端闭环验收报告》。
+
+已检查页面：
+- `miniprogram/pages/parent/login/`
+- `miniprogram/pages/parent/dashboard/`
+- `miniprogram/pages/parent/growth/`
+- `miniprogram/pages/parent/homework/`
+- `miniprogram/pages/parent/photos/`
+
+已检查接口：
+- `POST /api/auth/wechat/session`
+- `POST /api/auth/parent/bind`
+- `GET /api/auth/parent/auto-login`
+- `GET /api/parent/students`
+- `GET /api/parent/dashboard/today`
+- `GET /api/parent/growth/{student_id}`
+- `GET /api/parent/homework/{student_id}`
+- `GET /api/parent/photos/{student_id}`
+- `GET /api/public/homepage`
+
+修改文件：
+- `miniprogram/pages/parent/dashboard/dashboard.js`
+- `docs/体验版家长端闭环验收报告-2026-06-18.md`
+- `docs/协作记录/Codex-Claude协作联系单-2026-06-18-01.md`
+
+验证结果：
+- `node --check miniprogram/pages/parent/dashboard/dashboard.js` 通过。
+- 本地 8001 使用测试邀请码 `TB0101` 与测试 openid 完成闭环：mock session、邀请码绑定、自动登录、学生列表、今日首页、成长档案、作业记录、照片墙均通过。
+- 本地 `GET /api/parent/dashboard/today` 返回今日照片 9 张、餐食、作业、评语。
+- 云端 `POST /api/auth/wechat/session` 返回 `mock=true`，说明体验版测试绑定后端可用。
+- 云端无效邀请码绑定返回 `code=40002`、`message=邀请码无效`，错误提示清楚。
+- 云端家长页面接口不带 token 均返回 `code=40100`、`message=未登录`，说明接口存在且受 parent token 保护。
+- 本地测试绑定痕迹已清理，开发库默认家长 openid 已恢复。
+
+当前是否可以让家长继续体验：
+- 可以，但建议先重新上传体验版，确保家长首页最新代码生效。
+
+需要 Codex 处理：
+- 如用户确认，提交并推送本轮家长端闭环报告和首页修复。
+
+需要 Claude Code 处理：
+- 重新上传体验版后，真机复测家长邀请码绑定、自动登录、首页、成长档案、作业记录、照片墙。
+
+需要用户确认：
+- 是否允许体验版继续使用测试绑定。
+- 微信公众平台 request 合法域名是否已包含 `https://ccrong.cloud`。
+- 是否已有真实微信 AppSecret，正式上线前用于切换真实微信绑定。
+- 是否重新上传体验版并让体验家长重新扫码。
+
+是否需要重新上传体验版：
+- 建议需要。绑定后端和 mock 策略已可用，本轮家长首页代码有更新，上传后才能保证体验家长看到最新闭环。
+
+### 2026-06-18-009：Hermes 云端后端重启状态复查
+
+完成内容：
+- 按用户要求复查 Hermes/云端是否完成后端部署与重启。
+- 使用体验版 API `https://ccrong.cloud/api` 直接检查关键接口。
+- 结论：云端服务在线，部分新接口可用，但仍不能确认 Hermes 已完成“最新后端完整部署并重启”。
+
+已检查接口：
+- `GET /api/health`
+- `GET /api/auth/login-policy`
+- `POST /api/auth/teacher/wechat-login`
+- `POST /api/auth/wechat/session`
+- `GET /api/parent/dashboard/today`
+- `POST /api/photos/batch`
+
+验证结果：
+- `GET /api/health`：正常，production + PostgreSQL + uploads 可用。
+- `POST /api/auth/wechat/session`：正常，返回 `mock=true`。
+- `GET /api/parent/dashboard/today`：接口存在，不带 token 返回 `40100 未登录`，符合预期。
+- `POST /api/photos/batch`：接口存在，不带 token 返回 `40100 未登录`，符合预期。
+- `GET /api/auth/login-policy`：仍返回 404。
+- `POST /api/auth/teacher/wechat-login`：仍返回 404。
+
+当前判断：
+- Hermes/云端可能已有部分新代码或部分接口已经部署。
+- 但两个本地已实现、体验版需要的老师登录相关接口仍 404，因此不能标记为“最新后端完整部署并重启完成”。
+- T-001 继续保持 P0 阻塞。
+
+需要 Hermes 处理：
+- 在云服务器项目目录执行 `git pull origin main`，确认已经拉到包含最新后端代码的提交。
+- 确认云端后端代码中存在：
+  - `GET /api/auth/login-policy`
+  - `POST /api/auth/teacher/wechat-login`
+- 重启后端服务。
+- 重启后立刻复测：
+  - `GET https://ccrong.cloud/api/health` 应返回 200。
+  - `GET https://ccrong.cloud/api/auth/login-policy` 应返回 `code=0`。
+  - `POST https://ccrong.cloud/api/auth/teacher/wechat-login` 使用未绑定 openid 时应返回业务错误 `40104`，不能是 404。
+  - `POST https://ccrong.cloud/api/auth/wechat/session` 应继续返回 `mock=true`。
+  - `GET https://ccrong.cloud/api/parent/dashboard/today` 不带 token 应返回 `40100 未登录`。
+
+需要 Codex 处理：
+- Hermes 完成后再次复测上述接口。
+
+需要 Claude Code 处理：
+- 云端接口确认后重新上传体验版，并真机复测老师/家长登录流程。
+
+需要用户确认：
+- 通知 Hermes 按上述要求完成云端完整部署和后端重启。
 
 ## 5. 今日收尾备注
 
