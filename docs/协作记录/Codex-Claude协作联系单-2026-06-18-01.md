@@ -300,6 +300,34 @@ YYYY-MM-DD-003
 需要用户确认：
 - 暂无。
 
+### 2026-06-18-007：GitHub 推送失败原因排查与解决
+
+完成内容：
+- 排查 `git push origin main` 连续失败原因。
+- 确认本地提交 `062e62e docs: sync collaboration contact sheet` 已生成，`main` 曾处于 `ahead 1` 状态。
+- 确认远程地址正确：`https://github.com/kodo11shy/kodo.git`。
+- 确认仓库本地配置没有代理或远程地址异常。
+- DNS 可解析 `github.com`，但第一次 `Test-NetConnection github.com -Port 443` 显示 ping 通、TCP 443 不通。
+- 随后 `curl.exe -I https://github.com`、`git ls-remote origin HEAD`、`Test-NetConnection ssh.github.com -Port 443` 均恢复正常，判断为本机到 GitHub HTTPS 链路临时抖动/连接重置，不是提交、权限或仓库配置问题。
+- 趁链路恢复重新执行 `git push origin main`，已成功推送到 GitHub：`97ebba5..062e62e main -> main`。
+
+修改文件：
+- `docs/协作记录/Codex-Claude协作联系单-2026-06-18-01.md`
+
+验证结果：
+- `git push origin main` 已成功。
+- GitHub 远程 main 已包含最新联系单提交 `062e62e`。
+- Hermes 可执行 `git pull origin main` 后读取 `docs/协作记录/Codex-Claude协作联系单-2026-06-18-01.md`。
+
+需要 Codex 处理：
+- 将本条记录补充提交并推送。
+
+需要 Claude Code 处理：
+- 拉取后读取当前联系单。
+
+需要用户确认：
+- 如后续再次遇到 GitHub 443 连接重置，可先检查本机网络/代理/VPN，再重试 `git push origin main`。
+
 ## 5. 今日收尾备注
 
 本区可选填写。
