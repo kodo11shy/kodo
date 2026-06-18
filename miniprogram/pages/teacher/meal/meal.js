@@ -1,228 +1,176 @@
-// 餐食总览页
+// 餐食记录：每天一条今日餐食
 const api = require('../../../utils/api')
 const util = require('../../../utils/util')
 
-const MEAL_TYPES = ['早餐', '午餐', '晚餐', '上午加餐', '下午加餐']
-const PHOTO_GROUPS = [
-  { key: 'shopping', label: '🛒 采购' },
-  { key: 'cooking', label: '👨‍🍳 制作' },
-  { key: 'done', label: '🍽️ 成品' },
-  { key: 'kids_eating', label: '👶 孩子吃饭' }
-]
-
 Page({
   data: {
-    records: [],
-    filteredRecords: [],
     loading: false,
-    activeFilter: 'all',
-    filters: [],
-    mealTypes: MEAL_TYPES,
+    records: [],
+    todayMeal: null,
+    todayRecorded: false,
+    todayStatusText: '未记录',
+    primaryActionText: '记录今日餐食',
+    weekRecordedDays: 0,
+    monthRecordedDays: 0,
+    emptyTitle: '暂无餐食记录',
+    emptyDesc: '记录今日餐食后，会出现在这里',
 
-    // 状态卡
-    todayCount: 0,
-    todayTotal: 0,
-    weekCount: 0,
-    pendingTypes: [],
-
-    // 记录弹窗
     showForm: false,
+    editingMealId: null,
+    submitting: false,
+    formTitle: '记录今日餐食',
     form: {
       meal_date: '',
-      meal_type: '午餐',
       menu_text: '',
-      ingredient_notes: '',
-      cooking_notes: '',
-      hygiene_notes: '',
-      overall_remark: '',
-      photo_ids: { shopping: [], cooking: [], done: [], kids_eating: [] }
+      overall_remark: ''
     },
-    tempFiles: { shopping: [], cooking: [], done: [], kids_eating: [] },
-    formPhotoGroups: [],
-    submitting: false,
-
-    // 空状态
-    emptyTitle: '暂无餐食记录',
-    emptyDesc: '记录餐食后，会出现在这里'
+    tempFiles: [],
+    selectedPhotoIds: [],
+    coverPhotoId: null,
+    selectedStudentIds: [],
+    studentRows: [],
+    photoRows: [],
+    photoLibraryLoading: false
   },
 
   onLoad() {
-    this.setData({ formPhotoGroups: this._buildFormPhotoGroups(this.data.tempFiles) })
-    this.loadRecords()
+    this.loadPage()
   },
 
   onShow() {
-    this.loadRecords()
+    this.loadPage()
   },
 
-  loadRecords() {
+  loadPage() {
     this.setData({ loading: true })
-    api.request({ url: '/meals' })
-      .then((data) => {
-        const rawRecords = data.records || []
-        const records = rawRecords.map(this._buildMealRow)
-        this._setOverview(records)
+    Promise.all([
+      api.request({ url: '/meals/today' }),
+      api.request({ url: '/meals', data: { page: 1, page_size: 30 } })
+    ])
+      .then(([todayData, listData]) => {
+        const todayMeal = todayData.meal ? this._buildMealRow(todayData.meal) : null
+        const records = (listData.records || []).map(item => this._buildMealRow(item))
+        this.setData({
+          todayMeal,
+          records,
+          todayRecorded: !!todayData.recorded,
+          todayStatusText: todayData.recorded ? '已记录' : '未记录',
+          primaryActionText: todayData.recorded ? '编辑今日餐食' : '记录今日餐食',
+          weekRecordedDays: todayData.week_recorded_days || 0,
+          monthRecordedDays: todayData.month_recorded_days || 0,
+          _todayDefaults: {
+            date: todayData.date || util.today(),
+            defaultStudents: todayData.default_students || [],
+            allStudents: todayData.all_students || []
+          }
+        })
       })
-      .catch(() => {
-        util.showError('加载失败')
-        this.setData({ records: [], filteredRecords: [] })
+      .catch((err) => {
+        util.showError(err.message || '加载餐食失败')
       })
       .finally(() => this.setData({ loading: false }))
   },
 
   _buildMealRow(item) {
-    const photos = item.photos || {}
-    const donePhotos = (photos.done || []).map((photo) => {
-      const filePath = photo.file_path || photo
-      return { file_path: filePath, url: api.imageUrl(filePath) }
-    })
-    // 统计各分组照片数
-    const photoGroupCounts = PHOTO_GROUPS.map(group => ({
-      group: group.key,
-      label: group.label,
-      count: (photos[group.key] || []).length,
-      displayText: group.label + ' ' + (photos[group.key] || []).length + '张'
-    }))
-    const hasPhotos = photoGroupCounts.some(g => g.count > 0)
-
+    const photos = (item.photos || []).map(photo => ({
+      ...photo,
+      url: api.imageUrl(photo.file_path || photo.thumbnail)
+    })).filter(photo => photo.url)
+    const cover = item.cover_photo || photos[0] || null
     return {
       ...item,
       date: item.date || item.meal_date || '',
-      menuText: item.menu_text || item.menu || '—',
-      overallRemark: item.overall_remark || '',
-      donePhotos,
-      hasPhotos,
-      hasDetailNotes: !!(item.ingredient_notes || item.cooking_notes || item.hygiene_notes),
-      photoGroupCounts,
-      showDetail: false
+      menuText: item.menu_text || item.menu || '未填写菜单',
+      remarkText: item.overall_remark || '',
+      photos,
+      coverUrl: cover ? api.imageUrl(cover.file_path || cover.thumbnail) : '',
+      photoCount: item.photo_count != null ? item.photo_count : photos.length,
+      studentCount: item.student_count != null ? item.student_count : (item.students || []).length,
+      studentNames: (item.students || []).map(student => student.name).join('、'),
+      photoIds: item.photo_ids || photos.map(photo => photo.id),
+      studentIds: item.student_ids || (item.students || []).map(student => student.id),
+      coverPhotoId: item.cover_photo_id || (cover ? cover.id : null)
     }
   },
 
-  _setOverview(records) {
-    const today = util.today()
-
-    // 今日记录
-    const todayRecords = records.filter(r => r.date === today)
-    const todayRecordedTypes = todayRecords.map(r => r.meal_type)
-    const pendingTypes = MEAL_TYPES.filter(t => !todayRecordedTypes.includes(t))
-    const todayCount = todayRecords.length
-
-    // 本周记录（近7天）
-    const weekAgo = util.dateOffset(-6)
-    const weekRecords = records.filter(r => r.date >= weekAgo)
-    const weekCount = weekRecords.length
-
-    // 生成筛选
-    const filters = [
-      { key: 'all', label: '全部', count: records.length },
-      { key: 'today', label: '今日', count: todayCount },
-      { key: 'week', label: '本周', count: weekCount }
-    ].map(item => ({ ...item, className: item.key === this.data.activeFilter ? 'active' : '' }))
-
-    this.setData({
-      records,
-      todayCount,
-      todayTotal: todayCount,
-      weekCount,
-      pendingTypes,
-      filters
-    })
-    this._applyFilter()
-  },
-
-  _applyFilter() {
-    const filter = this.data.activeFilter
-    const today = util.today()
-    const weekAgo = util.dateOffset(-6)
-    let list = this.data.records
-
-    if (filter === 'today') list = list.filter(r => r.date === today)
-    if (filter === 'week') list = list.filter(r => r.date >= weekAgo)
-
-    const emptyMap = {
-      all: ['暂无餐食记录', '记录餐食后，会出现在这里'],
-      today: ['今日暂无餐食记录', '记录今日餐食后显示在此'],
-      week: ['本周暂无餐食记录', '记录餐食后自动汇总']
+  openTodayForm() {
+    if (this.data.todayMeal) {
+      this.openEditForm({ currentTarget: { dataset: { id: this.data.todayMeal.id } } })
+      return
     }
-    const empty = emptyMap[filter] || emptyMap.all
-
-    this.setData({
-      filteredRecords: list,
-      emptyTitle: empty[0],
-      emptyDesc: empty[1]
-    })
+    this._openFormWithMeal(null)
   },
 
-  switchFilter(e) {
-    const filter = e.currentTarget.dataset.filter
-    if (filter === this.data.activeFilter) return
-    this.setData({
-      activeFilter: filter,
-      filters: this.data.filters.map(item => ({ ...item, className: item.key === filter ? 'active' : '' }))
-    })
-    this._applyFilter()
+  openEditForm(e) {
+    const mealId = Number(e.currentTarget.dataset.id)
+    const existing = this.data.records.find(item => item.id === mealId) || this.data.todayMeal
+    if (!mealId || !existing) return
+
+    api.request({ url: '/meals/' + mealId })
+      .then((data) => {
+        this._openFormWithMeal(this._buildMealRow(data.meal || existing))
+      })
+      .catch(() => {
+        this._openFormWithMeal(existing)
+      })
   },
 
-  toggleDetail(e) {
-    const index = e.currentTarget.dataset.index
-    const key = 'filteredRecords[' + index + '].showDetail'
-    this.setData({ [key]: !this.data.filteredRecords[index].showDetail })
-  },
+  _openFormWithMeal(meal) {
+    const defaults = this.data._todayDefaults || {}
+    const defaultStudents = meal ? [] : (defaults.defaultStudents || [])
+    const selectedStudentIds = meal ? (meal.studentIds || []) : defaultStudents.map(item => item.id)
+    const selectedPhotoIds = meal ? (meal.photoIds || []) : []
+    const coverPhotoId = meal ? meal.coverPhotoId : null
 
-  // 记录今日餐食
-  openForm() {
-    const today = util.today()
     this.setData({
       showForm: true,
+      editingMealId: meal ? meal.id : null,
+      formTitle: meal ? '编辑今日餐食' : '记录今日餐食',
       form: {
-        meal_date: today,
-        meal_type: '午餐',
-        menu_text: '',
-        ingredient_notes: '',
-        cooking_notes: '',
-        hygiene_notes: '',
-        overall_remark: '',
-        photo_ids: { shopping: [], cooking: [], done: [], kids_eating: [] }
+        meal_date: meal ? meal.date : (defaults.date || util.today()),
+        menu_text: meal ? meal.menuText : '',
+        overall_remark: meal ? meal.remarkText : ''
       },
-      tempFiles: { shopping: [], cooking: [], done: [], kids_eating: [] }
+      tempFiles: [],
+      selectedPhotoIds,
+      coverPhotoId,
+      selectedStudentIds
     })
-    this._refreshFormPhotoGroups()
-  },
-
-  openFormForType(e) {
-    const mealType = e.currentTarget.dataset.type
-    const today = util.today()
-    this.setData({
-      showForm: true,
-      form: {
-        meal_date: today,
-        meal_type: mealType,
-        menu_text: '',
-        ingredient_notes: '',
-        cooking_notes: '',
-        hygiene_notes: '',
-        overall_remark: '',
-        photo_ids: { shopping: [], cooking: [], done: [], kids_eating: [] }
-      },
-      tempFiles: { shopping: [], cooking: [], done: [], kids_eating: [] }
-    })
-    this._refreshFormPhotoGroups()
+    this.loadFormOptions()
   },
 
   closeForm() {
+    if (this.data.submitting) return
     this.setData({ showForm: false })
   },
 
-  _buildFormPhotoGroups(tempFiles) {
-    return PHOTO_GROUPS.map(group => ({
-      key: group.key,
-      label: group.label,
-      files: (tempFiles[group.key] || []).map(path => ({ path }))
-    }))
-  },
-
-  _refreshFormPhotoGroups() {
-    this.setData({ formPhotoGroups: this._buildFormPhotoGroups(this.data.tempFiles) })
+  loadFormOptions() {
+    this.setData({ photoLibraryLoading: true })
+    Promise.all([
+      api.request({ url: '/students', data: { status: '在读' } }).catch(() => ({ students: [] })),
+      api.request({ url: '/photos', data: { page: 1, page_size: 60 } }).catch(() => ({ photos: [] }))
+    ])
+      .then(([studentsData, photosData]) => {
+        const fallbackStudents = (this.data._todayDefaults && this.data._todayDefaults.allStudents) || []
+        const students = (studentsData.students && studentsData.students.length > 0)
+          ? studentsData.students
+          : fallbackStudents
+        const studentRows = students.map(student => ({
+          id: student.id,
+          name: student.name,
+          grade: student.grade || '',
+          selected: this.data.selectedStudentIds.includes(student.id)
+        }))
+        const photoRows = (photosData.photos || []).map(photo => ({
+          id: photo.id,
+          url: api.imageUrl(photo.file_path || photo.thumbnail),
+          remark: photo.remark || '',
+          selected: this.data.selectedPhotoIds.includes(photo.id),
+          isCover: this.data.coverPhotoId === photo.id
+        })).filter(photo => photo.url)
+        this.setData({ studentRows, photoRows })
+      })
+      .finally(() => this.setData({ photoLibraryLoading: false }))
   },
 
   onFormField(e) {
@@ -230,66 +178,84 @@ Page({
     this.setData({ ['form.' + field]: e.detail.value })
   },
 
-  onMealTypeChange(e) {
-    const idx = parseInt(e.detail.value)
-    this.setData({ 'form.meal_type': MEAL_TYPES[idx] })
+  onDateChange(e) {
+    this.setData({ 'form.meal_date': e.detail.value })
   },
 
-  addGroupPhotos(e) {
-    const group = e.currentTarget.dataset.group
-    const remain = 9 - (this.data.tempFiles[group]?.length || 0)
-    if (remain <= 0) return
+  toggleStudent(e) {
+    const id = Number(e.currentTarget.dataset.id)
+    const selected = new Set(this.data.selectedStudentIds)
+    if (selected.has(id)) selected.delete(id)
+    else selected.add(id)
+    const ids = Array.from(selected)
+    this.setData({
+      selectedStudentIds: ids,
+      studentRows: this.data.studentRows.map(item => ({ ...item, selected: ids.includes(item.id) }))
+    })
+  },
 
+  toggleLibraryPhoto(e) {
+    const id = Number(e.currentTarget.dataset.id)
+    const selected = new Set(this.data.selectedPhotoIds)
+    if (selected.has(id)) selected.delete(id)
+    else selected.add(id)
+    const ids = Array.from(selected)
+    const coverPhotoId = ids.includes(this.data.coverPhotoId) ? this.data.coverPhotoId : (ids[0] || null)
+    this.setData({
+      selectedPhotoIds: ids,
+      coverPhotoId,
+      photoRows: this.data.photoRows.map(item => ({
+        ...item,
+        selected: ids.includes(item.id),
+        isCover: coverPhotoId === item.id
+      }))
+    })
+  },
+
+  setCoverPhoto(e) {
+    const id = Number(e.currentTarget.dataset.id)
+    if (!this.data.selectedPhotoIds.includes(id)) return
+    this.setData({
+      coverPhotoId: id,
+      photoRows: this.data.photoRows.map(item => ({ ...item, isCover: item.id === id }))
+    })
+  },
+
+  addPhotos() {
+    const remain = 9 - this.data.tempFiles.length
+    if (remain <= 0) {
+      util.showError('最多添加 9 张新照片')
+      return
+    }
     wx.chooseMedia({
       count: remain,
       mediaType: ['image'],
       sourceType: ['camera', 'album'],
       success: (res) => {
-        const files = res.tempFiles.map(f => f.tempFilePath)
-        const key = 'tempFiles.' + group
-        this.setData({ [key]: [...(this.data.tempFiles[group] || []), ...files] })
-        this._refreshFormPhotoGroups()
+        const files = res.tempFiles.map(file => ({ path: file.tempFilePath }))
+        this.setData({ tempFiles: [...this.data.tempFiles, ...files] })
       }
     })
   },
 
-  removeGroupPhoto(e) {
-    const group = e.currentTarget.dataset.group
-    const idx = parseInt(e.currentTarget.dataset.index)
-    const files = [...(this.data.tempFiles[group] || [])]
-    files.splice(idx, 1)
-    this.setData({
-      ['tempFiles.' + group]: files,
-      ['form.photo_ids.' + group]: []
-    })
-    this._refreshFormPhotoGroups()
+  removeTempPhoto(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    const files = [...this.data.tempFiles]
+    files.splice(index, 1)
+    this.setData({ tempFiles: files })
   },
 
-  _emptyPhotoIds() {
-    return PHOTO_GROUPS.reduce((acc, group) => {
-      acc[group.key] = []
-      return acc
-    }, {})
-  },
-
-  _uploadMealPhotos() {
-    const photoIds = this._emptyPhotoIds()
+  _uploadNewPhotos() {
     const uploadedIds = []
     let chain = Promise.resolve()
-
-    PHOTO_GROUPS.forEach((group) => {
-      const files = this.data.tempFiles[group.key] || []
-      files.forEach((filePath) => {
-        chain = chain.then(() => api.uploadFile(filePath)).then((result) => {
-          if (result && result.photo_id) {
-            photoIds[group.key].push(result.photo_id)
-            uploadedIds.push(result.photo_id)
-          }
+    this.data.tempFiles.forEach((file) => {
+      chain = chain
+        .then(() => api.uploadFile(file.path))
+        .then((result) => {
+          if (result && result.photo_id) uploadedIds.push(result.photo_id)
         })
-      })
     })
-
-    return chain.then(() => ({ photoIds, uploadedIds }))
+    return chain.then(() => uploadedIds)
   },
 
   _rollbackUploadedPhotos(uploadedIds) {
@@ -302,31 +268,45 @@ Page({
   },
 
   submitMeal() {
-    if (!this.data.form.menu_text.trim()) {
-      util.showError('请填写菜单')
+    const menu = (this.data.form.menu_text || '').trim()
+    if (!menu) {
+      util.showError('请填写今天吃了什么')
       return
     }
-    let uploadedIds = []
+    if (this.data.selectedStudentIds.length === 0) {
+      util.showError('请选择关联学生')
+      return
+    }
+
     this.setData({ submitting: true })
     util.showLoading('保存中...')
-    this._uploadMealPhotos()
-      .then((result) => {
-        uploadedIds = result.uploadedIds
+    let uploadedIds = []
+    this._uploadNewPhotos()
+      .then((ids) => {
+        uploadedIds = ids
+        const photoIds = [...this.data.selectedPhotoIds, ...uploadedIds]
+        const coverPhotoId = this.data.coverPhotoId || photoIds[0] || null
+        const payload = {
+          meal_date: this.data.form.meal_date,
+          menu_text: menu,
+          overall_remark: this.data.form.overall_remark || '',
+          photo_ids: photoIds,
+          cover_photo_id: coverPhotoId,
+          student_ids: this.data.selectedStudentIds
+        }
+        const mealId = this.data.editingMealId
         return api.request({
-          url: '/meals',
-          method: 'POST',
-          data: {
-            ...this.data.form,
-            photo_ids: result.photoIds
-          }
+          url: mealId ? '/meals/' + mealId : '/meals',
+          method: mealId ? 'PUT' : 'POST',
+          data: payload
         })
       })
       .then(() => {
         uploadedIds = []
         wx.hideLoading()
         util.showSuccess('保存成功')
-        this.setData({ showForm: false, 'form.photo_ids': this._emptyPhotoIds() })
-        this.loadRecords()
+        this.setData({ showForm: false })
+        this.loadPage()
       })
       .catch((err) => {
         wx.hideLoading()
@@ -336,5 +316,11 @@ Page({
       .finally(() => {
         this.setData({ submitting: false })
       })
+  },
+
+  previewMealPhoto(e) {
+    const url = e.currentTarget.dataset.url
+    if (!url) return
+    wx.previewImage({ urls: [url] })
   }
 })

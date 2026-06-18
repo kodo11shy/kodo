@@ -1,114 +1,92 @@
 <view class="page">
-
-  <!-- 顶部状态卡 -->
   <view class="overview-card">
     <view class="overview-head">
       <view>
         <text class="overview-title">今日餐食</text>
-        <text class="overview-subtitle">已记录 {{todayCount}} 餐</text>
+        <text class="overview-subtitle">每天只记录一条餐食</text>
       </view>
-      <view class="mini-action" bindtap="openForm">记录餐食</view>
+      <view class="mini-action" bindtap="openTodayForm">{{primaryActionText}}</view>
     </view>
     <view class="metric-grid">
       <view class="metric-item">
-        <text class="metric-value">{{todayCount}}</text>
-        <text class="metric-label">今日已记录</text>
+        <text class="metric-value">{{todayStatusText}}</text>
+        <text class="metric-label">今日状态</text>
       </view>
       <view class="metric-item">
-        <text class="metric-value">{{pendingTypes.length}}</text>
-        <text class="metric-label">待记录餐别</text>
+        <text class="metric-value">{{weekRecordedDays}}</text>
+        <text class="metric-label">本周已记录</text>
       </view>
       <view class="metric-item">
-        <text class="metric-value">{{weekCount}}</text>
-        <text class="metric-label">本周总记录</text>
+        <text class="metric-value">{{monthRecordedDays}}</text>
+        <text class="metric-label">本月已记录</text>
       </view>
     </view>
   </view>
 
-  <!-- 待记录队列 -->
-  <view class="todo-card" wx:if="{{pendingTypes.length > 0}}">
-    <view class="todo-head">
-      <text class="todo-title">今日待记录</text>
-      <text class="todo-count">{{pendingTypes.length}} 餐</text>
+  <view class="today-card" wx:if="{{todayRecorded && todayMeal}}">
+    <view class="today-cover" wx:if="{{todayMeal.coverUrl}}" bindtap="previewMealPhoto" data-url="{{todayMeal.coverUrl}}">
+      <image src="{{todayMeal.coverUrl}}" mode="aspectFill"></image>
     </view>
-    <view class="todo-row" wx:for="{{pendingTypes}}" wx:key="*this" data-type="{{item}}" bindtap="openFormForType">
-      <text>⏳ {{item}}</text>
-      <text class="todo-num">去记录 ›</text>
+    <view class="today-body">
+      <view class="section-row">
+        <text class="section-title">今天吃了什么</text>
+        <text class="edit-link" bindtap="openTodayForm">编辑</text>
+      </view>
+      <text class="meal-menu">{{todayMeal.menuText}}</text>
+      <text class="meal-remark" wx:if="{{todayMeal.remarkText}}">{{todayMeal.remarkText}}</text>
+      <view class="meta-row">
+        <text>{{todayMeal.photoCount}} 张照片</text>
+        <text>{{todayMeal.studentCount}} 个孩子</text>
+      </view>
     </view>
   </view>
 
-  <!-- 筛选 -->
-  <scroll-view class="filter-scroll" scroll-x>
-    <view class="filter-row">
-      <view
-        class="filter-chip {{item.className}}"
-        wx:for="{{filters}}"
-        wx:key="key"
-        data-filter="{{item.key}}"
-        bindtap="switchFilter"
-      >
-        <text>{{item.label}}</text>
-        <text class="filter-count">{{item.count}}</text>
-      </view>
-    </view>
-  </scroll-view>
+  <view class="today-empty" wx:elif="{{!loading}}">
+    <text class="empty-title">今日餐食尚未记录</text>
+    <text class="empty-desc">记录今天吃了什么，家长端和成长档案就能看到</text>
+    <button class="primary-btn" bindtap="openTodayForm">记录今日餐食</button>
+  </view>
 
-  <!-- 加载 -->
+  <view class="history-head">
+    <text class="history-title">历史餐食记录</text>
+    <text class="history-count">共 {{records.length}} 天</text>
+  </view>
+
   <view class="loading-container" wx:if="{{loading}}"><text>加载中...</text></view>
 
-  <!-- 餐食列表 -->
-  <view class="meal-list" wx:if="{{!loading && filteredRecords.length > 0}}">
-    <view class="meal-card" wx:for="{{filteredRecords}}" wx:key="id" data-index="{{index}}" bindtap="toggleDetail">
-      <view class="meal-header-row">
-        <view class="meal-header-left">
+  <view class="meal-list" wx:if="{{!loading && records.length > 0}}">
+    <view class="meal-card" wx:for="{{records}}" wx:key="id" data-id="{{item.id}}" bindtap="openEditForm">
+      <image class="meal-cover" wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" />
+      <view class="meal-cover placeholder" wx:else>
+        <text>餐食</text>
+      </view>
+      <view class="meal-info">
+        <view class="meal-row">
           <text class="meal-date">{{item.date}}</text>
-          <text class="meal-type tag tag-green">{{item.meal_type}}</text>
+          <text class="meal-edit">编辑</text>
         </view>
-        <text class="card-arrow" wx:if="{{item.showDetail}}">▾</text>
-        <text class="card-arrow" wx:else>▸</text>
-      </view>
-      <text class="meal-menu">{{item.menuText}}</text>
-      <text class="meal-remark" wx:if="{{item.overallRemark}}">💬 {{item.overallRemark}}</text>
-
-      <!-- 缩略图 -->
-      <view class="meal-photos" wx:if="{{item.donePhotos.length > 0}}">
-        <image class="meal-thumb" wx:for="{{item.donePhotos}}" wx:key="*this" wx:for-item="photo" src="{{photo.url}}" mode="aspectFill" />
-      </view>
-
-      <!-- 展开详情 -->
-      <view class="meal-detail" wx:if="{{item.showDetail}}">
-        <view class="detail-section" wx:if="{{item.hasDetailNotes}}">
-          <text class="detail-label">记录详情</text>
-          <text wx:if="{{item.ingredient_notes}}">🛒 采购：{{item.ingredient_notes}}</text>
-          <text wx:if="{{item.cooking_notes}}">👨‍🍳 制作：{{item.cooking_notes}}</text>
-          <text wx:if="{{item.hygiene_notes}}">🧹 卫生：{{item.hygiene_notes}}</text>
-        </view>
-        <view class="detail-section" wx:if="{{item.hasPhotos}}">
-          <text class="detail-label">照片分组</text>
-          <view class="photo-group-badges">
-            <text class="group-badge" wx:for="{{item.photoGroupCounts}}" wx:key="group" wx:if="{{item.count > 0}}">
-              {{item.displayText}}
-            </text>
-          </view>
+        <text class="meal-menu line-clamp">{{item.menuText}}</text>
+        <text class="meal-remark line-clamp" wx:if="{{item.remarkText}}">{{item.remarkText}}</text>
+        <view class="meta-row compact">
+          <text>{{item.photoCount}} 张照片</text>
+          <text>{{item.studentCount}} 个孩子</text>
         </view>
       </view>
     </view>
   </view>
 
-  <!-- 空状态 -->
-  <view class="empty-state" wx:if="{{!loading && filteredRecords.length === 0}}">
+  <view class="empty-state" wx:if="{{!loading && records.length === 0}}">
     <image class="empty-image" src="/images/empty-photos-v2.png" mode="aspectFit"></image>
     <text class="empty-title">{{emptyTitle}}</text>
     <text class="empty-desc">{{emptyDesc}}</text>
   </view>
 
-  <!-- 记录餐食弹窗 -->
   <view class="meal-sheet-overlay" wx:if="{{showForm}}" bindtap="closeForm">
     <view class="meal-sheet" catchtap="nop">
       <view class="meal-sheet-header">
         <view>
-          <text class="meal-sheet-title">记录餐食</text>
-          <text class="meal-sheet-subtitle">{{form.meal_date}} · {{form.meal_type}}</text>
+          <text class="meal-sheet-title">{{formTitle}}</text>
+          <text class="meal-sheet-subtitle">{{form.meal_date}}</text>
         </view>
         <text class="meal-sheet-close" bindtap="closeForm">×</text>
       </view>
@@ -116,68 +94,65 @@
       <scroll-view class="meal-sheet-body" scroll-y enhanced show-scrollbar="{{false}}">
         <view class="form-section">
           <text class="form-section-title">基础信息</text>
-          <view class="form-two-col">
-            <view class="meal-field compact">
-              <text class="meal-label">日期</text>
-              <picker mode="date" value="{{form.meal_date}}" bindchange="onFormField" data-field="meal_date">
-                <view class="meal-picker">{{form.meal_date}}</view>
-              </picker>
-            </view>
-            <view class="meal-field compact">
-              <text class="meal-label">餐别</text>
-              <picker bindchange="onMealTypeChange" range="{{mealTypes}}">
-                <view class="meal-picker">{{form.meal_type}}</view>
-              </picker>
-            </view>
+          <view class="meal-field">
+            <text class="meal-label">日期</text>
+            <picker mode="date" value="{{form.meal_date}}" bindchange="onDateChange">
+              <view class="meal-picker">{{form.meal_date}}</view>
+            </picker>
           </view>
           <view class="meal-field">
-            <text class="meal-label">菜单</text>
-            <textarea class="meal-textarea menu-textarea" placeholder="例如：土豆炖排骨、清炒青菜、米饭" value="{{form.menu_text}}" bindinput="onFormField" data-field="menu_text" />
+            <text class="meal-label">菜单/菜名</text>
+            <textarea class="meal-textarea menu-textarea" placeholder="例如：土豆炖排骨、清炒青菜" value="{{form.menu_text}}" bindinput="onFormField" data-field="menu_text" />
+          </view>
+          <view class="meal-field">
+            <text class="meal-label">备注</text>
+            <textarea class="meal-textarea remark-textarea" placeholder="例如：今天孩子们吃得很好" value="{{form.overall_remark}}" bindinput="onFormField" data-field="overall_remark" />
           </view>
         </view>
 
         <view class="form-section">
-          <text class="form-section-title">记录详情</text>
-          <view class="note-grid">
-            <view class="note-field">
-              <text class="note-label">采购</text>
-              <input class="note-input" placeholder="食材采购情况" value="{{form.ingredient_notes}}" bindinput="onFormField" data-field="ingredient_notes" />
-            </view>
-            <view class="note-field">
-              <text class="note-label">制作</text>
-              <input class="note-input" placeholder="制作过程" value="{{form.cooking_notes}}" bindinput="onFormField" data-field="cooking_notes" />
-            </view>
-            <view class="note-field">
-              <text class="note-label">卫生</text>
-              <input class="note-input" placeholder="卫生情况" value="{{form.hygiene_notes}}" bindinput="onFormField" data-field="hygiene_notes" />
+          <view class="section-row">
+            <text class="form-section-title">新拍/上传照片</text>
+            <text class="text-action" bindtap="addPhotos">添加</text>
+          </view>
+          <view class="thumb-grid" wx:if="{{tempFiles.length > 0}}">
+            <view class="thumb-wrap" wx:for="{{tempFiles}}" wx:key="path">
+              <image class="thumb" src="{{item.path}}" mode="aspectFill" />
+              <text class="thumb-remove" bindtap="removeTempPhoto" data-index="{{index}}">×</text>
             </view>
           </view>
+          <view class="hint-box" wx:else>可以现场拍照，也可以从手机相册上传。</view>
         </view>
 
         <view class="form-section">
-          <view class="section-headline">
-            <text class="form-section-title">照片记录</text>
-            <text class="section-hint">按环节补充</text>
+          <view class="section-row">
+            <text class="form-section-title">从照片库选择</text>
+            <text class="section-hint">{{selectedPhotoIds.length}} 张已选</text>
           </view>
-          <view class="photo-groups compact-groups">
-            <view class="photo-group" wx:for="{{formPhotoGroups}}" wx:key="key">
-              <view class="photo-group-header">
-                <text class="photo-group-label">{{item.label}}</text>
-                <text class="photo-add-btn" bindtap="addGroupPhotos" data-group="{{item.key}}">+ 添加</text>
-              </view>
-              <view class="photo-thumbs" wx:if="{{item.files.length > 0}}">
-                <view class="thumb-wrap" wx:for="{{item.files}}" wx:for-item="photo" wx:key="path">
-                  <image class="thumb" src="{{photo.path}}" mode="aspectFill" />
-                  <text class="thumb-remove" bindtap="removeGroupPhoto" data-group="{{item.key}}" data-index="{{index}}">×</text>
-                </view>
-              </view>
+          <view class="photo-library" wx:if="{{photoRows.length > 0}}">
+            <view class="library-photo {{item.selected ? 'selected' : ''}}" wx:for="{{photoRows}}" wx:key="id" data-id="{{item.id}}" bindtap="toggleLibraryPhoto">
+              <image src="{{item.url}}" mode="aspectFill" />
+              <text class="selected-mark" wx:if="{{item.selected}}">已选</text>
+              <text class="cover-mark" wx:if="{{item.isCover}}">封面</text>
+              <text class="cover-btn" wx:if="{{item.selected && !item.isCover}}" catchtap="setCoverPhoto" data-id="{{item.id}}">设封面</text>
             </view>
           </view>
+          <view class="hint-box" wx:elif="{{photoLibraryLoading}}">正在加载照片库...</view>
+          <view class="hint-box" wx:else>暂无可选照片，可先拍照上传。</view>
         </view>
 
         <view class="form-section last-section">
-          <text class="form-section-title">总体备注</text>
-          <textarea class="meal-textarea remark-textarea" placeholder="例如：孩子们今天吃得很好，青菜剩得较少" value="{{form.overall_remark}}" bindinput="onFormField" data-field="overall_remark" />
+          <view class="section-row">
+            <text class="form-section-title">关联学生</text>
+            <text class="section-hint">{{selectedStudentIds.length}} 个已选</text>
+          </view>
+          <view class="student-grid" wx:if="{{studentRows.length > 0}}">
+            <view class="student-chip {{item.selected ? 'selected' : ''}}" wx:for="{{studentRows}}" wx:key="id" data-id="{{item.id}}" bindtap="toggleStudent">
+              <text class="student-name">{{item.name}}</text>
+              <text class="student-grade" wx:if="{{item.grade}}">{{item.grade}}</text>
+            </view>
+          </view>
+          <view class="hint-box" wx:else>暂无在读学生，请先添加学生。</view>
         </view>
       </scroll-view>
 

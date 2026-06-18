@@ -145,6 +145,7 @@ YYYY-MM-DD-003
 | T-008 | 作业创建/批改页面真机小屏视觉验收 | P2 | Claude Code | 待处理 | 用户提供截图反馈 | 体验版验收 |
 | T-009 | navigateTo 堆栈上限风险 | P2 | Claude Code | 待处理 | 无 | 前端导航体验收口 |
 | T-010 | 隐私政策/用户协议链接占位 | P2 | 用户 | 需用户确认 | Claude Code 替换链接 | 当前可能仍指向 `tuoban.example.com` |
+| T-011 | 餐食记录从五餐打卡改为每日一条 | P0/P1 | Codex | 已完成 | Claude Code 真机复测并重新上传体验版 | 已支持今日餐食、历史列表、照片外显、照片库选择、学生关联、家长端展示 |
 
 ## 4. 今日变更记录
 
@@ -478,6 +479,58 @@ YYYY-MM-DD-003
 - 微信公众平台 request 合法域名是否包含 `https://ccrong.cloud`。
 - 体验版上传后，体验家长是否已经重新扫码进入最新版本。
 - 是否要把当前本地所有未提交的体验版代码统一提交到 GitHub，或只提交家长端闭环相关文件。
+
+### 2026-06-18-011：餐食记录逻辑调整
+
+需求理解：
+- 餐食模块不是“早餐、午餐、晚餐、上午加餐、下午加餐”的五餐打卡。
+- 当前体验版只需要每天一条“今日餐食”记录，用来记录今天吃了什么、相关照片、关联孩子，并沉淀到孩子档案/家长端展示。
+
+修改内容：
+- 后端餐食接口改为按日期处理每日一条餐食；创建今日餐食时会更新当天已有记录，不再按五个餐别拆分。
+- 新增/完善 `GET /api/meals/today`、`GET /api/meals/{id}`、`PUT /api/meals/{id}`。
+- `GET /api/meals` 历史列表按日期去重展示，每条返回封面图、照片数量、关联学生数量、照片列表、学生列表。
+- 餐食保存支持 `menu_text`、`overall_remark`、`photo_ids`、`cover_photo_id`、`student_ids`。
+- 复用现有 `meal_photos` 作为餐食-照片关联，复用 `meal_student_notes` 作为餐食-学生关联；不做大表结构重构。
+- 餐食关联照片时，会把照片标记为 `meal`，并补充照片与关联学生的 `photo_students` 关系。
+- 家长首页 `GET /api/parent/dashboard/today` 改为只展示当天餐食，并返回餐食照片列表、封面图和照片数量。
+- 家长成长档案 `GET /api/parent/growth/{student_id}` 保留近 30 天餐食时间线，并补充 `menu_text` 与餐食照片。
+- 老师端 `miniprogram/pages/teacher/meal/` 改为今日状态卡、今日餐食卡、历史记录列表和单条餐食表单。
+- 老师端餐食表单支持新拍/上传照片、从照片库选择已有照片、设置已有照片封面、关联多个学生。
+- 已移除页面中的五餐待办入口和“今日待记录 5 餐”等错误逻辑。
+
+修改文件：
+- `backend/app/api/routes/meals.py`
+- `backend/app/api/routes/parent.py`
+- `backend/app/schemas/meal.py`
+- `miniprogram/pages/teacher/meal/meal.js`
+- `miniprogram/pages/teacher/meal/meal.wxml`
+- `miniprogram/pages/teacher/meal/meal.wxss`
+
+验证方式：
+- `python -m py_compile backend/app/api/routes/meals.py backend/app/api/routes/parent.py backend/app/schemas/meal.py` 通过。
+- `node --check miniprogram/pages/teacher/meal/meal.js` 通过。
+- `rg` 检查餐食页无 `早餐/午餐/晚餐/上午加餐/下午加餐/今日待记录/待记录餐别` 等旧五餐逻辑残留。
+- `git diff --check` 对本轮修改文件通过，仅有 Git 换行符提示。
+- 使用 FastAPI TestClient 在 `backend/` 目录验证：`GET /api/meals/today`、`POST /api/meals`、`GET /api/meals/{id}`、`PUT /api/meals/{id}`、`GET /api/meals` 均通过。
+- 使用 TestClient 验证家长端 `GET /api/parent/dashboard/today`、`GET /api/parent/growth/{student_id}` 均返回 200。
+- 验证使用的 2099-01-01 测试餐食已清理，根目录误生成的 0 字节 `tuoban_dev.db` 已删除。
+
+当前状态：
+- P0 已完成：已去掉五餐待记录，改为每日一条餐食；老师可记录/编辑；历史列表可显示；餐食卡片可外显封面照片。
+- P1 基础完成：可关联学生，可从照片库选择已有照片，可让家长首页/成长档案看到关联餐食。
+- 仍需真机复测照片选择、封面选择、学生选择和保存后的家长端展示效果。
+
+需要 Claude Code 处理的问题：
+- 在微信开发者工具/真机上复测老师端餐食页布局和交互。
+- 复测从照片库选择已有照片、添加新照片、设置封面、关联学生后的保存效果。
+- 复测家长端首页和成长档案中餐食照片是否正常显示。
+- 复测后重新上传体验版。
+
+需要用户确认的问题：
+- 餐食记录是否必须允许“无学生关联”保存；当前实现要求至少选择 1 个学生，以保证能沉淀到孩子档案。
+- 是否接受体验版暂时不做菜品/制作/孩子用餐等照片细分类，只保留餐食照片集合和封面。
+- 云端后端需部署本轮代码并重启，前端需重新上传体验版后手机端才会生效。
 
 ## 5. 今日收尾备注
 

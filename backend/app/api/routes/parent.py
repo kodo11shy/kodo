@@ -13,6 +13,7 @@ from app.models import (
     AttendanceRecord,
     HomeworkPhoto,
     HomeworkRecord,
+    MealPhoto,
     MealRecord,
     MealStudentNote,
     Parent,
@@ -125,10 +126,9 @@ def parent_dashboard_today(
     ).scalars().all()
 
     meal_row = db.execute(
-        select(MealStudentNote, MealRecord, Photo)
+        select(MealStudentNote, MealRecord)
         .join(MealRecord, MealRecord.id == MealStudentNote.meal_id)
-        .outerjoin(Photo, Photo.id == MealStudentNote.photo_id)
-        .where(MealStudentNote.student_id == target_student_id)
+        .where(MealStudentNote.student_id == target_student_id, MealRecord.meal_date == today)
         .order_by(MealRecord.meal_date.desc(), MealStudentNote.id.desc())
         .limit(1)
     ).first()
@@ -152,7 +152,21 @@ def parent_dashboard_today(
 
     meal_today = None
     if meal_row:
-        meal_note, meal, meal_photo = meal_row
+        meal_note, meal = meal_row
+        meal_photos = db.execute(
+            select(Photo)
+            .join(MealPhoto, MealPhoto.photo_id == Photo.id)
+            .where(MealPhoto.meal_id == meal.id)
+            .order_by(MealPhoto.sort_order, MealPhoto.id)
+        ).scalars().all()
+        photo_items = [
+            {
+                "id": photo.id,
+                "file_path": photo.file_path,
+                "thumbnail": photo.thumbnail_path,
+            }
+            for photo in meal_photos
+        ]
         meal_today = {
             "id": meal.id,
             "date": meal.meal_date.isoformat(),
@@ -160,13 +174,10 @@ def parent_dashboard_today(
             "menu_text": meal.menu_text,
             "overall_remark": meal.overall_remark,
             "student_remark": meal_note.remark,
-            "photo": {
-                "id": meal_photo.id,
-                "file_path": meal_photo.file_path,
-                "thumbnail": meal_photo.thumbnail_path,
-            }
-            if meal_photo
-            else None,
+            "photo": photo_items[0] if photo_items else None,
+            "cover_photo": photo_items[0] if photo_items else None,
+            "photos": photo_items,
+            "photo_count": len(photo_items),
         }
 
     return ok(
@@ -328,6 +339,20 @@ def parent_growth(
         .where(MealStudentNote.student_id == student_id, MealRecord.meal_date >= start_date)
         .order_by(MealRecord.meal_date.desc(), MealStudentNote.id.desc())
     ).all()
+    meal_ids = [meal.id for _, meal in meal_notes]
+    meal_photo_rows = []
+    if meal_ids:
+        meal_photo_rows = db.execute(
+            select(MealPhoto, Photo)
+            .join(Photo, Photo.id == MealPhoto.photo_id)
+            .where(MealPhoto.meal_id.in_(meal_ids))
+            .order_by(MealPhoto.meal_id, MealPhoto.sort_order, MealPhoto.id)
+        ).all()
+    photos_by_meal: dict[int, list[dict]] = {}
+    for meal_photo, photo in meal_photo_rows:
+        photos_by_meal.setdefault(meal_photo.meal_id, []).append(
+            {"id": photo.id, "file_path": photo.file_path, "thumbnail": photo.thumbnail_path}
+        )
 
     timeline = [
         {
@@ -355,8 +380,10 @@ def parent_growth(
         {
             "date": meal.meal_date.isoformat(),
             "type": "meal",
-            "title": f"{meal.meal_type}记录",
-            "description": note.remark,
+            "title": "今日餐食",
+            "description": note.remark or meal.overall_remark or meal.menu_text,
+            "menu_text": meal.menu_text,
+            "photos": photos_by_meal.get(meal.id, []),
             "score": None,
             "source_id": note.id,
         }
