@@ -439,6 +439,46 @@ YYYY-MM-DD-003
 需要用户确认：
 - 通知 Hermes 按上述要求完成云端完整部署和后端重启。
 
+### 2026-06-18-010：最新体验版上传后复查与 GitHub 推送重试
+
+完成内容：
+- 用户反馈已上传最新体验版后，复查体验版依赖的云端接口与本地小程序配置。
+- 说明：Codex 无法直接读取微信公众平台后台的“体验版上传成功状态”，本轮以体验版实际调用的云端接口、`miniprogram/config.js` 配置和关键 JS 语法检查作为判断依据。
+- 尝试再次推送 GitHub。
+
+已检查内容：
+- `miniprogram/config.js`：体验版 API 仍为 `https://ccrong.cloud/api`，没有误切本地地址。
+- `GET /api/health`：正常。
+- `GET /api/public/homepage`：第一次超时，第二次正常返回首页数据、通知、收费标准、精彩瞬间。
+- `POST /api/auth/wechat/session`：正常，返回 `mock=true`，家长体验版测试绑定可继续使用。
+- `GET /api/parent/dashboard/today`：接口存在，不带 token 返回 `40100 未登录`，符合预期。
+- `GET /api/auth/login-policy`：仍返回 404。
+- `POST /api/auth/teacher/wechat-login`：仍返回 404。
+- `GET /api/config?keys=homework_subjects`：不带 token 返回 `40100 未登录`，前端会静默使用默认科目 `语文/数学`，不阻塞体验。
+- `node --check` 已检查：`miniprogram/app.js`、`miniprogram/pages/index/index.js`、`miniprogram/pages/parent/login/login.js`、`miniprogram/pages/parent/dashboard/dashboard.js`，均通过。
+
+当前判断：
+- 最新体验版前端上传后，家长体验版闭环依赖的 mock session、家长首页接口、公开首页接口均可用。
+- 老师端微信免账号登录和登录策略仍受云端后端未完整部署影响，两个接口仍 404。
+- 首页公开接口曾出现一次超时，复测恢复正常；建议真机打开体验版首页观察是否有偶发加载慢。
+- GitHub 推送仍失败，原因是本机到 `github.com:443` 的 TCP 连接不通，`git push` 返回 `Empty reply from server`，`curl https://github.com` 超时；不是仓库提交冲突。
+
+需要 Hermes 处理：
+- 继续按第 009 条执行云端完整部署和后端重启。
+- 重启后重点确认 `/api/auth/login-policy` 与 `/api/auth/teacher/wechat-login` 不再是 404。
+
+需要 Codex 处理：
+- GitHub 网络恢复后再次执行 `git push origin main`。
+- 如需要把本地“最新体验版代码”完整入库，应另做一次有范围的代码提交，避免把未确认改动混入。
+
+需要 Claude Code 处理：
+- 用已上传的体验版真机复测首页、家长邀请码绑定、家长首页、成长档案、作业记录、照片墙。
+
+需要用户确认：
+- 微信公众平台 request 合法域名是否包含 `https://ccrong.cloud`。
+- 体验版上传后，体验家长是否已经重新扫码进入最新版本。
+- 是否要把当前本地所有未提交的体验版代码统一提交到 GitHub，或只提交家长端闭环相关文件。
+
 ## 5. 今日收尾备注
 
 本区可选填写。
