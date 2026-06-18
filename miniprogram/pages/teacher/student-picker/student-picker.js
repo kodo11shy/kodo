@@ -39,6 +39,7 @@ Page({
       .then((data) => {
         const list = (data.students || data || []).map((item) => ({
           ...item,
+          id: Number(item.id),
           initial: (item.name || '').slice(0, 1),
           selected: false
         }))
@@ -59,7 +60,8 @@ Page({
   },
 
   toggleStudent(e) {
-    const id = e.currentTarget.dataset.id
+    const id = Number(e.currentTarget.dataset.id)
+    if (!id) return
     let selected = [...this.data.selectedIds]
 
     if (this.data.mode === 'single') {
@@ -93,7 +95,10 @@ Page({
   },
 
   confirmAssociate() {
-    if (this.data.selectedIds.length === 0) return
+    if (this.data.selectedIds.length === 0) {
+      util.showError('请先选择照片中的学生')
+      return
+    }
     this.setData({ saving: true })
 
     const payload = {

@@ -23,7 +23,7 @@
 
   <!-- 学生网格 -->
   <view class="student-grid">
-    <view class="student-item" wx:for="{{students}}" wx:key="id" bindtap="toggleStudent" data-id="{{item.id}}">
+    <view class="student-item {{item.selected ? 'selected' : ''}}" wx:for="{{students}}" wx:key="id" bindtap="toggleStudent" data-id="{{item.id}}">
       <view class="student-avatar {{item.selected ? 'selected' : ''}}">
         <text>{{item.initial}}</text>
         <view class="check-mark" wx:if="{{item.selected}}">✓</view>
@@ -59,7 +59,7 @@
 
   <!-- 确认按钮 -->
   <view class="confirm-bar">
-    <button class="btn-primary" bindtap="confirmAssociate" disabled="{{selectedIds.length === 0 || saving}}">
+    <button class="btn-primary confirm-btn {{selectedIds.length === 0 ? 'is-disabled' : ''}}" bindtap="confirmAssociate" disabled="{{saving}}">
       {{saving ? '保存中...' : '✅ 确认保存'}}
     </button>
   </view>
