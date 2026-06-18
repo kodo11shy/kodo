@@ -148,6 +148,7 @@ YYYY-MM-DD-003
 | T-011 | 餐食记录从五餐打卡改为每日一条 | P0/P1 | Codex | 已完成 | Claude Code 真机复测并重新上传体验版 | 已支持今日餐食、历史列表、照片外显、照片库选择、学生关联、家长端展示 |
 | T-012 | 照片选择学生确认按钮无反馈 | P1 | Codex | 已完成 | Claude Code 真机复测并重新上传体验版 | 未选学生时给出提示；修复学生 ID 类型不一致导致选中态不稳定的问题 |
 | T-013 | 公共活动照片无需强制关联学生 | P1 | Codex | 已完成 | Claude Code 真机复测并重新上传体验版 | 活动/餐食/日常照片可空学生保存；作业照片仍强制选择学生 |
+| T-014 | 孩子资料库与成长观察系统后端最小闭环 | P1 | Codex | 已完成 | Claude Code 对接前端并真机复测 | 新增成长观察草稿、确认入档、来源引用、资料库归档接口；家长端只读家长可见观察 |
 
 ## 4. 今日变更记录
 
@@ -658,6 +659,56 @@ YYYY-MM-DD-003
 
 需要用户确认：
 - 体验版上传后，确认照片上传速度和失败率是否改善。
+
+### 2026-06-18-016：孩子资料库与成长观察系统后端最小闭环
+
+完成内容：
+- 按 Codex 后端分工完成“孩子资料库与成长观察系统”的后端最小闭环。
+- 新增成长观察数据模型：
+  - `growth_observation_drafts`：AI/系统候选观察草稿，状态为 pending/approved/rejected。
+  - `growth_observations`：老师确认后的正式成长观察，可控制 `parent_visible`。
+  - `growth_observation_sources`：记录观察引用的签到、作业、照片、餐食、评语等来源。
+- 新增成长资料库归档能力：
+  - `GET /api/growth/archive/{student_id}` 汇总签到、作业、照片、餐食、评语、已确认观察。
+  - `GET /api/growth/timeline/{student_id}` 保持旧接口可用，并返回统一归档结构与 summary。
+- 新增成长观察接口：
+  - `POST /api/growth/observations/drafts`：基于现有日常记录生成候选观察草稿。
+  - `GET /api/growth/observations/drafts`：查询候选观察。
+  - `PUT /api/growth/observations/drafts/{draft_id}`：审核/拒绝候选观察。
+  - `POST /api/growth/observations/confirm`：老师确认后生成正式成长观察。
+  - `GET /api/growth/observations` 与 `GET /api/growth/observations/student/{student_id}`：查询正式观察。
+  - `PUT /api/growth/observations/{observation_id}`：编辑标题、内容、标签、家长可见性和状态。
+- 家长端成长档案 `GET /api/parent/growth/{student_id}` 已接入正式观察，只展示 `parent_visible=true` 且未 rejected 的观察。
+
+修改文件：
+- `backend/app/models/growth_observation.py`
+- `backend/app/schemas/growth_observation.py`
+- `backend/app/models/__init__.py`
+- `backend/app/api/routes/growth.py`
+- `backend/app/api/routes/parent.py`
+
+验证结果：
+- 已执行 `python -m py_compile backend/app/models/growth_observation.py backend/app/schemas/growth_observation.py backend/app/models/__init__.py backend/app/api/routes/growth.py backend/app/api/routes/parent.py`，通过。
+- 已执行 `git diff --check`，通过。
+- 已用 FastAPI TestClient 验证完整闭环：
+  - `GET /api/growth/archive/{student_id}` 返回签到/评语归档 summary。
+  - `POST /api/growth/observations/drafts` 可生成候选观察，source_count 正确。
+  - `POST /api/growth/observations/confirm` 可确认入档，并复制来源引用。
+  - `GET /api/growth/timeline/{student_id}` 可看到 observation。
+  - `GET /api/parent/growth/{student_id}` 只读展示家长可见 observation。
+- 测试数据已清理。
+
+当前状态：
+- 本地后端已完成并通过验证，等待提交和推送 GitHub。
+
+需要 Claude Code 处理：
+- 拉取后按前端页面对接新接口。
+- 真机验证老师端候选观察/确认入档/家长可见开关。
+- 真机验证家长端只显示老师确认且家长可见的成长观察。
+
+需要用户确认：
+- 是否允许第一阶段使用“系统候选观察”作为 AI 接入前的占位方案。
+- 云端后端部署后，需要重启服务并重新上传体验版。
 
 ## 5. 今日收尾备注
 

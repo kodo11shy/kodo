@@ -1,4 +1,9 @@
 from app.models.attendance import AttendanceRecord
+from app.models.growth_observation import (
+    GrowthObservation,
+    GrowthObservationDraft,
+    GrowthObservationSource,
+)
 from app.models.homework import HomeworkPhoto, HomeworkRecord
 from app.models.meal import MealPhoto, MealRecord, MealStudentNote
 from app.models.photo import Photo, PhotoStudent
@@ -16,6 +21,9 @@ from app.models.teacher import Teacher
 __all__ = [
     "AttendanceRecord",
     "AuthorizedPickup",
+    "GrowthObservation",
+    "GrowthObservationDraft",
+    "GrowthObservationSource",
     "HomeworkPhoto",
     "HomeworkRecord",
     "MealPhoto",

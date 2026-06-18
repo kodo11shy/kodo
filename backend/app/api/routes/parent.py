@@ -11,6 +11,7 @@ from app.core.responses import fail, ok
 from app.db.session import get_db
 from app.models import (
     AttendanceRecord,
+    GrowthObservation,
     HomeworkPhoto,
     HomeworkRecord,
     MealPhoto,
@@ -339,6 +340,16 @@ def parent_growth(
         .where(MealStudentNote.student_id == student_id, MealRecord.meal_date >= start_date)
         .order_by(MealRecord.meal_date.desc(), MealStudentNote.id.desc())
     ).all()
+    observations = db.execute(
+        select(GrowthObservation)
+        .where(
+            GrowthObservation.student_id == student_id,
+            GrowthObservation.observation_date >= start_date,
+            GrowthObservation.parent_visible.is_(True),
+            GrowthObservation.status != "rejected",
+        )
+        .order_by(GrowthObservation.observation_date.desc(), GrowthObservation.id.desc())
+    ).scalars().all()
     meal_ids = [meal.id for _, meal in meal_notes]
     meal_photo_rows = []
     if meal_ids:
@@ -389,6 +400,17 @@ def parent_growth(
         }
         for note, meal in meal_notes
     )
+    timeline.extend(
+        {
+            "date": observation.observation_date.isoformat(),
+            "type": "observation",
+            "title": observation.title,
+            "description": observation.content,
+            "score": None,
+            "source_id": observation.id,
+        }
+        for observation in observations
+    )
     timeline.sort(key=lambda item: item["date"], reverse=True)
 
     return ok(
@@ -399,6 +421,7 @@ def parent_growth(
                     "attended_days": attended_days,
                     "avg_score": round(float(avg_score), 1) if avg_score is not None else None,
                     "homework_count": homework_count,
+                    "observation_count": len(observations),
                 },
             },
             "timeline": timeline,
