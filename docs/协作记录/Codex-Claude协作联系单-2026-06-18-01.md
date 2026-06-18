@@ -136,7 +136,7 @@ YYYY-MM-DD-003
 
 | ID | 任务 | 优先级 | 负责人 | 状态 | 需要对方处理 | 备注 |
 |----|------|--------|--------|------|--------------|------|
-| T-001 | 生产 API 持续可用性验证 | P0 | Codex/Hermes | 已完成 | Hermes 已部署最新代码并重启 | 见变更 008。`/api/auth/login-policy`、`/api/auth/teacher/wechat-login` 源码中即不存在，非部署问题 |
+| T-001 | 生产 API 持续可用性验证 | P0 | Hermes | 已完成 | `git pull origin main` 拉取到 `da026a0`（含 /auth/login-policy + /teacher/wechat-login）→ rsync 部署 → 语法检查 → 重启 → 复测通过 | ✅ 不再 404：`/auth/login-policy` → 200/code=0；`/auth/teacher/wechat-login` → 401/code=40104 |
 | T-002 | 微信公众平台合法域名确认 | P0 | 用户 | 需用户确认 | Codex 记录结果 | request/uploadFile/downloadFile 需包含 `https://ccrong.cloud` |
 | T-003 | 4.3 接口清单验证 | P1 | Codex | 已完成 | 无 | 32/32 已实现 |
 | T-004 | 餐食记录照片提交前上传导致孤立照片 | P1 | Codex | 已完成 | Claude Code 真机复测餐食表单 | 已改为提交餐食时上传，保存失败时回滚已上传照片 |
