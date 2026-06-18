@@ -781,9 +781,129 @@ YYYY-MM-DD-003
 需要用户确认：
 - 第一阶段 5 个改动的交互草图是否可进入开发。
 
+### 2026-06-18-018：Codex 审核前端 v1.1 方案并统一后端口径
+
+完成内容：
+- 已拉取并检查 GitHub 最新提交 `3da02cc docs: 方案更新v1.1-反向审视补充修订`。
+- 已读取 `docs/方案/智慧托班-孩子资料库与成长观察系统-方案分析.md` 的 v1.1 内容。
+- 已同时检查本地尚未提交的第 14 节“第一阶段交互草图与字段设计”和本联系单 T-015~T-020 更新。
+- 已对照当前后端模型、schema、route，确认 v1.1 第一阶段不是纯前端改动，仍需后端字段、接口和迁移配合。
+
+统一口径：
+- Claude Code 的 v1.1 方案继续作为产品体验主方向。
+- Codex 已实现的 `GrowthObservation` 后端作为“观察归档/确认层”预研能力保留，暂不要求前端直接接入。
+- v1.1 第 14 节定义的作业标签、餐食例外标记、照片成长维度、评语可见性，属于“日常轻量采集层”。
+- 第一阶段建议先补轻量采集字段；等采集稳定后，再启用候选观察、确认入档、AI 摘要等后续能力。
+
+后端缺口：
+- `HomeworkRecord.observation_tags`：当前未实现。
+- `MealStudentNote.meal_status` / `allergy_confirmed`：当前未实现，过敏字段还需确认健康档案口径。
+- `Photo.dimension`：当前未实现。
+- `TeacherRemark.visible_to_parent`：当前未实现，家长端也尚未按可见性过滤旧评语。
+- `GET /api/growth/pending-count`：当前未实现，需先定义 pending 来源。
+- 云端旧库补列策略需加入 `ensure_compatible_schema` 或独立迁移脚本，避免部署后 500。
+
+审核意见：
+- 建议实施顺序：作业标签 / 照片维度 / 评语可见性 → 餐食例外标记 → 待确认角标。
+- “粗心、薄弱、需要帮助”等标签默认不得直接给家长展示，只能作为老师内部标记或转化为建设性表达。
+- 过敏属于安全信息，不应作为日常观察标签；健康档案字段稳定前，不建议先做强阻断提交。
+- 当前体验版阶段不做 AI、不接微信群、不改家长端为维度式展示。
+
+修改文件：
+- `docs/方案/智慧托班-孩子资料库与成长观察系统-方案分析.md`
+- `docs/协作记录/Codex-Claude协作联系单-2026-06-18-01.md`
+
+验证结果：
+- 已执行 `git pull --ff-only origin main`，确认本地基于远程最新。
+- 已对照当前后端模型文件：
+  - `backend/app/models/homework.py`
+  - `backend/app/models/meal.py`
+  - `backend/app/models/photo.py`
+  - `backend/app/models/remark_payment.py`
+- 已确认本次只更新方案和联系单，没有修改代码。
+
+需要 Codex 处理：
+- 若用户确认进入开发，先做 T-015 生产就绪检查，再补第一阶段字段和兼容迁移。
+
+需要 Claude Code 处理：
+- 确认第 14 节交互草图是否就是最终 v1.1 前端开发依据。
+- 开发前与 Codex 最后确认请求字段名和返回字段，避免前后端口径不一致。
+
+需要用户确认：
+- 第一阶段是否按“轻量采集字段先落地，GrowthObservation 观察入档后启用”的节奏执行。
+- 餐食过敏提醒是否先做“提醒不阻断”，等健康档案字段稳定后再做强阻断。
+
 需要用户确认：
 - 是否允许第一阶段使用“系统候选观察”作为 AI 接入前的占位方案。
 - 云端后端部署后，需要重启服务并重新上传体验版。
+
+### 2026-06-18-019：Claude Code 对 Codex 后端提交的代码审核
+
+审核对象：commit `2a0074a feat: add growth observation backend`
+
+审核结论：方向有价值，但存在 7 个问题需在联调前修复。
+
+| # | 严重程度 | 问题 | 说明 |
+|:-:|:-------:|------|------|
+| 1 | 🔴 高 | **超前新建 3 张表** | v1.1 方案明确第一阶段不加新表，但 `growth_observation_drafts`、`growth_observations`、`growth_observation_sources` 已建。当前体验版用不上，且需要 migration 脚本才能上线 |
+| 2 | 🟡 中 | **候选文案名不副实** | `_build_candidate_text()` 只是字符串格式化模板，不是 AI 生成。如果前端标注"AI 生成"，老师期望值会很高，看到模板句子会失望。建议前端改为"系统整理" |
+| 3 | 🟡 中 | **时间线数据可能重复** | `_archive_events()` 同时返回原始事件和 observation。同一个孩子同一日期可能出现两条内容相似的记录（原始作业 + 基于该作业的总结）。建议前端时间线做去重 |
+| 4 | 🟡 中 | **N+1 查询模式** | `_draft_out()` 和 `_observation_out()` 中每返回一条记录都会单独查询一次 `GrowthObservationSource`。列表 20 条时产生 1+20=21 次 SQL 查询。建议用 `selectinload` 批量加载 |
+| 5 | 🟡 中 | **归档接口无分页** | `GET /growth/archive/{id}` 没有 `page/page_size` 参数。一个月 300+ 条事件时全量返回。建议预留分页参数 |
+| 6 | 🟢 低 | **source_refs 静默丢失** | `POST /observations/confirm` 中 parse 失败走 `continue` 静默跳过。前台传错数据时，错误不会被发现。建议至少记录 warning 日志 |
+| 7 | 🟢 低 | **缺少 DB migration** | 3 张新表没有对应 alembic 迁移或 DDL。本地 SQLite 不会自动建表，云端 PostgreSQL 也无法同步 |
+
+**审核依据文件**：
+- `backend/app/models/growth_observation.py`（56 行，含 3 个模型类）
+- `backend/app/schemas/growth_observation.py`（35 行，含 4 个 schema 类）
+- `backend/app/api/routes/growth.py`（697 行，+659行/-60行）
+- `backend/app/api/routes/parent.py`（+23 行）
+
+### 2026-06-18-020：Claude Code 输出第一阶段交互草图
+
+完成内容：
+- 根据 GPT 合并评审收口路线，输出 5 个改动的交互草图（不修改代码）。
+- 每个改动包含：当前页面 UI（ASCII 图）、改动后 UI、交互规则表、数据模型、涉及文件清单、后端/DB migration 需求。
+
+| 改动 | 优先级 | 涉及文件数 | 新增字段 | 交互复杂度 |
+|------|:-----:|:--------:|:-------:|:--------:|
+| ① 作业批改标签 | P0 | 4 + migration | `HomeworkRecord.observation_tags` | 低 |
+| ② 餐食例外+过敏角标 | P0 | 4 + migration | `MealStudentNote.meal_status` + `allergy_confirmed` | 中 |
+| ③ 照片成长维度 | P1 | 3 + migration | `Photo.dimension` | 低 |
+| ④ 评语家长可见开关 | P1 | 4 + migration | `TeacherRemark.visible_to_parent` | 低 |
+| ⑤ 工作台待确认角标 | P1 | 4 | 无，新增 1 个 API | 中 |
+
+**v1.0 → v1.1 的核心修正**（本轮共修正 10 个盲点）：
+1. 工作量：从"改 4 页"修正为 ~19 文件，5~8 人天
+2. 冷启动：新增历史数据默认值策略
+3. 采纳率：标签从"事后弹出"改为"提交时一并选择"
+4. 维度定义：每个维度增加了正例/反例说明
+5. 过敏分离：从可选标签改为系统自动安全角标
+6. 家长可见：补充完整使用规范（48h、10% 比例、前端区分）
+7. 阶段衔接：新增"待确认"角标作为桥梁
+8. AI 评估：补充了数据量/模型/成本可行性边界
+9. 检索策略：第二阶段补充按维度/标签筛选
+10. 成功度量：补充了 6 个可量化指标和目标值
+
+文档位置：`docs/方案/智慧托班-孩子资料库与成长观察系统-方案分析.md` 第 14 节
+
+### 2026-06-18-021：GitHub 推送失败记录
+
+**现象**：
+- 本地提交 `8c0bf0e docs: 第一阶段交互草图输出+联系单路线收口` 已成功生成
+- `git push origin main` 连续失败：`Empty reply from server` / `Connection was reset` / `Could not connect to server port 443`
+- 这是本机到 GitHub 的 HTTPS 链路问题（与 2026-06-18-007 相同）
+
+**影响范围**：
+- 未推送内容：`docs/方案/智慧托班-孩子资料库与成长观察系统-方案分析.md`（更新）、`docs/协作记录/Codex-Claude协作联系单-2026-06-18-01.md`（更新）
+- 远程 Git 状态：停留在 `3da02cc`（方案 v1.1 反向审视补充修订），缺少 v1.1 交互草图和联系单 017~021 条目
+
+**建议**：
+- 待网络恢复后执行 `git push origin main`
+- 如果持续不通，可尝试切换 SSH 协议：`git remote set-url origin git@github.com:kodo11shy/kodo.git`
+
+修改文件：
+- 未推送（本条目仅写入本地联系单）
 
 ## 5. 今日收尾备注
 
