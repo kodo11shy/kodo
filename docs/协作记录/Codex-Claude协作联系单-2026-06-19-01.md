@@ -93,6 +93,7 @@ Codex / Claude Code 每次开始本项目工作前，优先读取本文件。
 | T-009 | 阶段间衔接：工作台待确认角标 | P1 | Claude Code/Codex | 暂缓 | 先定义 pending 来源 | 避免与 `GrowthObservation` 草稿机制重复 |
 | T-010 | 隐私政策/用户协议链接占位 | P2 | 用户/Claude Code | 需用户确认 | 用户提供正式链接 | 当前可能仍指向占位域名 |
 | T-011 | 推送 GrowthObservation 生产就绪检查记录 | P0 | Codex | 阻塞 | 网络恢复后重试 `git push origin main` | 本地提交 `e6c934d` 已生成，两次推送 GitHub 443 连接失败 |
+| T-012 | 推送四方协作闭环规则 | P0 | Codex | 阻塞 | 网络恢复后重试 `git push origin main` | 本地提交 `1a94a43` 已生成，两次推送 GitHub 失败 |
 
 状态只允许使用：
 
@@ -274,11 +275,41 @@ Codex / Claude Code 每次开始本项目工作前，优先读取本文件。
 - 已确认规则内容包含：任务前读取联系单、确认任务编号、任务后更新联系单、commit、push、最终回复 commit hash 和 git status、push 失败时说明原因。
 
 当前任务状态：
-- 待提交并推送 GitHub main。
+- 已本地提交；推送 GitHub main 失败，等待网络恢复后重试。
 
 下一步需要谁处理：
 - Codex：提交并推送。
 - GPT/Hermes/Claude Code：后续从 GitHub main 拉取最新联系单。
+
+是否需要用户确认：
+- 无。
+
+是否需要 Hermes 重启后端：
+- 否。本次未修改后端代码。
+
+是否需要重新上传体验版：
+- 否。本次未修改小程序代码。
+
+### 2026-06-19-007：四方协作闭环规则推送失败
+
+完成内容：
+- 已生成本地提交 `1a94a43 docs: finalize four-party collaboration rule`。
+- 尝试推送到 GitHub main 两次。
+
+失败现象：
+- 第一次：`Recv failure: Connection was reset`
+- 第二次：`Failed to connect to github.com port 443 after 21107 ms: Could not connect to server`
+
+判断：
+- 本地提交已成功，联系单规则已在本地生效。
+- 失败原因是本机到 GitHub HTTPS 连接失败，非文件内容或 Git 提交问题。
+
+当前任务状态：
+- 阻塞于 GitHub 网络连接。
+
+下一步需要谁处理：
+- Codex：网络恢复后执行 `git push origin main`。
+- GPT/Hermes/Claude Code：在 GitHub 未更新前，无法通过远程 main 读取本条规则；如在本机协作，应以本地联系单为准。
 
 是否需要用户确认：
 - 无。
