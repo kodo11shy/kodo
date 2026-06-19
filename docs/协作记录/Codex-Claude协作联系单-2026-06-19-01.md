@@ -94,6 +94,7 @@ Codex / Claude Code 每次开始本项目工作前，优先读取本文件。
 | T-010 | 隐私政策/用户协议链接占位 | P2 | 用户/Claude Code | 需用户确认 | 用户提供正式链接 | 当前可能仍指向占位域名 |
 | T-011 | 推送 GrowthObservation 生产就绪检查记录 | P0 | Codex | 阻塞 | 网络恢复后重试 `git push origin main` | 本地提交 `e6c934d` 已生成，两次推送 GitHub 443 连接失败 |
 | T-012 | 推送四方协作闭环规则 | P0 | Codex | 阻塞 | 网络恢复后重试 `git push origin main` | 本地提交 `1a94a43` 已生成，两次推送 GitHub 失败 |
+| T-013 | 网络调整后 GitHub 推送与远程核对 | P0 | Codex | 阻塞 | 用户继续检查本机到 GitHub HTTPS 连接 | `git fetch`、`git ls-remote`、`git push` 均仍失败；本地 `origin/main` 当前指向 `bdbfc30` |
 
 状态只允许使用：
 
@@ -313,6 +314,42 @@ Codex / Claude Code 每次开始本项目工作前，优先读取本文件。
 
 是否需要用户确认：
 - 无。
+
+是否需要 Hermes 重启后端：
+- 否。本次未修改后端代码。
+
+是否需要重新上传体验版：
+- 否。本次未修改小程序代码。
+
+### 2026-06-19-008：网络调整后 GitHub 推送与远程核对
+
+完成内容：
+- 按用户要求，在网络调整后重新检查 GitHub 同步状态。
+- 先读取最新联系单，并确认本地工作区状态。
+- 尝试远程核对和推送。
+
+是否修改代码：
+- 否。仅更新本联系单记录。
+
+修改文件：
+- `docs/协作记录/Codex-Claude协作联系单-2026-06-19-01.md`
+
+验证了什么：
+- `git status --short --branch` 一度显示本地工作区干净，且本地 `origin/main` 已指向 `bdbfc30`。
+- `git fetch origin main` 失败：`Empty reply from server`。
+- `git ls-remote origin refs/heads/main` 失败：`Failed to connect to github.com port 443 after 21072 ms`。
+- `git push origin main` 失败：`Failed to connect to github.com port 443 after 21090 ms`。
+
+当前任务状态：
+- 仍阻塞于本机到 GitHub HTTPS 连接。
+- 本地提交未丢失。
+
+下一步需要谁处理：
+- 用户/Codex：继续确认本机网络、代理或 GitHub HTTPS 访问。
+- Codex：网络恢复后执行 `git push origin main`，再用 `git status` 和 `git ls-remote` 核对远程。
+
+是否需要用户确认：
+- 需要用户继续确认网络是否真正可访问 GitHub。
 
 是否需要 Hermes 重启后端：
 - 否。本次未修改后端代码。
