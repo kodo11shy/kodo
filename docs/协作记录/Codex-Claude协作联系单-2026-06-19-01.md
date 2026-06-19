@@ -94,7 +94,7 @@ Codex / Claude Code 每次开始本项目工作前，优先读取本文件。
 | T-010 | 隐私政策/用户协议链接占位 | P2 | 用户/Claude Code | 需用户确认 | 用户提供正式链接 | 当前可能仍指向占位域名 |
 | T-011 | 推送 GrowthObservation 生产就绪检查记录 | P0 | Codex | 阻塞 | 网络恢复后重试 `git push origin main` | 本地提交 `e6c934d` 已生成，两次推送 GitHub 443 连接失败 |
 | T-012 | 推送四方协作闭环规则 | P0 | Codex | 阻塞 | 网络恢复后重试 `git push origin main` | 本地提交 `1a94a43` 已生成，两次推送 GitHub 失败 |
-| T-013 | 网络调整后 GitHub 推送与远程核对 | P0 | Codex | 阻塞 | 用户继续检查本机到 GitHub HTTPS 连接 | `git fetch`、`git ls-remote`、`git push` 均仍失败；本地 `origin/main` 当前指向 `bdbfc30` |
+| T-013 | 网络调整后 GitHub 推送与远程核对 | P0 | Codex | 已完成 | 无 | 原因定位：Git 未走本机代理；已配置本仓库 Git 代理 `127.0.0.1:7897`，已 rebase 并推送到 `237258f` |
 
 状态只允许使用：
 
@@ -350,6 +350,56 @@ Codex / Claude Code 每次开始本项目工作前，优先读取本文件。
 
 是否需要用户确认：
 - 需要用户继续确认网络是否真正可访问 GitHub。
+
+是否需要 Hermes 重启后端：
+- 否。本次未修改后端代码。
+
+是否需要重新上传体验版：
+- 否。本次未修改小程序代码。
+
+### 2026-06-19-009：GitHub 推送失败原因定位与修复
+
+完成内容：
+- 根据用户说明重新检查本机 Git/GitHub 网络链路。
+- 区分 Hermes 腾讯云 SSH 成功与本机 Codex 环境网络无直接可比性。
+- 检查 Git 远程地址、Git 代理配置、环境变量代理、Windows 代理、GitHub 端口连通性、Clash Verge/Mihomo 本机监听端口、SSH 认证状态。
+- 发现本机代理进程存在，`verge-mihomo` 监听 `127.0.0.1:7897`，但 Git 没有配置代理，导致 Git 一直直连 GitHub HTTPS。
+- 使用本机代理后，`git ls-remote`、`git push` 成功。
+- 发现远程已有 Claude/Hermes 新提交 `92b824c`、`49378c3`，已先 fetch/rebase，再推送本地提交。
+
+是否修改代码：
+- 否。未修改业务代码。
+
+修改文件：
+- `docs/协作记录/Codex-Claude协作联系单-2026-06-19-01.md`
+
+本机 Git 配置变更：
+- 已在本仓库本地配置代理，不影响全局 Git：
+  - `http.proxy=http://127.0.0.1:7897`
+  - `https.proxy=http://127.0.0.1:7897`
+
+验证了什么：
+- `git remote -v`：origin 使用 HTTPS：`https://github.com/kodo11shy/kodo.git`
+- Git 原本无 `http.proxy/https.proxy` 配置。
+- 环境变量无 `HTTP_PROXY/HTTPS_PROXY/ALL_PROXY`。
+- Windows WinHTTP 和用户代理均为 Direct/关闭。
+- `Test-NetConnection github.com -Port 443` 成功，说明端口不是完全不通。
+- `curl https://github.com` 成功，说明普通 HTTPS 可用。
+- `git` 直连 HTTPS 反复出现 reset/443 timeout，说明 Git 数据传输链路不稳定。
+- `curl -x http://127.0.0.1:7897 https://github.com` 成功。
+- `git -c http.proxy=http://127.0.0.1:7897 -c https.proxy=http://127.0.0.1:7897 ls-remote origin refs/heads/main` 成功。
+- SSH 方向：当前本机没有可用 GitHub SSH 私钥，`ssh.github.com:443` 返回 `Permission denied (publickey)`，不建议当前立即切 SSH。
+
+当前任务状态：
+- 已完成。
+- 诊断前本地和远程 main 已同步到 `237258f`；本条记录提交后继续通过本仓库代理配置推送到 GitHub main。
+
+下一步需要谁处理：
+- Codex：后续 Git 操作可直接使用本仓库本地代理配置。
+- 用户：如代理端口变化，需要同步更新本仓库 Git 代理配置。
+
+是否需要用户确认：
+- 如后续想切 SSH，需要用户提供/配置本机 GitHub SSH key；当前不需要。
 
 是否需要 Hermes 重启后端：
 - 否。本次未修改后端代码。
