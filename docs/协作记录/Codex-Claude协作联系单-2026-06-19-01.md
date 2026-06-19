@@ -92,6 +92,7 @@ Codex / Claude Code 每次开始本项目工作前，优先读取本文件。
 | T-008 | 第一阶段：评语家长可见开关 | P1 | Claude Code/Codex | 待处理 | 用户确认进入开发 | 后端字段建议：`TeacherRemark.visible_to_parent` |
 | T-009 | 阶段间衔接：工作台待确认角标 | P1 | Claude Code/Codex | 暂缓 | 先定义 pending 来源 | 避免与 `GrowthObservation` 草稿机制重复 |
 | T-010 | 隐私政策/用户协议链接占位 | P2 | 用户/Claude Code | 需用户确认 | 用户提供正式链接 | 当前可能仍指向占位域名 |
+| T-011 | 推送 GrowthObservation 生产就绪检查记录 | P0 | Codex | 阻塞 | 网络恢复后重试 `git push origin main` | 本地提交 `e6c934d` 已生成，两次推送 GitHub 443 连接失败 |
 
 状态只允许使用：
 
@@ -195,6 +196,33 @@ Codex / Claude Code 每次开始本项目工作前，优先读取本文件。
 
 需要用户确认：
 - 是否仅把 `GrowthObservation` 作为预研能力保留，暂不接入体验版前端。
+
+### 2026-06-19-004：GrowthObservation 检查记录推送失败
+
+完成内容：
+- 已生成本地提交 `e6c934d docs: record growth observation readiness review`。
+- 尝试推送到 GitHub 两次。
+
+失败现象：
+- 第一次：`Failed to connect to github.com port 443 after 21072 ms: Could not connect to server`
+- 第二次：`Failed to connect to github.com port 443 after 21096 ms: Could not connect to server`
+
+判断：
+- 本地提交已成功，工作内容没有丢。
+- 失败原因是本机到 GitHub HTTPS 443 的网络连接失败，和代码/文档内容无关。
+
+当前待推：
+- `e6c934d`：GrowthObservation 生产就绪检查记录。
+- 本条推送失败记录将在本地提交后一起等待后续推送。
+
+需要 Codex 处理：
+- 网络恢复后执行 `git push origin main`。
+
+需要 Claude Code 处理：
+- 在 GitHub 未更新前，如需读取 T-004 检查结果，应以本地联系单为准。
+
+需要用户确认：
+- 无。
 
 ## 5. 今日收尾备注
 
