@@ -85,7 +85,7 @@ Codex / Claude Code 每次开始本项目工作前，优先读取本文件。
 | T-001 | 当前文档与联系单同步 GitHub | P0 | Codex | 已完成 | 无 | 已推送 `0395da4`；包含 Codex v1.1 审核意见、6 月 19 日联系单、6 月 18 日交接记录 |
 | T-002 | 生产 API 持续可用性验证 | P0 | Codex/Hermes | 阻塞 | Hermes 完整部署并重启云端后端 | 本地固定 8001；体验版固定 `https://ccrong.cloud/api` |
 | T-003 | 微信公众平台合法域名确认 | P0 | 用户 | 需用户确认 | Codex 记录结果 | request/uploadFile/downloadFile 需包含 `https://ccrong.cloud` |
-| T-004 | GrowthObservation 后端生产就绪检查 | P1 | Codex | 待处理 | 无 | 检查迁移脚本、接口验证、权限边界、云端部署风险；不扩功能 |
+| T-004 | GrowthObservation 后端生产就绪检查 | P1 | Codex | 已完成 | Hermes/云端确认部署参数 | 本地语法、路由、开发库表结构通过；上线前需确认云端 `AUTO_CREATE_TABLES` 或补 DDL |
 | T-005 | 第一阶段：作业批改轻量标签 | P0 | Claude Code/Codex | 待处理 | 用户确认进入开发 | 后端字段建议：`HomeworkRecord.observation_tags` |
 | T-006 | 第一阶段：餐食例外标记+过敏角标 | P0 | Claude Code/Codex | 待处理 | 用户确认过敏提醒策略 | 后端字段建议：`MealStudentNote.meal_status/allergy_confirmed` |
 | T-007 | 第一阶段：照片成长维度标签 | P1 | Claude Code/Codex | 待处理 | 用户确认进入开发 | 后端字段建议：`Photo.dimension` |
@@ -147,6 +147,54 @@ Codex / Claude Code 每次开始本项目工作前，优先读取本文件。
 
 需要用户确认：
 - 是否进入 v1.1 第一阶段字段开发。
+
+### 2026-06-19-003：GrowthObservation 后端生产就绪检查
+
+完成内容：
+- 检查 `GrowthObservation` 相关模型、schema、路由注册、父母端可见性过滤、本地开发库表结构和云端部署风险。
+- 本轮只做检查，不修改代码，不扩展新功能。
+
+检查结果：
+- 语法检查通过：`growth_observation.py`、`growth_observation.py` schema、`growth.py`、`parent.py`、`models/__init__.py` 均可 `py_compile`。
+- OpenAPI 已注册以下接口：
+  - `/api/growth/archive/{student_id}`
+  - `/api/growth/observations/drafts`
+  - `/api/growth/observations/drafts/{draft_id}`
+  - `/api/growth/observations/confirm`
+  - `/api/growth/observations`
+  - `/api/growth/observations/student/{student_id}`
+  - `/api/growth/observations/{observation_id}`
+  - `/api/growth/timeline/{student_id}`
+  - `/api/parent/growth/{student_id}`
+- 老师端 growth 接口均依赖 `get_current_teacher`。
+- 家长端 `GET /api/parent/growth/{student_id}` 依赖 `get_current_parent`，并通过 `StudentParent.is_authorized` 校验家长是否有权查看学生。
+- 家长端只展示 `GrowthObservation.parent_visible=true` 且 `status != rejected` 的 observation。
+- 本地 `backend/tuoban_dev.db` 已存在 3 张表：`growth_observation_drafts`、`growth_observations`、`growth_observation_sources`。
+
+生产风险：
+- `backend/migrations/001_initial.sql` 尚未包含 3 张新表的 DDL。若云端依赖 SQL 脚本建库，或 `AUTO_CREATE_TABLES=false`，上线会缺表。
+- 当前 `backend/.env` 中 `AUTO_CREATE_TABLES=true`，本地可自动建表；云端必须确认同样配置或补迁移脚本。
+- `_draft_out()` / `_observation_out()` 列表返回时会逐条查询 sources，存在 N+1 查询风险；体验版少量数据可接受，正式联调前建议优化。
+- `GET /api/growth/archive/{student_id}` 无分页，长期数据量大后可能返回过多。
+- `_build_candidate_text()` 是规则模板整理，不是真 AI。前端文案应写“系统整理”或“候选观察”，不要写“AI 生成”。
+- 观察入档后，原始事件和 observation 可能在同一时间线重复出现，前端展示需要去重或分区。
+- `source_refs` 解析失败时目前静默跳过，联调前建议至少返回明确提示或写日志。
+
+结论：
+- 本地开发和小规模体验验证基本可用。
+- 作为“后端预研能力”可以保留。
+- 不建议现在直接让前端完整接入 `GrowthObservation`；应等 v1.1 第一阶段轻量采集字段确认后，再决定观察归档层接入节奏。
+
+需要 Codex 处理：
+- 若后续要云端启用该能力，先补 `backend/migrations/001_initial.sql` 或独立迁移脚本，并确认云端 `AUTO_CREATE_TABLES`。
+- 若后续要进入联调，优先优化 N+1、分页、source_refs 错误处理和前端文案。
+
+需要 Claude Code 处理：
+- 前端不要把候选观察标为“AI 生成”，建议使用“系统整理”。
+- 若展示成长时间线，需要避免原始作业/照片/餐食和 observation 重复展示。
+
+需要用户确认：
+- 是否仅把 `GrowthObservation` 作为预研能力保留，暂不接入体验版前端。
 
 ## 5. 今日收尾备注
 
