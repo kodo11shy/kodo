@@ -71,7 +71,7 @@ const uploadFile = (filePath) => {
     // 先压缩，再上传
     compressImage(filePath).then((compressedPath) => {
       const token = app.globalData.token
-      const upload = (apiBase, retried = false) => wx.uploadFile({
+      const upload = (apiBase, retried = false, retryCount = 0) => wx.uploadFile({
         url: apiBase + '/photos/upload',
         filePath: compressedPath,
         name: 'file',
@@ -80,6 +80,14 @@ const uploadFile = (filePath) => {
           'Authorization': 'Bearer ' + token
         },
         success: (res) => {
+          if (res.statusCode < 200 || res.statusCode >= 300) {
+            if (retryCount < 1) {
+              setTimeout(() => upload(apiBase, retried, retryCount + 1), 300)
+              return
+            }
+            reject(new Error('上传失败：HTTP ' + res.statusCode))
+            return
+          }
           try {
             const data = JSON.parse(res.data)
             if (data.code === 0) {
@@ -93,6 +101,10 @@ const uploadFile = (filePath) => {
         },
         fail: (err) => {
           console.error('上传请求失败', apiBase + '/photos/upload', err)
+          if (retryCount < 1) {
+            setTimeout(() => upload(apiBase, retried, retryCount + 1), 300)
+            return
+          }
           if (!retried && app.globalData.apiFallbackBase && apiBase !== app.globalData.apiFallbackBase) {
             upload(app.globalData.apiFallbackBase, true)
             return

@@ -68,17 +68,16 @@ Page({
   },
 
   setHomework(hw) {
-    const statusMap = { '待批改': '待批改', '已批改': '已批改', '已完成': '已完成' }
-    const classMap = { '待批改': 'pending', '已批改': 'graded', '已完成': 'done' }
+    const normalizedHomework = { ...hw, status: '已完成' }
     const photos = hw.photos || {}
 
     // 格式化时间
     const fmt = (t) => t ? util.formatTime(t) : ''
 
     this.setData({
-      homework: hw,
-      statusText: statusMap[hw.status] || hw.status,
-      statusClass: classMap[hw.status] || 'pending',
+      homework: normalizedHomework,
+      statusText: '已完成',
+      statusClass: 'done',
       studentNameDisplay: hw.student_name || '学生',
       homeworkMetaText: (hw.subject || '') + ' · ' + (hw.homework_type || '作业'),
       donePhotos: this.normalizePhotos(photos.done),
@@ -86,15 +85,15 @@ Page({
       correctedPhotos: this.normalizePhotos(photos.corrected),
       scoreOptions: this.buildScoreOptions(this.data.score),
       recordedByName: hw.recorded_by_name || '',
-      gradedByName: hw.graded_by_name || '',
-      correctedByName: hw.corrected_by_name || '',
-      gradedAt: fmt(hw.graded_at),
-      correctedAt: fmt(hw.corrected_at),
-      auditVisible: !!(hw.recorded_by_name || hw.graded_by_name || hw.corrected_by_name),
-      gradeStatusClass: hw.status === '待批改' ? 'pending' : 'done-status',
-      gradeStatusText: hw.status === '待批改' ? '⏳ 待批改' : '✅ 已批改',
-      correctStatusClass: hw.status === '已完成' ? 'done-status' : 'pending',
-      correctStatusText: hw.status === '已完成' ? '✅ 已完成' : '⏳ 待改错'
+      gradedByName: '',
+      correctedByName: '',
+      gradedAt: '',
+      correctedAt: '',
+      auditVisible: !!hw.recorded_by_name,
+      gradeStatusClass: 'done-status',
+      gradeStatusText: '✅ 已完成',
+      correctStatusClass: 'done-status',
+      correctStatusText: '✅ 已完成'
     })
   },
 

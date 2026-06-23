@@ -29,8 +29,9 @@ Page({
     donePhotoIds: [],
     remark: '',
     submitting: false,
+    uploadingPhotos: false,
     canSubmit: false,
-    submitText: '📌 暂存，待批改',
+    submitText: '✅ 保存已完成',
     loading: true,
     // 内部状态（存 data 但不用于渲染，避免 Set 序列化问题）
     _submittedIdArr: [],
@@ -163,30 +164,49 @@ Page({
   },
 
   addDonePhoto() {
+    if (this.data.uploadingPhotos || this.data.submitting) return
     wx.chooseMedia({
       count: 9 - this.data.donePhotos.length,
       mediaType: ['image'],
       sourceType: ['camera', 'album'],
+      sizeType: ['compressed'],
       success: (res) => {
         const files = res.tempFiles.map(f => f.tempFilePath)
-        const photos = [...this.data.donePhotos, ...files]
-        this.setData({ donePhotos: photos })
         this.uploadPhotos(files)
       }
     })
   },
 
-  uploadPhotos(files) {
+  async uploadPhotos(files) {
+    if (!files || files.length === 0) return
+    this.setData({ uploadingPhotos: true, canSubmit: false })
     util.showLoading('上传照片...')
-    const promises = files.map(file => api.uploadFile(file))
-    Promise.all(promises)
-      .then((results) => {
-        const newIds = results.map(r => r.photo_id)
-        this.setData({ donePhotoIds: [...this.data.donePhotoIds, ...newIds] })
-        this._refreshSubmitState()
+    const uploadedPhotos = []
+    const uploadedIds = []
+    let failedIndex = -1
+    for (let i = 0; i < files.length; i++) {
+      try {
+        const result = await api.uploadFile(files[i])
+        uploadedPhotos.push(files[i])
+        uploadedIds.push(result.photo_id)
+      } catch (err) {
+        console.error('作业照片上传失败', err)
+        failedIndex = i
+        break
+      }
+    }
+    if (uploadedIds.length > 0) {
+      this.setData({
+        donePhotos: [...this.data.donePhotos, ...uploadedPhotos],
+        donePhotoIds: [...this.data.donePhotoIds, ...uploadedIds]
       })
-      .catch(() => util.showError('部分照片上传失败'))
-      .finally(() => wx.hideLoading())
+    }
+    this.setData({ uploadingPhotos: false })
+    wx.hideLoading()
+    this._refreshSubmitState()
+    if (failedIndex >= 0) {
+      util.showError(`第${failedIndex + 1}张照片上传失败，请重试`)
+    }
   },
 
   removeDonePhoto(e) {
@@ -236,7 +256,7 @@ Page({
         homework_date: today
       }
     }).then((data) => {
-      util.showSuccess('作业已提交')
+      util.showSuccess('作业已保存')
       wx.redirectTo({
         url: '/pages/teacher/homework/detail/homework-detail?id=' + data.id
       })
@@ -252,10 +272,11 @@ Page({
     const canSubmit = !!this.data.selectedStudent &&
       !!this.data.subject &&
       this.data.donePhotoIds.length > 0 &&
+      !this.data.uploadingPhotos &&
       !this.data.submitting
     this.setData({
       canSubmit,
-      submitText: this.data.submitting ? '提交中...' : '📌 暂存，待批改'
+      submitText: this.data.submitting ? '提交中...' : (this.data.uploadingPhotos ? '照片上传中...' : '✅ 保存已完成')
     })
   }
 })

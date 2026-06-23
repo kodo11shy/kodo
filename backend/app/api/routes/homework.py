@@ -112,10 +112,11 @@ def create_homework(
         student_id=payload.student_id,
         subject=subject,
         homework_type=payload.homework_type,
-        completion_status="待批改",
+        completion_status="已完成",
         teacher_remark=_merge_remark(None, "完成", payload.remark),
         recorded_by=current_teacher.id,
         homework_date=homework_date,
+        completed_at=now_utc_naive(),
     )
     db.add(record)
     db.flush()

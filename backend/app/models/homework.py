@@ -11,7 +11,7 @@ class HomeworkRecord(Base):
     student_id: Mapped[int] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), nullable=False)
     subject: Mapped[str] = mapped_column(String(20), nullable=False)
     homework_type: Mapped[str] = mapped_column(String(30), default="课堂作业", nullable=False)
-    completion_status: Mapped[str] = mapped_column(String(20), default="待批改", nullable=False)
+    completion_status: Mapped[str] = mapped_column(String(20), default="已完成", nullable=False)
     accuracy_status: Mapped[str | None] = mapped_column(String(20))
     error_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     score: Mapped[int | None] = mapped_column(Integer)
@@ -37,4 +37,3 @@ class HomeworkPhoto(Base):
     step: Mapped[str] = mapped_column(String(20), nullable=False)
     sort_order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     created_at: Mapped[object] = mapped_column(DateTime, default=utc_now, nullable=False)
-

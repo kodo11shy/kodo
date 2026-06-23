@@ -23,7 +23,6 @@ Page({
     attendanceCount: 0,
     attendanceNames: '',
     subjectStats: [],
-    showStatusHint: false,
     selectedDate: '',
   },
 
@@ -111,22 +110,18 @@ Page({
   _calcSubjectStats(records) {
     const stats = {}
     FIXED_HOMEWORK_SUBJECTS.forEach(subject => {
-      stats[subject] = { subject, icon: SUBJECT_ICONS[subject], total: 0, pending: 0, graded: 0, done: 0 }
+      stats[subject] = { subject, icon: SUBJECT_ICONS[subject], total: 0, done: 0 }
     })
     for (const r of records) {
       const sub = r.subject
       if (!FIXED_HOMEWORK_SUBJECTS.includes(sub)) continue
       stats[sub].total++
-      if (r.status === '待批改') stats[sub].pending++
-      else if (r.status === '已批改') stats[sub].graded++
-      else if (r.status === '已完成') stats[sub].done++
+      stats[sub].done++
     }
     const subjectStats = FIXED_HOMEWORK_SUBJECTS.map(subject => stats[subject]).map(item => {
       const total = item.total || 0
       return {
         ...item,
-        pendingWidth: total > 0 ? (item.pending / total * 100) : 0,
-        gradedWidth: total > 0 ? (item.graded / total * 100) : 0,
         doneWidth: total > 0 ? (item.done / total * 100) : 0,
       }
     })
@@ -134,9 +129,6 @@ Page({
   },
 
   _formatRecord(r) {
-    const classMap = { '待批改': 'pending', '已批改': 'graded', '已完成': 'done' }
-    const labelMap = { '待批改': '⏳ 待批改', '已批改': '✅ 已批改', '已完成': '🎉 已完成' }
-
     const photos = {}
     if (r.photos) {
       for (const step of ['done', 'graded', 'corrected']) {
@@ -148,13 +140,8 @@ Page({
     }
 
     let operatorInfo = ''
-    if (r.status === '已批改' && r.graded_by_name) {
-      operatorInfo = `批改：${r.graded_by_name}`
-      if (r.graded_at) operatorInfo += ` ${util.formatTime(r.graded_at)}`
-    } else if (r.status === '已完成' && r.corrected_by_name) {
-      operatorInfo = `改错：${r.corrected_by_name}`
-      if (r.corrected_at) operatorInfo += ` ${util.formatTime(r.corrected_at)}`
-      if (r.graded_by_name) operatorInfo = `批改：${r.graded_by_name} | 改错：${r.corrected_by_name}`
+    if (r.recorded_by_name) {
+      operatorInfo = `记录：${r.recorded_by_name}`
     }
 
     // 取 date 字段的日期部分（兼容 "2026-06-09T..." 和 "2026-06-09" 两种格式）
@@ -167,9 +154,9 @@ Page({
       studentName: r.student_name || this.data.studentMap[r.student_id] || '学生#' + r.student_id,
       subject: r.subject,
       homeworkType: r.homework_type || '',
-      status: r.status,
-      statusLabel: labelMap[r.status] || r.status,
-      statusClass: classMap[r.status] || 'pending',
+      status: '已完成',
+      statusLabel: '已完成',
+      statusClass: 'done',
       score: r.score,
       errorCount: r.error_count,
       accuracy: r.accuracy,
@@ -182,18 +169,13 @@ Page({
     }
   },
 
-  // ── 同时按日期 + 状态筛选 ──
+  // ── 按日期筛选 ──
   _applyFilter() {
-    const tab = this.data.activeTab
     const selDate = this.data.selectedDate
     let filtered = this.data.records
     // 按日期筛选
     if (selDate) {
       filtered = filtered.filter(r => r.date === selDate)
-    }
-    // 按状态筛选
-    if (tab !== 'all') {
-      filtered = filtered.filter(r => r.status === tab)
     }
     this.setData({ filteredList: filtered })
   },
@@ -205,13 +187,6 @@ Page({
 
   selectAll() {
     this.setData({ selectedDate: '' })
-    this._applyFilter()
-  },
-
-  switchTab(e) {
-    const tab = e.currentTarget.dataset.tab
-    if (tab === this.data.activeTab) return
-    this.setData({ activeTab: tab })
     this._applyFilter()
   },
 
@@ -228,7 +203,4 @@ Page({
     })
   },
 
-  toggleStatusHint() {
-    this.setData({ showStatusHint: !this.data.showStatusHint })
-  }
 })
