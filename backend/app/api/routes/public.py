@@ -1,7 +1,7 @@
 import json
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.core.datetime import beijing_date
@@ -12,6 +12,8 @@ from app.models import Notice, Photo, SystemConfig
 
 router = APIRouter(prefix="/public", tags=["public"])
 
+
+PUBLIC_HOMEPAGE_PHOTO_TYPES = ("activity", "meal", "daily")
 
 FEE_CONFIGS = [
     ("tuition_fee", "托管费", "元/月", "周一至周五放学后"),
@@ -105,9 +107,14 @@ def homepage(db: Session = Depends(get_db)):
 
     featured_photos = db.execute(
         select(Photo)
-        .where(Photo.is_featured.is_(True))
-        .order_by(Photo.taken_at.desc())
-        .limit(10)
+        .where(
+            or_(
+                Photo.is_featured.is_(True),
+                Photo.photo_type.in_(PUBLIC_HOMEPAGE_PHOTO_TYPES),
+            )
+        )
+        .order_by(func.random())
+        .limit(50)
     ).scalars().all()
 
     fee_standard = _fee_standard(configs)
@@ -135,6 +142,8 @@ def homepage(db: Session = Depends(get_db)):
                     "file_path": public_upload_path(photo.file_path),
                     "thumbnail": public_upload_path(photo.thumbnail_path),
                     "remark": photo.remark,
+                    "photo_type": photo.photo_type,
+                    "is_featured": photo.is_featured,
                 }
                 for photo in featured_photos
             ],

@@ -86,6 +86,7 @@ Codex / Claude Code / Hermes / GPT 每次开始本项目工作前，优先读取
 | T-002 | 餐食照片无学生关联的家长端可见策略 | P1 | 用户/Codex | 需用户确认 | Claude Code 可根据结论调整前端文案与交互 | 当前后端可空学生保存，但前端仍拦截“请选择关联学生” |
 | T-003 | 新联系单与当前状态同步 GitHub | P0 | Codex | 已完成 | 无 | 本次只更新文档，不纳入既有未提交代码改动 |
 | T-004 | 云端部署与体验版版本一致性确认 | P1 | Hermes/用户 | 待处理 | Codex 提交后 Hermes 拉取重启，用户重新上传体验版 | 需要区分云端后端未更新和小程序体验版未上传 |
+| T-005 | 首页精彩瞬间改为公共照片+精选照片轮播池 | P1 | Codex | 已完成 | Hermes 部署后端；用户重新上传体验版后真机查看 | 公共照片口径先按 `activity/meal/daily`；`homework/general` 不自动公开，精选除外 |
 
 状态只允许使用：
 
@@ -129,6 +130,47 @@ Codex / Claude Code / Hermes / GPT 每次开始本项目工作前，优先读取
 
 是否需要重新上传体验版：
 - 本次仅文档变更，不需要。
+
+### 2026-06-25-002：首页精彩瞬间展示池调整
+
+完成内容：
+- 根据用户确认，首页“精彩瞬间”展示池改为：公共照片 + 精选照片。
+- 公共照片当前按现有照片分类落地为：
+  - `activity` 活动照片；
+  - `meal` 餐食照片；
+  - `daily` 生活照片。
+- `is_featured=true` 的照片无论照片类型，都进入首页展示池。
+- 同一张照片同时属于公共照片和精选照片时，只作为一张照片返回，不重复展示。
+- 首页接口按随机顺序返回最多 50 张照片；小程序首页现有 swiper 会按照片数组循环播放，刷新接口时顺序会重新随机。
+- 默认 `general` 暂不自动进入首页，避免未整理、误传或作业草稿照片直接公开。
+- `homework` 作业照片不自动进入首页，除非老师明确标记精选。
+
+修改文件：
+- `backend/app/api/routes/public.py`
+- `docs/协作记录/Codex-Claude协作联系单-2026-06-25-01.md`
+
+验证结果：
+- `backend/app/api/routes/public.py` AST 语法检查通过。
+- `git diff --check -- backend/app/api/routes/public.py` 通过，仅有 CRLF 提示。
+- `rg` 已确认首页接口使用 `PUBLIC_HOMEPAGE_PHOTO_TYPES`、`is_featured` 和 `func.random()`。
+
+当前任务状态：
+- 已完成本地代码修改，等待提交、推送与云端部署。
+
+需要 Codex 处理：
+- 提交并推送本次后端与联系单变更。
+
+需要 Claude Code 处理：
+- 暂不需要。小程序首页现有字段 `featured_photos` 可继续使用，无需前端改动。
+
+需要用户确认：
+- 是否接受当前公共照片类型口径：`activity/meal/daily` 自动进首页；`general/homework` 不自动进首页。
+
+需要 Hermes：
+- 需要。云端后端需 `git pull origin main` 并重启服务，体验版首页才能拿到新的随机展示池。
+
+是否需要重新上传体验版：
+- 严格说本次只改后端，若体验版已指向 `https://ccrong.cloud/api`，后端部署后即可生效；如果用户要确保最新前端也同步，仍建议重新上传体验版。
 
 ## 5. 今日收尾备注
 
