@@ -22,6 +22,8 @@ Codex / Claude Code / Hermes / GPT 每次开始本项目工作前，优先读取
 - 6 月 23 日联系单已记录作业状态简化与上传顺序调整，并追加推送记录：`d0766d8 docs: record homework fix push`。
 - 餐食模块已从“五餐打卡”调整为“每天一条今日餐食”，并支持餐食照片、封面、历史列表、学生关联、家长端展示。
 - GrowthObservation 后端生产就绪检查已完成并记录在 6 月 19 日联系单。
+- 首页“精彩瞬间”展示池已改为“公共照片 + 精选照片”，代码提交 `b949fb8` 已推送到 GitHub main，等待 Hermes 云端部署后生效。
+- Claude Code 已追加系统全面检查观察清单与 T-101~T-117 后续任务，但本地提交 `0760ee6` 读取时仍处于 `ahead 1`，本轮需要一并同步到 GitHub。
 
 当前稳定配置：
 - 项目根目录：`E:\projects\托班智慧管理系统开发`
@@ -58,7 +60,7 @@ Codex / Claude Code / Hermes / GPT 每次开始本项目工作前，优先读取
 - 真机复测餐食页：不关联学生的产品交互是否需要入口调整。
 
 需要 Hermes 处理：
-- 如代码提交后需要体验版验证，云端后端执行 `git pull origin main` 并重启服务。
+- 云端后端执行 `git pull origin main` 并重启服务，确保包含首页精彩瞬间接口改动 `b949fb8` 以及最新联系单。
 - 复测 `https://ccrong.cloud/api/health`、照片上传、作业创建接口。
 
 ## 2. 当前项目状态
@@ -143,7 +145,7 @@ Codex / Claude Code / Hermes / GPT 每次开始本项目工作前，优先读取
 
 | ID | 任务 | 说明 | 需要谁配合 |
 |----|------|------|-----------|
-| T-101 | **提交本地 4 个未完成文件** | 将第 1 节所列 4 个文件改动提交并推送到 GitHub main。注意先 rebase 远程，确认与 `27d714d` 无冲突 | 无 |
+| T-101 | **整理并验证本地 4 个未完成文件** | 先确认第 1 节所列 4 个文件是否真正修复“作业照片上传成功但作业保存失败”，完成语法/接口/真机验证后再提交；不要盲目提交未验证代码 | Claude Code/用户提供失败时接口返回或真机日志 |
 | T-102 | **确认云端部署状态** | 联系 Hermes：云端后端是否已拉取最新代码并重启？`AUTO_CREATE_TABLES` 是否已配置？体验版是否已重新上传？ | Hermes |
 | T-103 | **GrowthObservation 迁移脚本** | 补 `backend/migrations/001_initial.sql` 或独立迁移脚本，包含 3 张新表的 DDL | 无 |
 
@@ -239,10 +241,11 @@ Codex / Claude Code / Hermes / GPT 每次开始本项目工作前，优先读取
 - `rg` 已确认首页接口使用 `PUBLIC_HOMEPAGE_PHOTO_TYPES`、`is_featured` 和 `func.random()`。
 
 当前任务状态：
-- 已完成本地代码修改，等待提交、推送与云端部署。
+- 已完成并已推送到 GitHub main：`b949fb8 fix: include public photos in homepage moments`。
+- 等待 Hermes 云端部署后在体验版首页验证。
 
 需要 Codex 处理：
-- 提交并推送本次后端与联系单变更。
+- 暂无。后续只需跟进 Hermes 部署状态与用户真机反馈。
 
 需要 Claude Code 处理：
 - 暂不需要。小程序首页现有字段 `featured_photos` 可继续使用，无需前端改动。
@@ -255,6 +258,39 @@ Codex / Claude Code / Hermes / GPT 每次开始本项目工作前，优先读取
 
 是否需要重新上传体验版：
 - 严格说本次只改后端，若体验版已指向 `https://ccrong.cloud/api`，后端部署后即可生效；如果用户要确保最新前端也同步，仍建议重新上传体验版。
+
+### 2026-06-25-003：统一最新联系单信息进度
+
+完成内容：
+- 重新读取本文件并核对 Git 状态。
+- 确认本地存在 1 个未推送文档提交：`0760ee6 docs: add full task list and system-wide observations to 06-25 contact sheet`。
+- 确认首页精彩瞬间后端改动 `b949fb8` 已在 GitHub main，但联系单原文仍写“等待提交、推送”，本轮已改为“已推送，等待 Hermes 部署”。
+- 调整 T-101 口径：本地 4 个未提交代码文件不能直接盲目提交，应先验证是否解决作业照片保存失败，再决定提交或继续修复。
+
+修改文件：
+- `docs/协作记录/Codex-Claude协作联系单-2026-06-25-01.md`
+
+验证结果：
+- `git status --short --branch` 显示当前分支读取时为 `main...origin/main [ahead 1]`，并有 4 个作业相关未提交文件。
+- `git log -5 --oneline --decorate` 显示本地最新提交为 `0760ee6`，远程 main 停在 `b949fb8`。
+
+当前任务状态：
+- 联系单信息已统一，等待本条提交并推送 GitHub。
+
+需要 Codex 处理：
+- 提交并推送本次联系单进度统一记录。
+
+需要 Claude Code 处理：
+- 暂无。
+
+需要用户确认：
+- 是否先处理 T-001/T-101 作业照片保存失败。
+
+需要 Hermes：
+- 需要在 GitHub main 更新后拉取最新代码并重启云端后端。
+
+是否需要重新上传体验版：
+- 本次仅联系单更新，不需要；首页精彩瞬间接口改动仍需云端后端部署。
 
 ## 5. 今日收尾备注
 
