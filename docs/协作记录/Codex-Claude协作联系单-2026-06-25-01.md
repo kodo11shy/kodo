@@ -84,7 +84,7 @@ Codex / Claude Code / Hermes / GPT 每次开始本项目工作前，优先读取
 
 | ID | 任务 | 优先级 | 负责人 | 状态 | 需要对方处理 | 备注 |
 |----|------|--------|--------|------|--------------|------|
-| T-001 | 作业照片上传成功但作业保存请求失败 | P1 | Codex | 待处理 | Claude Code/用户真机提供失败时控制台或接口返回 | 当前已有未提交代码改动疑似针对该问题，但未验证、未提交、未推送 |
+| T-001 | 作业照片上传成功但作业保存请求失败 | P1 | Codex | 已完成 | Hermes 部署后端；用户/Claude Code 真机复测 | 已提交 `744e921`：作业照片归档关联、预选学生、错误提示增强；仍需体验版验证 |
 | T-002 | 餐食照片无学生关联的家长端可见策略 | P1 | 用户/Codex | 需用户确认 | Claude Code 可根据结论调整前端文案与交互 | 当前后端可空学生保存，但前端仍拦截“请选择关联学生” |
 | T-003 | 新联系单与当前状态同步 GitHub | P0 | Codex | 已完成 | 无 | 本次只更新文档，不纳入既有未提交代码改动 |
 | T-004 | 云端部署与体验版版本一致性确认 | P1 | Hermes/用户 | 待处理 | Codex 提交后 Hermes 拉取重启，用户重新上传体验版 | 需要区分云端后端未更新和小程序体验版未上传 |
@@ -145,7 +145,7 @@ Codex / Claude Code / Hermes / GPT 每次开始本项目工作前，优先读取
 
 | ID | 任务 | 说明 | 需要谁配合 |
 |----|------|------|-----------|
-| T-101 | **整理并验证本地 4 个未完成文件** | 先确认第 1 节所列 4 个文件是否真正修复“作业照片上传成功但作业保存失败”，完成语法/接口/真机验证后再提交；不要盲目提交未验证代码 | Claude Code/用户提供失败时接口返回或真机日志 |
+| T-101 | **整理并验证本地 4 个未完成文件** | 已完成：4 个既有文件有效，另补 `photolib.wxml` 绑定待关联入口；代码提交 `744e921` 并推送 GitHub main | Hermes 部署后端；用户/Claude Code 真机复测 |
 | T-102 | **确认云端部署状态** | 联系 Hermes：云端后端是否已拉取最新代码并重启？`AUTO_CREATE_TABLES` 是否已配置？体验版是否已重新上传？ | Hermes |
 | T-103 | **GrowthObservation 迁移脚本** | 补 `backend/migrations/001_initial.sql` 或独立迁移脚本，包含 3 张新表的 DDL | 无 |
 
@@ -296,3 +296,50 @@ Codex / Claude Code / Hermes / GPT 每次开始本项目工作前，优先读取
 
 本次只补建联系单和整理状态，不修改代码。
 下一轮优先处理 T-001 作业保存失败，再根据用户确认处理 T-002 餐食照片可见策略。
+
+### 2026-06-25-004：照片库类型保存与待关联入口收口
+
+本轮处理的问题：
+- 核对 4 个未提交文件的实际改动，并补齐照片库待关联入口的 WXML 事件绑定。
+- 修复照片库“待关联学生 - 去处理”点击无反应：点击后切换到未关联照片列表，并显示“已显示待关联照片”提示。
+- 补强照片类型保存流程：选择活动/作业/餐食/生活/日常后调用 `PUT /photos/{id}` 保存到后端，保存中禁止重复点击，成功后立即刷新当前照片卡片类型并显示 toast。
+- 补充 `nop()` 空事件处理，避免 `catchtap="nop"` 找不到方法造成小程序端异常。
+- 保留并提交作业照片相关修复：作业创建页预选学生、统一学生 ID 类型、后端将作业照片归档为 `homework` 并补充 `photo_students` 关联、接口错误提示增强。
+
+修改文件：
+- `backend/app/api/routes/homework.py`
+- `miniprogram/pages/teacher/homework/create/homework-create.js`
+- `miniprogram/pages/teacher/photolib/photolib.js`
+- `miniprogram/pages/teacher/photolib/photolib.wxml`
+- `miniprogram/utils/api.js`
+- `docs/协作记录/Codex-Claude协作联系单-2026-06-25-01.md`
+
+验证结果：
+- `node --check miniprogram/pages/teacher/photolib/photolib.js` 通过。
+- `node --check miniprogram/pages/teacher/homework/create/homework-create.js` 通过。
+- `node --check miniprogram/utils/api.js` 通过。
+- `backend/app/api/routes/homework.py` AST 语法检查通过。
+- `git diff --check` 通过，仅有 CRLF 提示。
+- `Select-String` 检查 `photolib.wxml` 未发现复杂函数表达式；确认 `bindtap="goUnassociated"` 已存在。
+
+commit hash：
+- 代码提交：`744e921b2175621f429b6ad88612bd13f017ff3a`
+
+是否已 push：
+- 已 push 到 GitHub `main`，远程 `refs/heads/main` 为 `744e921b2175621f429b6ad88612bd13f017ff3a`。
+
+当前 git status 是否 clean：
+- 代码提交并 push 后 worktree clean；本条联系单记录追加后将单独提交并推送。
+
+仍需用户在体验版验证的事项：
+- 在照片库长按照片，选择“修改标签”，切换到活动/餐食/生活/作业后是否能保存并刷新卡片标签。
+- 点击“待关联学生 - 去处理”是否能切换到未关联照片列表。
+- 新建作业从照片流程进入时是否能自动选中学生，并成功“保存已完成”。
+- 作业保存后照片是否同时出现在照片库和作业详情里。
+- 若体验版仍请求失败，需要提供微信开发者工具 Network 中 `/homework` 或 `/photos/{id}` 的返回 message/code。
+
+需要 Hermes：
+- 云端后端 `git pull origin main` 到 `744e921` 并重启服务。
+
+是否需要重新上传体验版：
+- 需要。此次包含小程序前端 JS/WXML 改动，体验版需重新上传后用户才能验证照片库交互。
