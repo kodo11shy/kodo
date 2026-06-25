@@ -33,16 +33,16 @@ Codex / Claude Code / Hermes / GPT 每次开始本项目工作前，优先读取
 - Git 远程：`origin https://github.com/kodo11shy/kodo.git`
 
 仍未完成：
-- 当前仓库有 4 个未提交代码改动：`backend/app/api/routes/homework.py`、`miniprogram/pages/teacher/homework/create/homework-create.js`、`miniprogram/pages/teacher/photolib/photolib.js`、`miniprogram/utils/api.js`。
-- 用户反馈“新建作业保存已完成”仍出现“请求失败”：照片已进入照片库，但作业没有生成或没有关联到作业记录。
-- 需要确认云端后端是否已部署并重启到最新代码。
-- 需要确认微信体验版是否重新上传了包含最新前端修改的版本。
+- 4 个历史未提交代码文件已在 `744e921 fix: 修复照片库类型保存与待关联处理入口` 中提交并 push；当前对账结果显示工作区 clean。
+- 作业照片保存失败、照片库类型保存、待关联入口无响应已完成代码修复，仍需在体验版真机验证。
+- 需要确认云端后端是否已部署并重启到最新代码 `b084ac8`。
+- 需要确认微信体验版是否重新上传了包含最新前端修改的版本，尤其是 `photolib.js` / `photolib.wxml` / `homework-create.js`。
 - 需要确认体验版合法域名与当前代码域名是否一致：当前代码使用 `https://ccrong.cloud/api`。
 
 今日优先级：
-1. P1：先收口“作业照片上传成功但作业保存请求失败/照片未关联”的问题，查明 `/api/homework` 失败原因。
+1. P1：等待 Hermes 部署最新后端、用户重新上传体验版后，真机复测作业照片保存与照片库标签保存。
 2. P1：明确餐食照片不关联学生时的家长端可见策略。
-3. P1：整理未提交代码改动，验证后再决定提交或调整。
+3. P1：开始体验版全面体检与收口优化，先出检查结果再决定修复项。
 
 需要用户确认：
 - 餐食记录中“公共餐食/环境/活动类照片”是否允许不关联学生保存。
@@ -295,7 +295,7 @@ Codex / Claude Code / Hermes / GPT 每次开始本项目工作前，优先读取
 ## 5. 今日收尾备注
 
 本次只补建联系单和整理状态，不修改代码。
-下一轮优先处理 T-001 作业保存失败，再根据用户确认处理 T-002 餐食照片可见策略。
+下一轮优先进行体验版全面体检与收口优化；T-001/T-101 已完成代码提交，后续以体验版真机验证为准。
 
 ### 2026-06-25-004：照片库类型保存与待关联入口收口
 
@@ -343,3 +343,38 @@ commit hash：
 
 是否需要重新上传体验版：
 - 需要。此次包含小程序前端 JS/WXML 改动，体验版需重新上传后用户才能验证照片库交互。
+
+### 2026-06-25-005：联系单与 Git 状态对账
+
+Git 状态：
+- `git status`：Not currently on any branch；nothing to commit, working tree clean。
+- `git status -sb`：`## HEAD (no branch)`。
+- `git log --oneline -5` 显示最近提交包含：
+  - `b084ac8 docs: 记录照片库收口与推送结果`
+  - `744e921 fix: 修复照片库类型保存与待关联处理入口`
+  - `e681f16 docs: align June 25 contact progress`
+  - `0760ee6 docs: add full task list and system-wide observations to 06-25 contact sheet`
+  - `b949fb8 fix: include public photos in homepage moments`
+- 远程 `origin/main` 对账时为 `b084ac851e69944a532224eb1faee57bfff64438`。
+
+是否 clean：
+- 是。对账时工作区 clean。
+
+4 个历史未提交文件状态：
+- `backend/app/api/routes/homework.py`：无未提交改动。
+- `miniprogram/pages/teacher/homework/create/homework-create.js`：无未提交改动。
+- `miniprogram/pages/teacher/photolib/photolib.js`：无未提交改动。
+- `miniprogram/utils/api.js`：无未提交改动。
+- 这些文件已在 `744e921` 提交并 push。
+
+最新 commit hash：
+- 对账时最新远程 main commit：`b084ac851e69944a532224eb1faee57bfff64438`。
+
+是否已 push：
+- 是。代码提交 `744e921` 和联系单提交 `b084ac8` 均已同步到 GitHub main。
+
+联系单口径是否已修正：
+- 已修正。前文“仍未完成”段落已删除“当前仓库有 4 个未提交代码改动”的过期说法，改为“4 个历史未提交文件已由 `744e921` 提交并 push；当前工作区 clean”。
+
+下一步：
+- 在此对账完成并推送后，再继续“体验版全面体检与收口优化”。
