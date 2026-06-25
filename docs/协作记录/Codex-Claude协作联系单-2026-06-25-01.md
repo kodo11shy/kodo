@@ -377,4 +377,152 @@ Git 状态：
 - 已修正。前文“仍未完成”段落已删除“当前仓库有 4 个未提交代码改动”的过期说法，改为“4 个历史未提交文件已由 `744e921` 提交并 push；当前工作区 clean”。
 
 下一步：
-- 在此对账完成并推送后，再继续“体验版全面体检与收口优化”。
+- 在此对账完成并推送后，再继续”体验版全面体检与收口优化”。
+
+### 2026-06-25-006：Claude Code 复核 Codex 体验版体检结果
+
+#### 1. 复核背景
+
+用户反馈 Codex 界面显示”编辑了 21 个文件”并出现使用上限提示，要求 Claude Code 复核：Codex 所说的”已完成”是否真的完成，代码是否全部提交推送，以及体验版图片上传/浏览性能是否真的已优化。
+
+#### 2. Git 状态
+
+| 项目 | 结果 |
+|------|------|
+| 当前分支 | `main` |
+| 本地 vs 远程 | 完全同步（`up to date with origin/main`） |
+| 工作区是否 clean | 是。本地 stash 有 1 个备份（内容与远程提交重复，可后续清理） |
+| 未提交文件 | 无 |
+| 最新 commit | `6284f51 docs: 对账联系单与 Git 状态` |
+| 是否已 push | 是。全部已同步到 GitHub main |
+
+#### 3. Codex 本轮实际修改文件清单
+
+Codex 提交并推送的代码文件仅为 **5 个**（不是用户看到的 21 个）：
+
+| 文件 | 改动内容 |
+|------|---------|
+| `backend/app/api/routes/homework.py` | 新增 `_archive_homework_photos()`，创建/批改/改错时自动关联照片到 `PhotoStudent` |
+| `miniprogram/pages/teacher/homework/create/homework-create.js` | 修复学生 ID 类型，支持从跳转预选学生，改进出勤数据容错 |
+| `miniprogram/pages/teacher/photolib/photolib.js` | 新增 `applyFilter()`/`goUnassociated()`/`tagSaving`/`nop()`，改进筛选和标签保存流程 |
+| `miniprogram/pages/teacher/photolib/photolib.wxml` | 待关联行增加 `bindtap=”goUnassociated”` |
+| `miniprogram/utils/api.js` | 增强 `request()` 错误处理，提取 `getResponseMessage()`，统一 401 检测 |
+| `docs/协作记录/Codex-Claude协作联系单-2026-06-25-01.md` | 联系单更新 |
+
+用户看到的 21 个文件包括 **IDE 工作区未保存的编辑内容**。Codex 因为使用上限提示中断，以下文件的修改**没有被提交**：
+- `backend/app/api/routes/photos.py` → 未被 Codex 修改
+- `backend/app/api/routes/parent.py` → 未被 Codex 修改
+- `backend/requirements.txt` → 未被 Codex 修改（无 Pillow 加入）
+- 缩略图生成逻辑 → 完全未实现
+
+#### 4. 已确认有效的改动
+
+以下为 Codex 提交的改动中确实有效的部分：
+
+- **作业照片自动关联**：`_archive_homework_photos()` 在新建/批改/改错时执行，将照片标记为 `homework` 类型并写入 `PhotoStudent` 关联表
+- **照片库待关联入口可点击**：`bindtap=”goUnassociated”` 已绑定，点击后切换到”未关联”筛选视图
+- **照片标签保存防重复**：`tagSaving` 标志防止保存中重复点击
+- **照片库已有分页**：`pageSize: 30`，`onReachBottom` 触发 `loadMore()`（Codex 未新增，但已存在）
+- **上传前压缩**：`api.js` 中的 `compressImage()`（quality: 80）已存在（Codex 未修改此逻辑）
+- **错误提示增强**：`getResponseMessage()` 可解析 FastAPI validation error detail，提升调试体验
+- **WXML 无违规表达式**：所有 `bindtap` 使用简单函数名，无 `?.` / 内联函数调用 / 复杂三元嵌套
+
+#### 5. 发现的问题与风险
+
+##### 5.1 未实现的缩略图机制 — 🔴 高优先级
+
+| 检查项 | 状态 | 说明 |
+|--------|------|------|
+| `Photo.thumbnail_path` 字段 | 已存在 | Model 已有可空字段 |
+| 上传时生成缩略图 | ❌ 未实现 | `upload_photo()` 仅保存原图，从未调用缩略图生成 |
+| 列表接口返回 thumbnail | 返回 `None` | 接口有 thumbnail 字段，但因未生成一直为 null |
+| 前端使用缩略图 | ❌ 未实现 | 前端 image src 仍用原图路径 |
+| Pillow 依赖 | ❌ 不在 requirements.txt | 无 Pillow，后端无法生成缩略图 |
+| 旧图片无缩略图时降级 | ❌ 无条件 | 无缩略图时会破图 |
+
+**影响**：老师手机端照片库加载原图，是”手机上慢”的核心原因。
+
+##### 5.2 照片库未使用 `lazy-load` — ⚠️ 中优先级
+
+photolib.wxml 中 `<image>` 标签未添加 `lazy-load=”{{true}}”` 属性，页面加载时所有可见照片仍会同时请求。照片数量多时首屏加载慢。
+
+##### 5.3 家长端未做性能优化 — ⚠️ 中优先级
+
+家长端照片墙/首页/作业页面：无缩略图机制、无 lazy-load、无分页确认。
+
+##### 5.4 云端未部署最新代码 — 🔴 高优先级
+
+Codex 的 `744e921` 和精彩瞬间 `b949fb8` 均已在远程 main，但：
+- Hermes 未执行 `git pull origin main`
+- 云端后端未重启
+- 体验版未重新上传
+- 依赖无变化（Pillow 未加），但即使有依赖也尚未安装
+
+#### 6. 体验版性能问题复核结论
+
+从”手机端真实使用”角度逐条评估：
+
+| 问题 | Codex 是否处理 | 当前状态 |
+|------|:------------:|---------|
+| 上传前是否压缩 | 已有 (`compressImage` quality:80) | ✅ 有效 |
+| 照片列表是否用缩略图 | ❌ 未实现 | ⛔ 手机仍加载原图 |
+| 是否分页 | 已有 (`pageSize:30`) | ✅ 有效 |
+| 是否 lazy-load | ❌ 未实现 | ⛔ 首屏图片同时请求 |
+| 是否避免一次渲染太多 | 已有（分页30条） | ✅ 部分有效 |
+| 是否有进度条或 loading | 有 loading 状态 | ✅ 基本有效 |
+| 是否有失败重试或错误提示 | 有自动重试 + 增强错误信息 | ✅ 有效 |
+| 云端是否需要重装依赖 | 当前无新增依赖 | ❌ Pillow 未加 |
+| 体验版是否已生效 | ❌ 未上传 | ⛔ 老师端看不到任何改动 |
+
+**核心结论**：Codex 修复了照片库交互问题和作业照片关联，但**没有解决”手机上慢”的性能问题**。缩略图是老师反馈慢的最可能原因。
+
+#### 7. 需要补充的改动清单
+
+以下为体验版性能优化必须补充的改动（基于现有代码结构，不改动大逻辑）：
+
+| # | 改动 | 文件 | 说明 |
+|---|------|------|------|
+| F-01 | 增加缩略图生成 | `backend/app/api/routes/photos.py` | upload_photo 中，保存原图后生成 480px 缩略图 |
+| F-02 | 增加 Pillow 依赖 | `backend/requirements.txt` | 添加 `Pillow>=10.0.0` |
+| F-03 | 列表接口优先用缩略图 | `miniprogram/pages/teacher/photolib/photolib.js` | grid image src 改用 `thumbnail` 字段，预览用原图 |
+| F-04 | image 标签增加 lazy-load | `miniprogram/pages/teacher/photolib/photolib.wxml` | 添加 `lazy-load=”{{true}}”` |
+| F-05 | 家长端 photo image 增加 lazy-load | `miniprogram/pages/parent/photos/photos.wxml` | 同上 |
+| F-06 | 后端 thumbnail 降级方案 | `backend/app/api/routes/photos.py` | 无缩略图时返回原图，不破图 |
+
+#### 8. 本轮补充修复
+
+本轮复核不修改代码。如需启动缩略图实现，请用户确认后由 Claude Code 或 Codex 执行。
+
+#### 9. 验证结果
+
+- 语法检查：`photos.py` / `parent.py` / `homework.py` 全部通过
+- JS 检查：`api.js` / `photolib.js` / `homework-create.js` 全部通过
+- WXML 高风险表达式扫描：全部页面均无 `?.` / 内联函数调用 / 复杂嵌套
+- 文件删除检查：无文件被删除，`app.json` 中所有页面对应 JS 文件均存在
+- 联系单完整性检查：Codex 写了 004（照片库收口）和 005（对账），但缺少”体验版全面体检”的实际成果
+
+#### 10. 是否已 commit / push
+
+- 复核记录：待写入后 commit + push
+- 本地 stash：有 1 个备份（stash@{0}），内容与远程提交 `744e921` 重复，可安全删除
+
+#### 11. 仍需用户或 Hermes 云端处理
+
+| 事项 | 负责人 | 说明 |
+|------|--------|------|
+| 确认缩略图方案是否进入开发 | 用户 | 是否进入缩略图实现，还是先上传体验版验证现有改动 |
+| 确认体验版重新上传 | Hermes | 现有改动（照片库交互+作业关联）需要上传后才能验证 |
+| 确认云端后端 `git pull` + 重启 | Hermes | `b949fb8` 和 `744e921` 均在 remote main，但云端未部署 |
+| 拍照上传手机端复测 | 用户 | 体验版上传后，验证新建作业多图和照片库标签保存 |
+
+#### 12. 体验版重新上传要求
+
+**需要重新上传体验版**。现有远程 main 包含：
+- `744e921` 照片库交互修复 + 作业照片自动关联 + 错误提示增强
+- `b949fb8` 首页精彩瞬间展示池调整
+
+体验版需重新上传后，老师才能在手机上验证：
+- 照片库”待关联→去处理”入口
+- 照片类型修改保存
+- 作业照片自动出现在照片库
+- 首页精彩瞬间随机展示
