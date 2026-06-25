@@ -604,3 +604,89 @@ Claude Code 复核后已完成缩略图实现与前端优化（见 007 条目）
 1. Hermes 云端 `git pull origin main` → `pip install Pillow` → 重启后端
 2. 重新上传微信小程序体验版
 3. 用户真机验证：照片库加载速度、照片上传、照片墙展示
+
+### 2026-06-25-008：Hermes 云端部署图片性能优化
+
+#### 1. 拉取代码结果
+
+| 项目 | 结果 |
+|------|------|
+| 当前云端分支 | main |
+| 当前云端 commit | `a31683a` |
+| 是否包含 f558d58 | ✅ 是（`chore: implement thumbnail generation and frontend perf optimization`） |
+| 是否已同步 origin/main | ✅ 是（`Your branch is up to date with 'origin/main'`） |
+| 是否有本地改动被覆盖 | 无，工作区 clean，kodo 仓库 → rsync → tuoban 部署目录 |
+
+#### 2. Pillow 安装结果
+
+| 项目 | 结果 |
+|------|------|
+| 是否执行 pip install -r requirements.txt | ✅ 是 |
+| Pillow 是否安装成功 | ✅ `Successfully installed Pillow-12.2.0` |
+| `from PIL import Image` 是否成功 | ✅ `Pillow OK` |
+
+#### 3. 后端重启结果
+
+| 项目 | 结果 |
+|------|------|
+| 重启方式 | `sudo systemctl restart tuoban-backend` |
+| 服务状态 | ✅ active (running) since Thu 2026-06-25 12:46:34 CST |
+| 日志是否有 Pillow/photos/uploads 报错 | ✅ 无报错。启动日志干净：`Application startup complete` |
+
+#### 4. 接口验证结果
+
+| 项目 | 结果 |
+|------|------|
+| `/api/health` | ✅ `{"status": "ok", "database": {"ok": true}}` |
+| `/api/public/homepage` | ✅ 正常返回首页数据 |
+| 上传新照片是否生成缩略图 | ✅ 是。上传测试图片后接口返回 `"thumbnail": "/uploads/photos/2026/06/25/3f787d481f664f21b2274d999983e868_thumb.jpg"` |
+| 缩略图文件是否存在 | ✅ `/opt/tuoban/uploads/photos/2026/06/25/3f787d481f664f21b2274d999983e868_thumb.jpg`（3747 bytes） |
+| 缩略图尺寸 | 480×360（原图 800×600，缩略图 60%） |
+| 照片列表接口是否返回 thumbnail 字段 | ✅ 是。`GET /api/photos` 返回包含 `"thumbnail": "/uploads/photos/.../xxx_thumb.jpg"` |
+| 旧照片是否受影响 | 不受影响。旧照片 `thumbnail_path` 为 null，前端回退到原图 |
+
+#### 5. 小程序体验版上传结果
+
+| 项目 | 结果 |
+|------|------|
+| 是否已重新上传体验版 | ❌ **未上传**。小程序需要 WeChat Developer Tools（桌面端）或 miniprogram-ci 上传。服务器无 GUI 环境，无法直接操作 |
+| 解决方案 | 用户需在本地 Windows 机器打开微信开发者工具 → 导入项目（appid: `wxe1884374620755fb`） → 上传体验版。服务器上已准备好最新小程序代码在 `/home/ubuntu/kodo/miniprogram/` |
+
+#### 6. 手机真机验证结果
+
+| 场景 | 结果 |
+|------|------|
+| 老师端上传 1 张照片 | ✅ 后端验证通过，缩略图正常生成 |
+| 老师端上传 9 张照片 | ⏳ 需用户上传体验版后在手机端验证 |
+| 照片库首屏加载 | ⏳ 需体验版验证（前端改用缩略图 + lazy-load） |
+| 照片大图预览 | ⏳ 后端验证 thumbnail 字段正常，前端预览逻辑需体验版验证 |
+| 待关联学生"去处理" | ⏳ 需体验版验证 |
+| 照片类型保存 | ⏳ 需体验版验证 |
+| 家长端照片墙 | ⏳ 需体验版验证 |
+| 作业照片流程 | ⏳ 需体验版验证 |
+
+#### 7. 发现的问题
+
+**主要问题：小程序体验版无法从服务器直接上传。**
+- 微信小程序上传需要 WeChat Developer Tools 桌面端，服务器无此环境
+- 有两种方案：
+  - **方案 A（推荐）**：用户在本地 Windows 电脑上用微信开发者工具手动上传体验版
+  - **方案 B（自动化）**：配置 `miniprogram-ci`（微信官方 CLI 工具），需管理员在微信公众平台生成上传密钥（private key）并下发到服务器
+
+#### 8. 仍需 Codex / Claude Code 处理
+
+- 无。本轮纯部署，代码已在 GitHub main 中（f558d58）
+
+#### 9. 仍需用户处理
+
+- ☐ 在本地 Windows 电脑上用微信开发者工具上传最新体验版
+- ☐ 手机端真机验证：照片库加载速度、照片上传、照片墙、作业照片流程
+- ☐ 如希望后续自动化上传，在微信公众平台生成上传密钥，配置 miniprogram-ci
+
+#### 10. 结论
+
+| 项目 | 状态 |
+|------|------|
+| 是否已完成云端部署和依赖安装 | ✅ 已完成（git pull → rsync → pip install Pillow → 重启后端） |
+| 是否已完成体验版更新 | ❌ 未完成，需用户操作 |
+| 是否可以交给老师继续体验 | ⏳ 需要用户上传体验版并真机验证后再交给老师 |
