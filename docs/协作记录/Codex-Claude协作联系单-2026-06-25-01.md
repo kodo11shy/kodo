@@ -690,3 +690,117 @@ Claude Code 复核后已完成缩略图实现与前端优化（见 007 条目）
 | 是否已完成云端部署和依赖安装 | ✅ 已完成（git pull → rsync → pip install Pillow → 重启后端） |
 | 是否已完成体验版更新 | ❌ 未完成，需用户操作 |
 | 是否可以交给老师继续体验 | ⏳ 需要用户上传体验版并真机验证后再交给老师 |
+
+### 2026-06-25-009：Hermes 体验版图片与家长端显示问题排查
+
+#### 1. 用户反馈
+
+用户上传体验版后手机端验证发现三个问题：
+- 首页"精彩瞬间"没有照片；
+- 点击照片后加载仍慢；
+- 家长端看不到照片和记录。
+
+#### 2. 当前云端版本
+
+| 项目 | 结果 |
+|------|------|
+| 当前 commit | `deb3172` |
+| 是否包含 f558d58 | ✅ 是 |
+| Pillow 是否可用 | ✅ `Pillow OK` |
+| 后端是否已重启 | ✅ 正常运行中（since 12:46 CST） |
+
+#### 3. 首页精彩瞬间排查
+
+| 项目 | 结果 |
+|------|------|
+| `/api/public/homepage` 是否返回 featured_photos | ✅ 接口正常，返回 `featured_photos: []`（空数组） |
+| photos 表照片数量 | 6 张 |
+| 各 photo_type 数量 | `general`: 6（100%）；`activity/meal/daily`: 0 |
+| is_featured=true 数量 | 0 |
+| **判断原因** | **B — 有照片，但全是 `general` 类型，未进入首页展示池** |
+
+**详情**：
+- 当前首页接口规则只展示 `activity/meal/daily` 或 `is_featured=true` 的照片
+- 老师上传照片时默认类型为 `general`，没人知道要去手动标记"精选"或改类型
+- 如果老师标记照片类型为"日常"，类型仍是 `general`，不是 `daily`
+
+**需要用户确认的方案**：
+- 方案 1：老师在照片库手动把照片标记为"精选"
+- 方案 2：把 `general`（日常）也纳入首页展示池（即展示 `activity/meal/daily/general` 或 `is_featured=true`）
+- 方案 3：前端上传时把"日常"照片类型改为 `daily`，不要用 `general` 表示日常照片
+
+#### 4. 图片加载慢排查
+
+| 项目 | 结果 |
+|------|------|
+| 原图最大文件大小 | **2 张超大图**：5.3MB（2026/06/18 上传）、4.5MB（2026/06/18 上传） |
+| 其他原图大小 | 598KB、573KB、250KB、250KB（后 2 张实际是 my test upload） |
+| 缩略图是否已生成 | **只有 id=44（测试上传）有缩略图**；其余 5 张真实照片无缩略图 |
+| 缩略图大小 | 3.7KB（测试图） |
+| 列表是否使用缩略图 | ✅ 前端代码正确：`photolib.js` line 175 和 `parent/photos.js` line 38 均有 `p.thumbnail ? ... : ...` 回退逻辑 |
+| 点击预览是否仍加载原图 | ✅ 是！`photolib.js` line 246 `wx.previewImage({ current: photo.url })` 和 `parent/photos.js` line 69 `previewUrl: photo.originalUrl` 均使用原图 |
+| **判断原因** | **C（旧照片无缩略图使列表回退到原图）+ D（点击预览始终加载原图大文件）** |
+
+**补充发现**：首页 swiper 的 `featuredPhotos` 映射（index.js line 70）直接使用 `api.imageUrl(p.file_path)`，即使有照片也不走缩略图。
+
+**建议**：
+- 短期：跑一个"旧照片缩略图回填脚本"，给现有 5 张照片生成缩略图
+- 中期：预览图改为"中等图"（长边 1600px），避免点击预览加载 5MB 原图
+- 首页 swiper 也加上缩略图判断
+
+#### 5. 家长端照片/记录排查
+
+| 项目 | 结果 |
+|------|------|
+| 家长是否绑定孩子 | ✅ 是。`student_parents` 表：parent_id=12（潘）→ student_id=8（刘浩荣），`is_authorized=true` |
+| 授权是否有效 | ✅ `is_authorized=true`，学生 status=在读，is_active=true |
+| 另一个学生（滕菀可 id=7）| 没有绑定任何家长 |
+| `photo_students` 是否有关联 | ❌ **无。photo_students 表完全为空** |
+| `parent/students` 是否返回数据 | ✅ 返回 `[{id:8, name:刘浩荣}]` |
+| `parent/photos/8` 是否返回数据 | ✅ 返回 `photos: []`（空，因为无关联） |
+| `parent/homework/8` 是否返回数据 | ✅ 返回 `records: []`（空，无作业记录） |
+| `parent/growth/8` 是否返回数据 | ✅ 返回 `overview` 正常，`timeline: []` |
+| `parent/dashboard/today` 是否返回数据 | ✅ 返回正常结构，`latest_photos: []`、`homework_today: null`、`latest_remark: null` |
+| **判断原因** | **D — 照片没有关联到孩子；同时作业/成长档案也没有数据** |
+
+**详情**：
+- 家长端接口设计正确，返回的数据结构是合理的
+- 但 `photo_students` 表没有任何关联记录，所以家长端看不到照片
+- `homework_records` 表也是空的，所以家长端看不到作业记录
+- 这不是 bug，是"数据没填"——老师在照片库上传照片后没有关联学生，也没有创建过成功保存的作业
+
+#### 6. 作业记录排查
+
+| 项目 | 结果 |
+|------|------|
+| homework_records 是否有数据 | ❌ **0 条记录** |
+| homework_photos 是否有数据 | ❌ **0 条记录** |
+| 是否关联当前学生 | - |
+| 是否存在学科过滤导致不显示 | - |
+
+**结论**：从来没有保存成功的作业记录。不是显示问题，是数据空。
+
+#### 7. 初步结论
+
+| 问题 | 原因 |
+|------|------|
+| 首页精彩瞬间为空 | **B — 照片全是 `general` 类型，未进入首页展示池**。6 张照片全部是 `general`，没有 `activity/meal/daily`，没有 `is_featured=true` |
+| 点击照片加载慢 | **C + D — 旧照片无缩略图，列表回退加载原图；点击预览始终加载原图（5.3MB / 4.5MB）**。5 张真实照片无缩略图，2 张超大 |
+| 家长端看不到照片/记录 | **D + 数据空 — `photo_students` 无关联；`homework_records` 无记录**。接口设计正确，但底层数据没填充 |
+
+#### 8. 需要 Codex / Claude Code 处理
+
+- 旧照片缩略图回填脚本：给现有 5 张照片批量生成缩略图（运行一次即可）
+- 首页 swiper 改用缩略图：index.js line 70 加 `p.thumbnail ? api.imageUrl(p.thumbnail) : api.imageUrl(p.file_path)`
+- 点击预览的中等图方案：后续迭代
+
+#### 9. 需要用户确认
+
+- ☐ 是否把 `general`（日常）也纳入首页展示池？当前规则 `activity/meal/daily` 或 `is_featured=true`。如果用户接受 `general` 也进首页，只需改一行 public.py 的展示池类型列表
+- ☐ 是否跑旧照片缩略图回填脚本？
+- ☐ 本轮是否先让老师在照片库手动标记"精选"或关联学生，而不是改代码？
+
+#### 10. 是否需要再次上传体验版
+
+- 如果只改后端规则（首页展示池增加 `general` / 旧照片缩略图回填），不需要上传体验版
+- 如果改前端（首页 swiper 用缩略图），需要重新上传
