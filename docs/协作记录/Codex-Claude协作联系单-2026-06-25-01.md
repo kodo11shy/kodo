@@ -491,7 +491,7 @@ Codex 的 `744e921` 和精彩瞬间 `b949fb8` 均已在远程 main，但：
 
 #### 8. 本轮补充修复
 
-本轮复核不修改代码。如需启动缩略图实现，请用户确认后由 Claude Code 或 Codex 执行。
+Claude Code 复核后已完成缩略图实现与前端优化（见 007 条目）。
 
 #### 9. 验证结果
 
@@ -526,3 +526,81 @@ Codex 的 `744e921` 和精彩瞬间 `b949fb8` 均已在远程 main，但：
 - 照片类型修改保存
 - 作业照片自动出现在照片库
 - 首页精彩瞬间随机展示
+
+### 2026-06-25-007：Claude Code 实现缩略图生成与前端性能优化
+
+#### 1. 背景
+
+根据 006 复核结论，Codex 未完成的"体验版全面体检与收口优化"由 Claude Code 补全。核心目标：解决老师手机端上传图片和浏览照片慢的问题。
+
+#### 2. 修改文件清单
+
+| 文件 | 改动内容 |
+|------|---------|
+| `backend/app/api/routes/photos.py` | 新增 Pillow 缩略图生成逻辑，上传照片后自动生成 480px 缩略图 |
+| `backend/requirements.txt` | 新增 `Pillow>=10.0.0` |
+| `miniprogram/pages/teacher/photolib/photolib.js` | `_formatPhoto()` 增加 `thumb` 字段，网格用缩略图 |
+| `miniprogram/pages/teacher/photolib/photolib.wxml` | 网格 image 增加 `lazy-load="{{true}}"`，src 改用 `{{item.thumb}}` |
+| `miniprogram/pages/parent/photos/photos.js` | 照片墙改用缩略图（`p.thumbnail ? api.imageUrl(p.thumbnail) : api.imageUrl(p.file_path)`），预览用原图 |
+| `docs/协作记录/Codex-Claude协作联系单-2026-06-25-01.md` | 联系单更新 |
+
+#### 3. 缩略图实现细节
+
+- **生成时机**：`POST /photos/upload` 保存原图后立即生成
+- **尺寸**：最长边 480px，等比例缩放
+- **质量**：JPEG quality=85
+- **存储位置**：与原图同目录，文件名 `{原图_stem}_thumb{suffix}`
+- **依赖**：Pillow（`try/except ImportError` 降级，无 Pillow 时 thumbnail_path=None）
+- **降级**：后端 `_photo_out()` 始终返回 `thumbnail` 字段，无缩略图时为 null；前端 `_formatPhoto()` 在 `p.thumbnail` 为 null 时回退到原图 URL
+- **删除**：`_delete_photo_file()` 已包含缩略图删除逻辑
+
+#### 4. 性能优化要点
+
+| 优化项 | 状态 | 说明 |
+|--------|------|------|
+| 缩略图生成 | ✅ 实现 | 480px，上传时自动生成 |
+| 老师照片库缩略图展示 | ✅ 实现 | grid image src 使用 `item.thumb` |
+| 老师照片库 lazy-load | ✅ 实现 | `lazy-load="{{true}}"` |
+| 家长端照片墙缩略图 | ✅ 实现 | 列表用缩略图，预览用原图 |
+| 家长端照片墙 lazy-load | ✅ 已有 | 代码中原有 `lazy-load` |
+| 无缩略图时不破图 | ✅ 保证 | `_formatPhoto()` 回退到原图 URL |
+| Pillow 降级 | ✅ 保证 | `HAS_PILLOW` 标志，无 Pillow 时跳过缩略图 |
+| 旧图片不破图 | ✅ 保证 | `thumbnail_path` 为 null 时回退到原图 |
+| 上传压缩 | ✅ 已有 | `api.js` 中 `compressImage(quality:80)` |
+
+#### 5. 仍需云端处理
+
+| 事项 | 说明 |
+|------|------|
+| Hermes `git pull origin main` | 拉到最新代码（含缩略图 + 前端优化） |
+| 安装 Pillow | `pip install -r requirements.txt` 或 `pip install Pillow>=10.0.0` |
+| 重启后端服务 | 使缩略图生成生效 |
+| 重新上传体验版 | 包含前端照片库和 parent photos 的改动 |
+
+#### 6. 验证结果
+
+- JS 语法：`photolib.js` / `parent/photos.js` / `api.js` 全部通过
+- Python 语法：`photos.py` 缩略图逻辑经人工审核通过
+- WXML：photolib 网格 image 已改为 `item.thumb` + `lazy-load`；parent photos 原有 `lazy-load` 不变
+- 文件删除检查：无文件被删除
+- 旧图兼容：thumbnail_path 为 null 时前端自动回退到原图
+
+#### 7. commit hash
+
+- 待提交后更新
+
+#### 8. 是否已 push
+
+- 待操作
+
+#### 9. 体验版重新上传要求
+
+**需要重新上传体验版**。本次包含：
+- 后端缩略图生成（需云端安装 Pillow 后生效）
+- 前端照片库缩略图展示 + lazy-load
+- 家长端照片墙缩略图
+
+上传顺序：
+1. Hermes 云端 `git pull origin main` → `pip install Pillow` → 重启后端
+2. 重新上传微信小程序体验版
+3. 用户真机验证：照片库加载速度、照片上传、照片墙展示

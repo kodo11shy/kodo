@@ -21,6 +21,13 @@ from app.schemas.photo import (
     PhotoUpdateRequest,
 )
 
+try:
+    from PIL import Image
+
+    HAS_PILLOW = True
+except ImportError:
+    HAS_PILLOW = False
+
 router = APIRouter(prefix="/photos", tags=["photos"])
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
@@ -97,8 +104,34 @@ def upload_photo(
             output.write(chunk)
 
     public_path = public_upload_path(str(Path("uploads") / relative_dir / filename))
+
+    # Generate thumbnail (480px max side) if Pillow is available
+    thumb_public_path = None
+    if HAS_PILLOW:
+        try:
+            thumb_filename = f"{Path(filename).stem}_thumb{suffix}"
+            thumb_disk_path = upload_dir / thumb_filename
+            img = Image.open(disk_path)
+            max_size = 480
+            w, h = img.size
+            if w > max_size or h > max_size:
+                if w > h:
+                    new_w = max_size
+                    new_h = int(h * max_size / w)
+                else:
+                    new_h = max_size
+                    new_w = int(w * max_size / h)
+                img = img.resize((new_w, new_h), Image.LANCZOS)
+            img.save(thumb_disk_path, quality=85)
+            thumb_public_path = public_upload_path(
+                str(Path("uploads") / relative_dir / thumb_filename)
+            )
+        except Exception:
+            thumb_public_path = None  # Thumbnail failed, fall back to original
+
     photo = Photo(
         file_path=public_path,
+        thumbnail_path=thumb_public_path,
         original_name=file.filename,
         file_size=size,
         photo_type="general",

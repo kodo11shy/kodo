@@ -35,7 +35,8 @@ Page({
       .then((data) => {
         const photos = (data.photos || []).map(p => ({
           ...p,
-          imageUrl: api.imageUrl(p.file_path),
+          imageUrl: p.thumbnail ? api.imageUrl(p.thumbnail) : api.imageUrl(p.file_path),
+          originalUrl: api.imageUrl(p.file_path),
           typeLabel: this.getTypeLabel(p.photo_type),
           timeStr: util.formatTime(p.taken_at)
         }))
@@ -65,7 +66,7 @@ Page({
     if (!photo) return
     this.setData({
       previewing: true,
-      previewUrl: photo.imageUrl,
+      previewUrl: photo.originalUrl || photo.imageUrl,
       previewRemark: photo.remark || ''
     })
   },

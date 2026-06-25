@@ -71,7 +71,7 @@
       data-index="{{index}}"
       bindtap="tapPhoto"
       bindlongpress="onLongPress">
-      <image class="photo-img" src="{{item.url}}" mode="aspectFill"></image>
+      <image class="photo-img" src="{{item.thumb}}" mode="aspectFill" lazy-load="{{true}}"></image>
       <view class="photo-featured-badge" wx:if="{{item.isFeatured && !multiMode}}">
         <text>⭐</text>
       </view>

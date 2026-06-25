@@ -168,9 +168,11 @@ Page({
   _formatPhoto(p) {
     const photoType = p.photo_type || 'general'
     const localTag = photoType === 'general' ? '' : photoType
+    const originalUrl = api.imageUrl(p.file_path)
     return {
       id: p.id,
-      url: api.imageUrl(p.file_path),
+      url: originalUrl,
+      thumb: p.thumbnail ? api.imageUrl(p.thumbnail) : originalUrl,
       filePath: p.file_path,
       photoType,
       photoTypeLabel: this._typeLabel(photoType) || '',
