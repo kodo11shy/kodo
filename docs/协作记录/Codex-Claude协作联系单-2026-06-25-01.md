@@ -587,11 +587,11 @@ Claude Code 复核后已完成缩略图实现与前端优化（见 007 条目）
 
 #### 7. commit hash
 
-- 待提交后更新
+- `f558d58 chore: implement thumbnail generation and frontend perf optimization`
 
 #### 8. 是否已 push
 
-- 待操作
+- ✅ 已推送到 GitHub main。远程返回 `23ce1e4..f558d58  main -> main`
 
 #### 9. 体验版重新上传要求
 
