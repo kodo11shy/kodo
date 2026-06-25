@@ -31,7 +31,7 @@
       <text class="todo-title">待关联学生</text>
       <text class="todo-count">{{unassociatedCount}} 张</text>
     </view>
-    <view class="todo-row" wx:for="{{unassociatedPhotos}}" wx:key="text">
+    <view class="todo-row" wx:for="{{unassociatedPhotos}}" wx:key="text" bindtap="goUnassociated">
       <text>⏳ {{item.text}}</text>
       <text class="todo-num">去处理 ›</text>
     </view>

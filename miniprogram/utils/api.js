@@ -1,5 +1,18 @@
 const app = getApp()
 
+const getResponseMessage = (res, fallback) => {
+  const data = res && res.data ? res.data : {}
+  if (data.message) return data.message
+  if (typeof data.detail === 'string') return data.detail
+  if (Array.isArray(data.detail) && data.detail.length > 0) {
+    const first = data.detail[0] || {}
+    const field = Array.isArray(first.loc) ? first.loc[first.loc.length - 1] : ''
+    const msg = first.msg || fallback
+    return field ? field + ': ' + msg : msg
+  }
+  return fallback || '请求失败'
+}
+
 /**
  * 接口请求封装
  * 统一处理 token、错误码、网络异常
@@ -21,16 +34,26 @@ const request = (options) => {
       header: header,
       timeout: 15000,
       success: (res) => {
-        if (res.data.code === 0) {
-          resolve(res.data.data)
-        } else {
-          // token 过期，跳回登录
-          if (res.data.code === 401) {
+        const data = res.data || {}
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          if (res.statusCode === 401 || [401, 40100, 40101, 40102].includes(data.code)) {
             app.logout()
             wx.showToast({ title: '登录已过期，请重新登录', icon: 'none' })
             return
           }
-          reject(new Error(res.data.message || '请求失败'))
+          reject(new Error(getResponseMessage(res, '请求失败')))
+          return
+        }
+        if (data.code === 0) {
+          resolve(data.data)
+        } else {
+          // token 过期，跳回登录
+          if ([401, 40100, 40101, 40102].includes(data.code)) {
+            app.logout()
+            wx.showToast({ title: '登录已过期，请重新登录', icon: 'none' })
+            return
+          }
+          reject(new Error(getResponseMessage(res, '请求失败')))
         }
       },
       fail: (err) => {

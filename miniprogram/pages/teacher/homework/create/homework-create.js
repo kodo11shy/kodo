@@ -35,7 +35,8 @@ Page({
     loading: true,
     // 内部状态（存 data 但不用于渲染，避免 Set 序列化问题）
     _submittedIdArr: [],
-    _studentNameMap: {}
+    _studentNameMap: {},
+    _preselectStudentId: 0
   },
 
   onLoad(options) {
@@ -53,6 +54,10 @@ Page({
     // 先检查有没有 pre-select
     if (options.photo_id) {
       this.setData({ donePhotoIds: [parseInt(options.photo_id)] })
+    }
+    if (options.student_ids) {
+      const firstId = parseInt(String(options.student_ids).split(',')[0])
+      if (firstId > 0) this.setData({ _preselectStudentId: firstId })
     }
 
     // 并行加载
@@ -77,7 +82,15 @@ Page({
   loadAttendance() {
     return api.request({ url: '/attendance/today' })
       .then((data) => {
-        this.setData({ allCheckedIn: data.checked_in || [] })
+        const checkedIn = (data.checked_in || []).map((item) => {
+          const id = Number(item.id || item.student_id)
+          return {
+            ...item,
+            id,
+            student_id: id
+          }
+        }).filter(item => item.id > 0)
+        this.setData({ allCheckedIn: checkedIn })
       })
       .catch(() => {
         this.setData({ allCheckedIn: [] })
@@ -107,7 +120,7 @@ Page({
       .then((data) => {
         const records = data.records || []
         // 用数组存已交学生 ID（不用 Set，因为 setData 会序列化）
-        const submittedIdArr = records.map(r => r.student_id)
+        const submittedIdArr = records.map(r => Number(r.student_id)).filter(id => id > 0)
         this.setData({
           _submittedIdArr: submittedIdArr,
           submittedCount: submittedIdArr.length
@@ -135,17 +148,30 @@ Page({
     const submittedIdArr = this.data._submittedIdArr || []
     const nameMap = this.data._studentNameMap || {}
 
-    const filtered = checkedIn.filter(s => !submittedIdArr.includes(s.id))
+    const submittedSet = new Set(submittedIdArr.map(id => Number(id)))
+    const filtered = checkedIn.filter(s => !submittedSet.has(Number(s.id || s.student_id)))
     const students = filtered.map(s => ({
       ...s,
-      name: s.name || nameMap[s.id] || ('学生#' + s.id)
+      id: Number(s.id || s.student_id),
+      student_id: Number(s.id || s.student_id),
+      name: s.name || nameMap[s.id || s.student_id] || ('学生#' + (s.id || s.student_id))
     }))
 
-    this.setData({ students })
+    const patch = { students }
+    if (this.data._preselectStudentId) {
+      const idx = students.findIndex(s => Number(s.id) === Number(this.data._preselectStudentId))
+      if (idx >= 0) {
+        patch.studentIndex = idx
+        patch.selectedStudent = students[idx]
+      }
+    }
+
+    this.setData(patch)
+    this._refreshSubmitState()
   },
 
   onStudentChange(e) {
-    const idx = e.detail.value
+    const idx = Number(e.detail.value)
     this.setData({
       studentIndex: idx,
       selectedStudent: this.data.students[idx]
@@ -241,6 +267,12 @@ Page({
       return
     }
 
+    const studentId = Number(this.data.selectedStudent.id || this.data.selectedStudent.student_id)
+    if (!studentId) {
+      util.showError('学生信息异常，请返回后重试')
+      return
+    }
+
     this.setData({ submitting: true, canSubmit: false, submitText: '提交中...' })
 
     const today = util.today()
@@ -248,7 +280,7 @@ Page({
       url: '/homework',
       method: 'POST',
       data: {
-        student_id: this.data.selectedStudent.id,
+        student_id: studentId,
         subject: this.data.subject,
         homework_type: this.data.homeworkTypes[this.data.homeworkTypeIndex],
         photo_ids: this.data.donePhotoIds,

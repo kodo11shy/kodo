@@ -23,7 +23,7 @@ Page({
     filterTab: 'all',
     filterTabs: [
       { key: 'all', label: '全部', className: 'active' },
-      { key: 'unassociated', label: '未分类', className: '' },
+      { key: 'unassociated', label: '未关联', className: '' },
       { key: 'featured', label: '精选', className: '' }
     ],
 
@@ -45,6 +45,7 @@ Page({
 
     // 标签选择器
     showTagPicker: false,
+    tagSaving: false,
     tagPickerPhoto: null,
     tagOptions: [
       { key: 'general', label: '日常' },
@@ -56,7 +57,7 @@ Page({
   },
 
   onLoad() {
-    this.loadPhotos()
+    this.loadPhotos(true)
   },
 
   onShow() {
@@ -202,7 +203,12 @@ Page({
 
   switchFilter(e) {
     const key = e.currentTarget.dataset.key
-    if (key === this.data.filterTab) return
+    this.applyFilter(key)
+  },
+
+  applyFilter(key) {
+    if (!key) return Promise.resolve()
+    if (key === this.data.filterTab && this.data.photos.length > 0) return Promise.resolve()
     this.setData({
       filterTab: key,
       filterTabs: this.data.filterTabs.map(item => ({ ...item, className: item.key === key ? 'active' : '' })),
@@ -210,9 +216,18 @@ Page({
       page: 1,
       hasMore: true,
       multiMode: false,
-      selectedIds: []
+      selectedIds: [],
+      selectedPhotos: []
     })
-    this.loadPhotos(true)
+    return this.loadPhotos(true)
+  },
+
+  goUnassociated() {
+    this.applyFilter('unassociated').then(() => {
+      wx.showToast({ title: '已显示待关联照片', icon: 'none' })
+    }).catch(() => {
+      util.showError('加载待关联照片失败')
+    })
   },
 
   // ======== 照片预览 ========
@@ -339,16 +354,19 @@ Page({
   },
 
   selectTag(e) {
+    if (this.data.tagSaving) return
     const tagKey = e.currentTarget.dataset.key
     const photo = this.data.tagPickerPhoto
     if (!photo) return
     const photoType = tagKey || 'general'
+    this.setData({ tagSaving: true })
+    util.showLoading('保存中...')
     api.request({
       url: '/photos/' + photo.id,
       method: 'PUT',
       data: { photo_type: photoType }
     }).then((data) => {
-      const savedType = data.photo?.photo_type || photoType
+      const savedType = data && data.photo && data.photo.photo_type ? data.photo.photo_type : photoType
       const localTag = savedType === 'general' ? '' : savedType
       const photos = this.data.photos.map(p => {
         if (p.id === photo.id) {
@@ -358,14 +376,22 @@ Page({
         }
         return p
       })
+      wx.hideLoading()
       this.setData({ photos, showTagPicker: false, tagPickerPhoto: null })
       wx.showToast({ title: tagKey ? '已设为' + this._typeLabel(savedType) : '已清除标签', icon: 'success' })
     }).catch((err) => util.showError(err.message || '标签保存失败'))
+      .finally(() => {
+        wx.hideLoading()
+        this.setData({ tagSaving: false })
+      })
   },
 
   cancelTagPicker() {
+    if (this.data.tagSaving) return
     this.setData({ showTagPicker: false, tagPickerPhoto: null })
   },
+
+  nop() {},
 
   // ======== 多选模式 ========
 

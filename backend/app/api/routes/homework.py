@@ -7,7 +7,7 @@ from app.core.datetime import beijing_date, now_utc_naive
 from app.core.homework_rules import ALLOWED_HOMEWORK_SUBJECTS, is_allowed_homework_subject
 from app.core.responses import fail, ok
 from app.db.session import get_db
-from app.models import AttendanceRecord, HomeworkPhoto, HomeworkRecord, Photo, Student, Teacher
+from app.models import AttendanceRecord, HomeworkPhoto, HomeworkRecord, Photo, PhotoStudent, Student, Teacher
 from app.schemas.homework import HomeworkCorrectRequest, HomeworkCreateRequest, HomeworkGradeRequest
 
 router = APIRouter(prefix="/homework", tags=["homework"])
@@ -39,6 +39,30 @@ def _add_homework_photos(db: Session, homework_id: int, photo_ids: list[int], st
                 sort_order=index,
             )
         )
+
+
+def _archive_homework_photos(db: Session, photos: list[Photo], student_id: int) -> None:
+    """Mark uploaded photos as homework photos and associate them with the student."""
+    if not photos:
+        return
+
+    photo_ids = [photo.id for photo in photos]
+    existing_photo_ids = set(
+        db.execute(
+            select(PhotoStudent.photo_id).where(
+                PhotoStudent.student_id == student_id,
+                PhotoStudent.photo_id.in_(photo_ids),
+            )
+        )
+        .scalars()
+        .all()
+    )
+    is_single = len(photo_ids) == 1
+
+    for photo in photos:
+        photo.photo_type = "homework"
+        if photo.id not in existing_photo_ids:
+            db.add(PhotoStudent(photo_id=photo.id, student_id=student_id, is_main=is_single))
 
 
 def _merge_remark(existing: str | None, label: str, remark: str | None) -> str | None:
@@ -121,6 +145,7 @@ def create_homework(
     db.add(record)
     db.flush()
     _add_homework_photos(db, record.id, payload.photo_ids, "done")
+    _archive_homework_photos(db, photos, payload.student_id)
     db.commit()
     db.refresh(record)
     return ok({"id": record.id, "status": record.completion_status})
@@ -150,6 +175,7 @@ def grade_homework(
     record.teacher_remark = _merge_remark(record.teacher_remark, "批改", payload.remark)
     record.updated_at = now_utc_naive()
     _add_homework_photos(db, record.id, payload.photo_ids, "graded")
+    _archive_homework_photos(db, photos, record.student_id)
     db.commit()
     return ok({"id": record.id, "status": record.completion_status})
 
@@ -176,6 +202,7 @@ def correct_homework(
     record.completed_at = now_utc_naive()
     record.updated_at = now_utc_naive()
     _add_homework_photos(db, record.id, payload.photo_ids, "corrected")
+    _archive_homework_photos(db, photos, record.student_id)
     db.commit()
     return ok({"id": record.id, "status": record.completion_status})
 
