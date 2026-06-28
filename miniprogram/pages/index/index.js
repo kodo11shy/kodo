@@ -67,7 +67,7 @@ Page({
           })),
           featuredPhotos: (data.featured_photos || []).map(p => ({
             id: p.id,
-            url: api.imageUrl(p.file_path)
+            url: p.thumbnail ? api.imageUrl(p.thumbnail) : api.imageUrl(p.file_path)
           }))
         })
       })

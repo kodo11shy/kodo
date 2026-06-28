@@ -1,45 +1,50 @@
-/* 首页样式 · 家长信任型 */
+/* 首页 · 晨光封面版 */
+/* 暖杏色系 · 大圆角 · 温和信任感 */
+
 .page {
-  background: linear-gradient(180deg, #FFF8F0 0%, #FFFFFF 30%, #F7F9FC 100%);
+  background: #FCF8F3;
   padding-bottom: 60rpx;
   min-height: 100vh;
 }
 
 /* ====== 1. 氛围大图 ====== */
+
 .hero {
-  margin: 24rpx 24rpx 0;
-  height: 360rpx;
+  margin: 28rpx 24rpx 0;
+  height: 380rpx;
   position: relative;
   overflow: hidden;
-  border-radius: 32rpx;
-  background: #FFE8D6;
-  box-shadow: 0 18rpx 42rpx rgba(255, 140, 90, 0.16);
+  border-radius: 36rpx;
+  background: #F0DACA;
 }
 
 .hero-image {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: cover;
 }
 
 .hero-content {
   position: absolute;
-  top: 28rpx;
+  bottom: 28rpx;
+  left: 28rpx;
   right: 28rpx;
-  width: 292rpx;
   display: flex;
   align-items: center;
-  padding: 18rpx 20rpx;
-  border-radius: 26rpx;
-  background: rgba(255, 250, 247, 0.86);
-  box-shadow: 0 10rpx 28rpx rgba(124, 85, 60, 0.10);
+  padding: 20rpx 24rpx;
+  border-radius: 24rpx;
+  background: rgba(255, 250, 247, 0.92);
+  backdrop-filter: blur(8rpx);
+  box-shadow: 0 4rpx 20rpx rgba(124, 85, 60, 0.08);
 }
 
 .hero-logo {
-  width: 72rpx;
-  height: 72rpx;
-  margin-right: 14rpx;
+  width: 64rpx;
+  height: 64rpx;
+  margin-right: 16rpx;
   flex-shrink: 0;
+  border-radius: 16rpx;
 }
 
 .hero-copy {
@@ -49,129 +54,168 @@
 }
 
 .hero-title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #2F3A4C;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #4A3A30;
   line-height: 1.2;
 }
 
 .hero-subtitle {
   font-size: 22rpx;
-  color: #8A6A5B;
-  margin-top: 6rpx;
+  color: #B09888;
+  margin-top: 4rpx;
   line-height: 1.35;
 }
 
-/* ====== 2. 家长行动区 ====== */
+/* ====== 最新通知条 ====== */
+
+.notice-card {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  margin: 20rpx 24rpx 0;
+  padding: 22rpx 26rpx;
+  box-shadow: 0 4rpx 16rpx rgba(180, 140, 120, 0.06);
+}
+
+.notice-card:active {
+  opacity: 0.7;
+}
+
+.notice-dot {
+  font-size: 26rpx;
+  margin-right: 14rpx;
+  flex-shrink: 0;
+}
+
+.notice-text-short {
+  flex: 1;
+  font-size: 26rpx;
+  color: #4A3A30;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notice-more {
+  font-size: 24rpx;
+  color: #D4A080;
+  flex-shrink: 0;
+  margin-left: 12rpx;
+  font-weight: 500;
+}
+
+/* ====== 家长行动区 ====== */
+
 .contact-section {
   padding: 24rpx 24rpx 0;
 }
 
 .contact-card {
   background: #FFFFFF;
-  border-radius: 26rpx;
+  border-radius: 28rpx;
   overflow: hidden;
-  box-shadow: 0 10rpx 30rpx rgba(49,64,90,0.08);
+  box-shadow: 0 4rpx 24rpx rgba(180, 140, 120, 0.06);
 }
 
 .contact-row {
   display: flex;
   align-items: center;
-  padding: 26rpx 28rpx;
+  padding: 28rpx 30rpx;
 }
 
 .contact-row:active {
-  opacity: 0.6;
+  background: #FCF6F0;
 }
 
 .contact-icon-big {
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 22rpx;
-  background: #FFF3E8;
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 20rpx;
+  background: #F5EBE0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
+  font-size: 34rpx;
   margin-right: 20rpx;
   flex-shrink: 0;
 }
 
 .contact-info {
   flex: 1;
+  min-width: 0;
 }
 
 .contact-label {
   font-size: 28rpx;
-  font-weight: bold;
-  color: #2F3A4C;
+  font-weight: 700;
+  color: #4A3A30;
   display: block;
 }
 
 .contact-value {
-  font-size: 26rpx;
-  color: #7B8496;
+  font-size: 24rpx;
+  color: #B09888;
   margin-top: 4rpx;
   display: block;
 }
 
 .contact-desc {
-  font-size: 24rpx;
-  color: #B1B8C7;
+  font-size: 22rpx;
+  color: #C0B0A0;
   margin-top: 4rpx;
   display: block;
 }
 
 .contact-btn {
-  font-size: 24rpx;
-  color: #FF8C42;
+  font-size: 23rpx;
+  color: #D4A080;
   font-weight: 600;
   padding: 8rpx 24rpx;
-  border: 2rpx solid #FFDCC0;
+  border: 2rpx solid #F0DACA;
   border-radius: 999rpx;
   flex-shrink: 0;
 }
 
 .call-btn {
-  color: #4CAF50;
-  border-color: #C8E6C9;
+  color: #7AB090;
+  border-color: #D5E8DE;
 }
 
 .contact-arrow {
-  font-size: 40rpx;
-  color: #C7CDD8;
+  font-size: 36rpx;
+  color: #D0C8B8;
   flex-shrink: 0;
-}
-
-.parent-row {
-  margin-top: 0;
 }
 
 .contact-divider {
   height: 2rpx;
-  background: #F0F2F5;
-  margin: 0 28rpx;
+  background: #F5EDE5;
+  margin: 0 30rpx;
 }
 
 /* ====== 分区标题 ====== */
+
 .section {
   padding: 28rpx 24rpx 0;
 }
 
 .section-title {
   font-size: 30rpx;
-  font-weight: bold;
-  color: #2F3A4C;
+  font-weight: 700;
+  color: #4A3A30;
   margin-bottom: 16rpx;
   display: block;
 }
 
-/* ====== 3. 精彩瞬间 ====== */
+/* ====== 精彩瞬间轮播 ====== */
+
 .photo-swiper {
   height: 340rpx;
-  border-radius: 24rpx;
+  border-radius: 28rpx;
   overflow: hidden;
-  box-shadow: 0 8rpx 24rpx rgba(49,64,90,0.08);
+  box-shadow: 0 4rpx 20rpx rgba(180, 140, 120, 0.06);
 }
 
 .photo-item {
@@ -181,7 +225,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #FFF5EE;
+  background: #F5EBE0;
 }
 
 .photo-img {
@@ -194,20 +238,21 @@
   display: flex;
   width: 100%;
   height: 100%;
-  background-color: #FFF1E8;
-  border-radius: 24rpx;
+  background-color: #F5EBE0;
+  border-radius: 28rpx;
   justify-content: center;
   align-items: center;
 }
 
 .placeholder-text {
   font-size: 24rpx;
-  color: #B98A73;
+  color: #C0A890;
 }
 
 .photo-swiper .wx-swiper-dots {
   margin-bottom: 8rpx;
 }
+
 .photo-swiper .wx-swiper-dot {
   width: 12rpx;
   height: 12rpx;
@@ -215,53 +260,19 @@
   margin: 0 6rpx;
   background: rgba(255,255,255,0.5);
 }
+
 .photo-swiper .wx-swiper-dot-active {
   width: 24rpx;
   background: #FFFFFF;
 }
 
-/* ====== 4. 最新通知（温和信息条） ====== */
-.notice-card {
-  display: flex;
-  align-items: center;
-  background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 22rpx 26rpx;
-  box-shadow: 0 6rpx 20rpx rgba(49,64,90,0.06);
-}
+/* ====== 透明收费 ====== */
 
-.notice-card:active {
-  opacity: 0.6;
-}
-
-.notice-dot {
-  font-size: 28rpx;
-  margin-right: 14rpx;
-  flex-shrink: 0;
-}
-
-.notice-text-short {
-  flex: 1;
-  font-size: 26rpx;
-  color: #2F3A4C;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.notice-more {
-  font-size: 24rpx;
-  color: #5B7FFF;
-  flex-shrink: 0;
-  margin-left: 12rpx;
-}
-
-/* ====== 5. 透明收费 ====== */
 .fee-card {
   background: #FFFFFF;
   border-radius: 26rpx;
   overflow: hidden;
-  box-shadow: 0 10rpx 30rpx rgba(49,64,90,0.08);
+  box-shadow: 0 4rpx 20rpx rgba(180, 140, 120, 0.06);
 }
 
 .fee-item {
@@ -269,7 +280,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 24rpx 28rpx;
-  border-bottom: 2rpx solid #ECEFF5;
+  border-bottom: 2rpx solid #F5EDE5;
 }
 
 .fee-item:last-child {
@@ -283,29 +294,29 @@
 
 .fee-name {
   font-size: 28rpx;
-  color: #2F3A4C;
+  color: #4A3A30;
   font-weight: 600;
   display: block;
 }
 
 .fee-desc {
   font-size: 22rpx;
-  color: #B1B8C7;
+  color: #C0B0A0;
   margin-top: 4rpx;
   display: block;
 }
 
 .fee-amount {
   font-size: 34rpx;
-  color: #FF8C42;
-  font-weight: bold;
+  color: #D4A080;
+  font-weight: 700;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .fee-unit {
   font-size: 22rpx;
-  color: #B1B8C7;
+  color: #C0B0A0;
   font-weight: normal;
 }
 
@@ -316,61 +327,64 @@
 
 .fee-empty-text {
   font-size: 24rpx;
-  color: #B1B8C7;
+  color: #C8B8A8;
 }
 
-/* ====== 6. 关于托班 ====== */
+/* ====== 关于托班 ====== */
+
 .about-card {
   background: #FFFFFF;
   border-radius: 26rpx;
   padding: 28rpx;
-  box-shadow: 0 10rpx 30rpx rgba(49,64,90,0.08);
+  box-shadow: 0 4rpx 20rpx rgba(180, 140, 120, 0.06);
 }
 
 .about-card-title {
   font-size: 30rpx;
-  font-weight: bold;
-  color: #2F3A4C;
+  font-weight: 700;
+  color: #4A3A30;
   display: block;
   margin-bottom: 12rpx;
 }
 
 .about-card-desc {
   font-size: 26rpx;
-  color: #7B8496;
+  color: #B09888;
   line-height: 1.7;
   display: block;
 }
 
-/* ====== 7. 老师入口（底部弱化） ====== */
+/* ====== 老师入口 ====== */
+
 .teacher-bottom {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 36rpx 24rpx 0;
+  padding: 40rpx 24rpx 0;
 }
 
 .teacher-bottom:active {
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .teacher-bottom-icon {
-  font-size: 24rpx;
+  font-size: 22rpx;
   margin-right: 8rpx;
 }
 
 .teacher-bottom-text {
   font-size: 24rpx;
-  color: #B1B8C7;
+  color: #C8B8A8;
 }
 
 .teacher-bottom-arrow {
-  font-size: 24rpx;
-  color: #C7CDD8;
+  font-size: 22rpx;
+  color: #D0C8B8;
   margin-left: 4rpx;
 }
 
-/* ====== 8. 底部 ====== */
+/* ====== 底部 ====== */
+
 .footer {
   text-align: center;
   padding: 40rpx 30rpx 20rpx;
@@ -378,10 +392,11 @@
 
 .footer-text {
   font-size: 22rpx;
-  color: #C7CDD8;
+  color: #D0C8B8;
 }
 
 /* ====== 通知详情弹窗 ====== */
+
 .notice-modal {
   background: #FFF;
   border-radius: 32rpx;
@@ -390,15 +405,15 @@
   max-height: 75vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20rpx 60rpx rgba(0,0,0,0.15);
+  box-shadow: 0 20rpx 60rpx rgba(74, 58, 48, 0.12);
   overflow: hidden;
   box-sizing: border-box;
 }
 
 .notice-modal-title {
   font-size: 34rpx;
-  font-weight: bold;
-  color: #2F3A4C;
+  font-weight: 700;
+  color: #4A3A30;
   padding: 36rpx 32rpx 8rpx;
   text-align: center;
   display: block;
@@ -406,7 +421,7 @@
 
 .notice-modal-type {
   font-size: 22rpx;
-  color: #FF8C5A;
+  color: #D4A080;
   text-align: center;
   display: block;
   padding: 4rpx 0 12rpx;
@@ -414,7 +429,7 @@
 
 .notice-modal-divider {
   height: 2rpx;
-  background: #F0F0F0;
+  background: #F5EDE5;
   margin: 0 32rpx;
 }
 
@@ -429,7 +444,7 @@
 
 .notice-modal-content {
   font-size: 28rpx;
-  color: #4A4A5A;
+  color: #4A3A30;
   line-height: 1.8;
   white-space: pre-wrap;
   word-break: break-all;
@@ -440,25 +455,26 @@
 }
 
 .notice-modal-footer {
-  border-top: 2rpx solid #F0F0F0;
+  border-top: 2rpx solid #F5EDE5;
   padding: 24rpx 0;
   text-align: center;
 }
 
 .notice-close-btn {
   font-size: 28rpx;
-  color: #5B7FFF;
+  color: #D4A080;
   font-weight: 600;
   padding: 8rpx 48rpx;
 }
 
-/* 加载与错误态 */
+/* ====== 加载与错误态 ====== */
+
 .loading-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 60vh;
-  color: #B1B8C7;
+  color: #C8B8A8;
   font-size: 28rpx;
 }
 
@@ -478,24 +494,25 @@
 
 .error-text {
   font-size: 32rpx;
-  color: #7B8496;
-  font-weight: bold;
+  color: #B09888;
+  font-weight: 600;
 }
 
 .error-desc {
   font-size: 26rpx;
-  color: #B1B8C7;
+  color: #C8B8A8;
   margin-top: 12rpx;
 }
 
-/* 半透明遮罩 */
+/* ====== 遮罩 ====== */
+
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(74, 58, 48, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
