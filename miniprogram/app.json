@@ -27,10 +27,10 @@
     "pages/teacher/admin/admin"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#5B7FFF",
+    "navigationBarBackgroundColor": "#E8835A",
     "navigationBarTitleText": "智慧托班",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#F5F5F5"
+    "backgroundColor": "#FFF8F3"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
