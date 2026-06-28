@@ -1,128 +1,103 @@
-<!-- 老师工作台 — 暖色版 -->
 <view class="page-teacher page">
-  <!-- 背景氛围渐变 -->
-  <view class="bg-accent"></view>
 
-  <!-- 顶部区域 -->
-  <view class="dash-header">
-    <view class="header-top">
-      <view class="header-info">
-        <text class="greeting">{{greeting}}，{{teacherName}}</text>
-        <text class="date-text">{{dateStr}}</text>
+  <!-- ===== 顶栏 ===== -->
+  <view class="top-bar">
+    <view class="top-row">
+      <view class="top-info">
+        <text class="top-greeting">{{greeting}}，</text>
+        <text class="top-name">{{teacherName}}</text>
+        <text class="top-date">{{dateStr}}</text>
       </view>
-      <view class="logout-btn" bindtap="doLogout">退出</view>
+      <view class="top-exit" bindtap="doLogout">退出</view>
     </view>
 
-    <!-- 接口异常提示 -->
-    <view class="error-banner" wx:if="{{attendanceError}}">
-      <text class="error-banner-text">⚠️ 数据加载异常，请下拉刷新重试</text>
+    <view class="err-bar" wx:if="{{attendanceError}}">
+      ⚠️ 数据加载异常，请下拉刷新重试
     </view>
 
-    <!-- 出勤统计 -->
-    <view class="header-stats" wx:else bindtap="goAttendance">
-      <view class="stat-item">
-        <text class="stat-num">{{attendedCount}}</text>
-        <text class="stat-label">已签到</text>
+    <view class="stat-panel" wx:else bindtap="goAttendance">
+      <view class="stat-cell">
+        <text class="stat-val">{{attendedCount}}</text>
+        <text class="stat-tag">已签到</text>
       </view>
-      <view class="stat-divider"></view>
-      <view class="stat-item">
-        <text class="stat-num">{{totalCount}}</text>
-        <text class="stat-label">总人数</text>
+      <view class="stat-line"></view>
+      <view class="stat-cell">
+        <text class="stat-val">{{totalCount}}</text>
+        <text class="stat-tag">总人数</text>
       </view>
-      <view class="stat-divider"></view>
-      <view class="stat-item">
-        <text class="stat-num stat-rate">{{attendanceRate}}%</text>
-        <text class="stat-label">出勤率</text>
+      <view class="stat-line"></view>
+      <view class="stat-cell">
+        <text class="stat-val stat-highlight">{{attendanceRate}}%</text>
+        <text class="stat-tag">出勤率</text>
       </view>
     </view>
   </view>
 
-  <!-- 功能导航九宫格 -->
-  <view class="grid-menu">
-    <view class="grid-item" bindtap="goPhoto">
-      <view class="grid-icon-wrap icon-camera-bg">
-        <image class="grid-icon" src="/images/icons/icon-camera.png" mode="aspectFit"></image>
-      </view>
-      <text class="grid-label">拍照</text>
+  <!-- ===== 功能入口 ===== -->
+  <view class="func-grid">
+    <view class="func-cell" bindtap="goPhoto">
+      <view class="func-icon func-camera"></view>
+      <text class="func-name">拍照</text>
     </view>
-    <view class="grid-item" bindtap="goPhotoLib">
-      <view class="grid-icon-wrap icon-photolib-bg">
-        <text class="grid-icon-emoji">🖼️</text>
-      </view>
-      <text class="grid-label">照片库</text>
+    <view class="func-cell" bindtap="goPhotoLib">
+      <view class="func-icon func-gallery"></view>
+      <text class="func-name">照片库</text>
     </view>
-    <view class="grid-item" bindtap="goAttendance">
-      <view class="grid-icon-wrap icon-checkin-bg">
-        <image class="grid-icon" src="/images/icons/icon-checkin.png" mode="aspectFit"></image>
-      </view>
-      <text class="grid-label">签到签退</text>
+    <view class="func-cell" bindtap="goAttendance">
+      <view class="func-icon func-checkin"></view>
+      <text class="func-name">签到</text>
     </view>
-    <view class="grid-item" bindtap="goHomework">
-      <view class="grid-icon-wrap icon-homework-bg">
-        <image class="grid-icon" src="/images/icons/icon-homework.png" mode="aspectFit"></image>
-      </view>
-      <text class="grid-label">作业</text>
+    <view class="func-cell" bindtap="goHomework">
+      <view class="func-icon func-hw"></view>
+      <text class="func-name">作业</text>
     </view>
-    <view class="grid-item" bindtap="goGrowth">
-      <view class="grid-icon-wrap icon-growth-bg">
-        <image class="grid-icon" src="/images/icons/icon-growth.png" mode="aspectFit"></image>
-      </view>
-      <text class="grid-label">成长档案</text>
+    <view class="func-cell" bindtap="goGrowth">
+      <view class="func-icon func-growth"></view>
+      <text class="func-name">成长</text>
     </view>
-    <view class="grid-item" bindtap="goMeal">
-      <view class="grid-icon-wrap icon-meal-bg">
-        <image class="grid-icon" src="/images/icons/icon-meal.png" mode="aspectFit"></image>
-      </view>
-      <text class="grid-label">餐食</text>
+    <view class="func-cell" bindtap="goMeal">
+      <view class="func-icon func-meal"></view>
+      <text class="func-name">餐食</text>
     </view>
-    <view class="grid-item" bindtap="goStudents">
-      <view class="grid-icon-wrap icon-students-bg">
-        <image class="grid-icon" src="/images/icons/icon-students.png" mode="aspectFit"></image>
-      </view>
-      <text class="grid-label">学生管理</text>
+    <view class="func-cell" bindtap="goStudents">
+      <view class="func-icon func-students"></view>
+      <text class="func-name">学生</text>
     </view>
-    <view class="grid-item" bindtap="goPayment">
-      <view class="grid-icon-wrap icon-payment-bg">
-        <image class="grid-icon" src="/images/icons/icon-payment.png" mode="aspectFit"></image>
-      </view>
-      <text class="grid-label">收费</text>
+    <view class="func-cell" bindtap="goPayment">
+      <view class="func-icon func-pay"></view>
+      <text class="func-name">收费</text>
     </view>
-    <view class="grid-item" bindtap="goNotices">
-      <view class="grid-icon-wrap icon-notice-bg">
-        <image class="grid-icon" src="/images/icons/icon-notice.png" mode="aspectFit"></image>
-      </view>
-      <text class="grid-label">通知</text>
+    <view class="func-cell" bindtap="goNotices">
+      <view class="func-icon func-notice"></view>
+      <text class="func-name">通知</text>
     </view>
-    <view class="grid-item" bindtap="goSettings">
-      <view class="grid-icon-wrap icon-settings-bg">
-        <image class="grid-icon" src="/images/icons/icon-settings.png" mode="aspectFit"></image>
-      </view>
-      <text class="grid-label">设置</text>
+    <view class="func-cell" bindtap="goSettings">
+      <view class="func-icon func-set"></view>
+      <text class="func-name">设置</text>
     </view>
-    <view class="grid-item" wx:if="{{isAdmin}}" bindtap="goAdmin">
-      <view class="grid-icon-wrap icon-admin-bg">
-        <image class="grid-icon" src="/images/icons/icon-settings.png" mode="aspectFit"></image>
-      </view>
-      <text class="grid-label">系统管理</text>
-      <text class="admin-badge">管理员</text>
+    <view class="func-cell" wx:if="{{isAdmin}}" bindtap="goAdmin">
+      <view class="func-icon func-admin"></view>
+      <text class="func-name">管理</text>
+      <view class="func-badge">管理员</view>
     </view>
   </view>
 
-  <!-- 今日动态 -->
-  <view class="section-card">
-    <view class="section-head">
-      <text class="section-title">今日动态</text>
-      <text class="section-count" wx:if="{{recentActivities.length > 0}}">{{recentActivities.length}} 条</text>
+  <!-- ===== 今日动态 ===== -->
+  <view class="feed-block">
+    <view class="feed-head">
+      <text class="feed-title">今日动态</text>
+      <text class="feed-num" wx:if="{{recentActivities.length > 0}}">{{recentActivities.length}}</text>
     </view>
-    <view class="dynamic-list">
-      <view class="dynamic-item" wx:for="{{recentActivities}}" wx:key="index">
-        <view class="dynamic-dot"></view>
-        <text class="dynamic-time">{{item.time}}</text>
-        <text class="dynamic-text">{{item.text}}</text>
+    <view class="feed-body">
+      <view class="feed-item" wx:for="{{recentActivities}}" wx:key="index">
+        <view class="feed-bullet"></view>
+        <text class="feed-time">{{item.time}}</text>
+        <text class="feed-text">{{item.text}}</text>
       </view>
-      <view class="empty-state-mini" wx:if="{{recentActivities.length === 0}}">
-        <text>暂无今日动态</text>
+      <view class="feed-empty" wx:if="{{recentActivities.length === 0}}">
+        <text>暂无动态记录</text>
       </view>
     </view>
   </view>
+
 </view>
