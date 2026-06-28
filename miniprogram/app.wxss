@@ -1,19 +1,19 @@
 /* ===== 全局样式 ===== */
 
-/* 设计令牌 — 沉稳暖沙色系 */
+/* 设计令牌 — 晨光暖杏色系 */
 page {
-  --color-primary: #B8956A;
-  --color-primary-dark: #A07850;
-  --color-primary-light: #F0ECE6;
-  --color-accent: #B8956A;
-  --color-positive: #7A9A8A;
-  --color-bg-teacher: #E8E3DC;
-  --color-bg-parent: #F5F0EB;
-  --color-text: #2A2622;
-  --color-text-secondary: #8A8078;
-  --color-text-muted: #B0A8A0;
-  --color-border: #E0D8D0;
-  --color-shadow: rgba(100, 90, 80, 0.08);
+  --color-primary: #D4A080;
+  --color-primary-dark: #C08868;
+  --color-primary-light: #F5EBE0;
+  --color-accent: #E8C8A0;
+  --color-positive: #7AB090;
+  --color-bg-teacher: #FCF8F3;
+  --color-bg-parent: #FAF5EE;
+  --color-text: #4A3A30;
+  --color-text-secondary: #B09888;
+  --color-text-muted: #C8B8A8;
+  --color-border: #E8DACC;
+  --color-shadow: rgba(200, 160, 140, 0.08);
 
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Helvetica Neue', sans-serif;
   font-size: 28rpx;

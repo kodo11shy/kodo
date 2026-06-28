@@ -1,101 +1,104 @@
 <view class="page-teacher page">
 
-  <!-- ===== 顶栏 ===== -->
-  <view class="top-bar">
-    <view class="top-row">
-      <view class="top-info">
-        <text class="top-greeting">{{greeting}}，</text>
-        <text class="top-name">{{teacherName}}</text>
-        <text class="top-date">{{dateStr}}</text>
+  <!-- ===== 晨光顶栏 ===== -->
+  <view class="dawn-bar">
+    <view class="dawn-top">
+      <view class="dawn-info">
+        <text class="dawn-greet">{{greeting}}，</text>
+        <text class="dawn-user">{{teacherName}}</text>
+        <text class="dawn-day">{{dateStr}}</text>
       </view>
-      <view class="top-exit" bindtap="doLogout">退出</view>
+      <view class="dawn-exit" bindtap="doLogout">退出</view>
     </view>
 
-    <view class="err-bar" wx:if="{{attendanceError}}">
+    <view class="dawn-err" wx:if="{{attendanceError}}">
       ⚠️ 数据加载异常，请下拉刷新重试
     </view>
 
-    <view class="stat-panel" wx:else bindtap="goAttendance">
-      <view class="stat-cell">
-        <text class="stat-val">{{attendedCount}}</text>
-        <text class="stat-tag">已签到</text>
+    <!-- 出勤卡片 -->
+    <view class="dawn-stats" wx:else bindtap="goAttendance">
+      <view class="ds-item">
+        <text class="ds-num">{{attendedCount}}</text>
+        <text class="ds-lbl">已签到</text>
       </view>
-      <view class="stat-line"></view>
-      <view class="stat-cell">
-        <text class="stat-val">{{totalCount}}</text>
-        <text class="stat-tag">总人数</text>
+      <view class="ds-gap"></view>
+      <view class="ds-item">
+        <text class="ds-num">{{totalCount}}</text>
+        <text class="ds-lbl">总人数</text>
       </view>
-      <view class="stat-line"></view>
-      <view class="stat-cell">
-        <text class="stat-val stat-highlight">{{attendanceRate}}%</text>
-        <text class="stat-tag">出勤率</text>
+      <view class="ds-gap"></view>
+      <view class="ds-item">
+        <text class="ds-num ds-hit">{{attendanceRate}}%</text>
+        <text class="ds-lbl">出勤率</text>
       </view>
     </view>
   </view>
 
-  <!-- ===== 功能入口 ===== -->
-  <view class="func-grid">
-    <view class="func-cell" bindtap="goPhoto">
-      <view class="func-icon func-camera"></view>
-      <text class="func-name">拍照</text>
+  <!-- ===== 功能入口网格 ===== -->
+  <view class="menu-grid">
+    <view class="mg-cell" bindtap="goPhoto">
+      <view class="mg-ico mg-cam"></view>
+      <text class="mg-txt">拍照</text>
     </view>
-    <view class="func-cell" bindtap="goPhotoLib">
-      <view class="func-icon func-gallery"></view>
-      <text class="func-name">照片库</text>
+    <view class="mg-cell" bindtap="goPhotoLib">
+      <view class="mg-ico mg-album"></view>
+      <text class="mg-txt">照片库</text>
     </view>
-    <view class="func-cell" bindtap="goAttendance">
-      <view class="func-icon func-checkin"></view>
-      <text class="func-name">签到</text>
+    <view class="mg-cell" bindtap="goAttendance">
+      <view class="mg-ico mg-sign"></view>
+      <text class="mg-txt">签到</text>
     </view>
-    <view class="func-cell" bindtap="goHomework">
-      <view class="func-icon func-hw"></view>
-      <text class="func-name">作业</text>
+    <view class="mg-cell" bindtap="goHomework">
+      <view class="mg-ico mg-hw"></view>
+      <text class="mg-txt">作业</text>
     </view>
-    <view class="func-cell" bindtap="goGrowth">
-      <view class="func-icon func-growth"></view>
-      <text class="func-name">成长</text>
+    <view class="mg-cell" bindtap="goGrowth">
+      <view class="mg-ico mg-grow"></view>
+      <text class="mg-txt">成长</text>
     </view>
-    <view class="func-cell" bindtap="goMeal">
-      <view class="func-icon func-meal"></view>
-      <text class="func-name">餐食</text>
+    <view class="mg-cell" bindtap="goMeal">
+      <view class="mg-ico mg-meal"></view>
+      <text class="mg-txt">餐食</text>
     </view>
-    <view class="func-cell" bindtap="goStudents">
-      <view class="func-icon func-students"></view>
-      <text class="func-name">学生</text>
+    <view class="mg-cell" bindtap="goStudents">
+      <view class="mg-ico mg-stud"></view>
+      <text class="mg-txt">学生</text>
     </view>
-    <view class="func-cell" bindtap="goPayment">
-      <view class="func-icon func-pay"></view>
-      <text class="func-name">收费</text>
+    <view class="mg-cell" bindtap="goPayment">
+      <view class="mg-ico mg-pay"></view>
+      <text class="mg-txt">收费</text>
     </view>
-    <view class="func-cell" bindtap="goNotices">
-      <view class="func-icon func-notice"></view>
-      <text class="func-name">通知</text>
+    <view class="mg-cell" bindtap="goNotices">
+      <view class="mg-ico mg-ntf"></view>
+      <text class="mg-txt">通知</text>
     </view>
-    <view class="func-cell" bindtap="goSettings">
-      <view class="func-icon func-set"></view>
-      <text class="func-name">设置</text>
+    <view class="mg-cell" bindtap="goSettings">
+      <view class="mg-ico mg-set"></view>
+      <text class="mg-txt">设置</text>
     </view>
-    <view class="func-cell" wx:if="{{isAdmin}}" bindtap="goAdmin">
-      <view class="func-icon func-admin"></view>
-      <text class="func-name">管理</text>
-      <view class="func-badge">管理员</view>
+    <view class="mg-cell" wx:if="{{isAdmin}}" bindtap="goAdmin">
+      <view class="mg-ico mg-adm"></view>
+      <text class="mg-txt">管理</text>
+      <view class="mg-badge">管理员</view>
     </view>
   </view>
 
   <!-- ===== 今日动态 ===== -->
-  <view class="feed-block">
-    <view class="feed-head">
-      <text class="feed-title">今日动态</text>
-      <text class="feed-num" wx:if="{{recentActivities.length > 0}}">{{recentActivities.length}}</text>
-    </view>
-    <view class="feed-body">
-      <view class="feed-item" wx:for="{{recentActivities}}" wx:key="index">
-        <view class="feed-bullet"></view>
-        <text class="feed-time">{{item.time}}</text>
-        <text class="feed-text">{{item.text}}</text>
+  <view class="dyn-card">
+    <view class="dyn-head">
+      <text class="dyn-ttl">📋 今日动态</text>
+      <view class="dyn-badge" wx:if="{{recentActivities.length > 0}}">
+        <text>{{recentActivities.length}} 条</text>
       </view>
-      <view class="feed-empty" wx:if="{{recentActivities.length === 0}}">
-        <text>暂无动态记录</text>
+    </view>
+    <view class="dyn-body">
+      <view class="dyn-row" wx:for="{{recentActivities}}" wx:key="index">
+        <view class="dyn-dot"></view>
+        <text class="dyn-tm">{{item.time}}</text>
+        <text class="dyn-tx">{{item.text}}</text>
+      </view>
+      <view class="dyn-null" wx:if="{{recentActivities.length === 0}}">
+        <text>暂无今日动态</text>
       </view>
     </view>
   </view>
