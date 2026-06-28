@@ -1,401 +1,290 @@
-/* 首页 · 晨光封面版 */
-/* 暖杏色系 · 大圆角 · 温和信任感 */
+/* 首页 · 一屏封面版 */
+/* 暖杏色系 · 整屏无滚动 · 所有入口立等可见 */
 
 .page {
   background: #FCF8F3;
-  padding-bottom: 60rpx;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ====== 1. 氛围大图 ====== */
+.cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: calc(100vh - 0rpx);
+  padding: 0 0 40rpx;
+  box-sizing: border-box;
+}
 
-.hero {
-  margin: 28rpx 24rpx 0;
-  height: 380rpx;
+/* ====== 品牌大图 ====== */
+
+.brand-header {
   position: relative;
-  overflow: hidden;
+  height: 320rpx;
+  margin: 24rpx 24rpx 0;
   border-radius: 36rpx;
-  background: #F0DACA;
+  overflow: hidden;
+  background: linear-gradient(135deg, #F0DACA 0%, #E8C8B0 100%);
+  flex-shrink: 0;
 }
 
-.hero-image {
+.brand-bg {
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
 }
 
-.hero-content {
+.brand-overlay {
   position: absolute;
-  bottom: 28rpx;
-  left: 28rpx;
-  right: 28rpx;
-  display: flex;
-  align-items: center;
-  padding: 20rpx 24rpx;
-  border-radius: 24rpx;
-  background: rgba(255, 250, 247, 0.92);
-  backdrop-filter: blur(8rpx);
-  box-shadow: 0 4rpx 20rpx rgba(124, 85, 60, 0.08);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 24rpx 24rpx;
+  background: linear-gradient(0deg, rgba(74,58,48,0.50) 0%, transparent 100%);
 }
 
-.hero-logo {
-  width: 64rpx;
-  height: 64rpx;
-  margin-right: 16rpx;
-  flex-shrink: 0;
+.brand-box {
+  display: flex;
+  align-items: center;
+}
+
+.brand-logo {
+  width: 60rpx;
+  height: 60rpx;
   border-radius: 16rpx;
-}
-
-.hero-copy {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.hero-title {
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #4A3A30;
-  line-height: 1.2;
-}
-
-.hero-subtitle {
-  font-size: 22rpx;
-  color: #B09888;
-  margin-top: 4rpx;
-  line-height: 1.35;
-}
-
-/* ====== 最新通知条 ====== */
-
-.notice-card {
-  display: flex;
-  align-items: center;
-  background: #FFFFFF;
-  border-radius: 20rpx;
-  margin: 20rpx 24rpx 0;
-  padding: 22rpx 26rpx;
-  box-shadow: 0 4rpx 16rpx rgba(180, 140, 120, 0.06);
-}
-
-.notice-card:active {
-  opacity: 0.7;
-}
-
-.notice-dot {
-  font-size: 26rpx;
   margin-right: 14rpx;
   flex-shrink: 0;
+  background: rgba(255,255,255,0.9);
+  padding: 4rpx;
 }
 
-.notice-text-short {
+.brand-texts {
   flex: 1;
-  font-size: 26rpx;
+}
+
+.brand-name {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #FFF;
+  display: block;
+  text-shadow: 0 2rpx 8rpx rgba(74,58,48,0.20);
+}
+
+.brand-slogan {
+  font-size: 22rpx;
+  color: rgba(255,255,255,0.80);
+  margin-top: 4rpx;
+  display: block;
+  text-shadow: 0 1rpx 4rpx rgba(74,58,48,0.15);
+}
+
+/* 通知角标 — 右上角小条 */
+
+.brand-notice {
+  position: absolute;
+  top: 20rpx;
+  left: 20rpx;
+  right: 20rpx;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(6rpx);
+  border-radius: 16rpx;
+  padding: 12rpx 18rpx;
+  display: flex;
+  align-items: center;
+  max-height: 72rpx;
+  overflow: hidden;
+}
+
+.bn-dot {
+  font-size: 22rpx;
+  margin-right: 10rpx;
+  flex-shrink: 0;
+}
+
+.bn-text {
+  font-size: 22rpx;
   color: #4A3A30;
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.notice-more {
-  font-size: 24rpx;
-  color: #D4A080;
-  flex-shrink: 0;
-  margin-left: 12rpx;
-  font-weight: 500;
-}
+/* ====== 家长入口 ====== */
 
-/* ====== 家长行动区 ====== */
-
-.contact-section {
-  padding: 24rpx 24rpx 0;
-}
-
-.contact-card {
-  background: #FFFFFF;
-  border-radius: 28rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 24rpx rgba(180, 140, 120, 0.06);
-}
-
-.contact-row {
+.parent-entry {
   display: flex;
   align-items: center;
-  padding: 28rpx 30rpx;
+  background: #FFFFFF;
+  margin: 24rpx 24rpx 0;
+  border-radius: 28rpx;
+  padding: 30rpx 28rpx;
+  box-shadow: 0 4rpx 24rpx rgba(180, 140, 120, 0.08);
+  flex-shrink: 0;
 }
 
-.contact-row:active {
+.parent-entry:active {
   background: #FCF6F0;
 }
 
-.contact-icon-big {
-  width: 68rpx;
-  height: 68rpx;
-  border-radius: 20rpx;
+.pe-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 22rpx;
   background: #F5EBE0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 34rpx;
+  font-size: 40rpx;
   margin-right: 20rpx;
   flex-shrink: 0;
 }
 
-.contact-info {
+.pe-texts {
   flex: 1;
   min-width: 0;
 }
 
-.contact-label {
-  font-size: 28rpx;
+.pe-title {
+  font-size: 30rpx;
   font-weight: 700;
   color: #4A3A30;
   display: block;
 }
 
-.contact-value {
+.pe-desc {
   font-size: 24rpx;
-  color: #B09888;
-  margin-top: 4rpx;
-  display: block;
-}
-
-.contact-desc {
-  font-size: 22rpx;
   color: #C0B0A0;
   margin-top: 4rpx;
   display: block;
 }
 
-.contact-btn {
-  font-size: 23rpx;
-  color: #D4A080;
-  font-weight: 600;
-  padding: 8rpx 24rpx;
-  border: 2rpx solid #F0DACA;
-  border-radius: 999rpx;
-  flex-shrink: 0;
-}
-
-.call-btn {
-  color: #7AB090;
-  border-color: #D5E8DE;
-}
-
-.contact-arrow {
-  font-size: 36rpx;
+.pe-arrow {
+  font-size: 40rpx;
   color: #D0C8B8;
   flex-shrink: 0;
+  margin-left: 10rpx;
 }
 
-.contact-divider {
-  height: 2rpx;
-  background: #F5EDE5;
-  margin: 0 30rpx;
-}
+/* ====== 联系方式 ====== */
 
-/* ====== 分区标题 ====== */
-
-.section {
-  padding: 28rpx 24rpx 0;
-}
-
-.section-title {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #4A3A30;
-  margin-bottom: 16rpx;
-  display: block;
-}
-
-/* ====== 精彩瞬间轮播 ====== */
-
-.photo-swiper {
-  height: 340rpx;
-  border-radius: 28rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 20rpx rgba(180, 140, 120, 0.06);
-}
-
-.photo-item {
-  width: 100%;
-  height: 100%;
+.contact-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background: #F5EBE0;
-}
-
-.photo-img {
-  width: 100%;
-  display: block;
-  min-height: 160rpx;
-}
-
-.photo-placeholder {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  background-color: #F5EBE0;
-  border-radius: 28rpx;
-  justify-content: center;
-  align-items: center;
-}
-
-.placeholder-text {
-  font-size: 24rpx;
-  color: #C0A890;
-}
-
-.photo-swiper .wx-swiper-dots {
-  margin-bottom: 8rpx;
-}
-
-.photo-swiper .wx-swiper-dot {
-  width: 12rpx;
-  height: 12rpx;
-  border-radius: 999rpx;
-  margin: 0 6rpx;
-  background: rgba(255,255,255,0.5);
-}
-
-.photo-swiper .wx-swiper-dot-active {
-  width: 24rpx;
+  margin: 20rpx 24rpx 0;
   background: #FFFFFF;
-}
-
-/* ====== 透明收费 ====== */
-
-.fee-card {
-  background: #FFFFFF;
-  border-radius: 26rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 20rpx rgba(180, 140, 120, 0.06);
-}
-
-.fee-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 24rpx 28rpx;
-  border-bottom: 2rpx solid #F5EDE5;
-}
-
-.fee-item:last-child {
-  border-bottom: none;
-}
-
-.fee-left {
-  flex: 1;
-  margin-right: 20rpx;
-}
-
-.fee-name {
-  font-size: 28rpx;
-  color: #4A3A30;
-  font-weight: 600;
-  display: block;
-}
-
-.fee-desc {
-  font-size: 22rpx;
-  color: #C0B0A0;
-  margin-top: 4rpx;
-  display: block;
-}
-
-.fee-amount {
-  font-size: 34rpx;
-  color: #D4A080;
-  font-weight: 700;
-  white-space: nowrap;
+  border-radius: 20rpx;
+  padding: 0;
+  box-shadow: 0 4rpx 16rpx rgba(180, 140, 120, 0.04);
   flex-shrink: 0;
+  overflow: hidden;
 }
 
-.fee-unit {
+.ct-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22rpx 16rpx;
+}
+
+.ct-item:active {
+  background: #FCF6F0;
+}
+
+.ct-ico {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+
+.ct-lbl {
   font-size: 22rpx;
   color: #C0B0A0;
-  font-weight: normal;
+  margin-right: 6rpx;
 }
 
-.fee-empty {
-  padding: 40rpx;
-  text-align: center;
-}
-
-.fee-empty-text {
+.ct-val {
   font-size: 24rpx;
-  color: #C8B8A8;
-}
-
-/* ====== 关于托班 ====== */
-
-.about-card {
-  background: #FFFFFF;
-  border-radius: 26rpx;
-  padding: 28rpx;
-  box-shadow: 0 4rpx 20rpx rgba(180, 140, 120, 0.06);
-}
-
-.about-card-title {
-  font-size: 30rpx;
-  font-weight: 700;
   color: #4A3A30;
-  display: block;
-  margin-bottom: 12rpx;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 40%;
 }
 
-.about-card-desc {
-  font-size: 26rpx;
-  color: #B09888;
-  line-height: 1.7;
-  display: block;
+.ct-divider {
+  width: 2rpx;
+  height: 40rpx;
+  background: #F0E8E0;
+  flex-shrink: 0;
 }
 
 /* ====== 老师入口 ====== */
 
-.teacher-bottom {
+.teacher-entry {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40rpx 24rpx 0;
+  padding: 28rpx 0 10rpx;
+  flex-shrink: 0;
+  margin-top: 12rpx;
 }
 
-.teacher-bottom:active {
+.teacher-entry:active {
   opacity: 0.6;
 }
 
-.teacher-bottom-icon {
+.te-ico {
   font-size: 22rpx;
   margin-right: 8rpx;
 }
 
-.teacher-bottom-text {
+.te-txt {
   font-size: 24rpx;
   color: #C8B8A8;
 }
 
-.teacher-bottom-arrow {
-  font-size: 22rpx;
-  color: #D0C8B8;
-  margin-left: 4rpx;
+/* ====== 加载与错误态 ====== */
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: #C8B8A8;
+  font-size: 28rpx;
 }
 
-/* ====== 底部 ====== */
-
-.footer {
-  text-align: center;
-  padding: 40rpx 30rpx 20rpx;
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 60rpx;
 }
 
-.footer-text {
-  font-size: 22rpx;
-  color: #D0C8B8;
+.err-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
 }
 
-/* ====== 通知详情弹窗 ====== */
+.err-txt {
+  font-size: 32rpx;
+  color: #B09888;
+  font-weight: 600;
+}
+
+.err-desc {
+  font-size: 26rpx;
+  color: #C8B8A8;
+  margin-top: 12rpx;
+}
+
+/* ====== 通知弹窗 ====== */
 
 .notice-modal {
   background: #FFF;
@@ -448,7 +337,6 @@
   line-height: 1.8;
   white-space: pre-wrap;
   word-break: break-all;
-  overflow-wrap: break-word;
   display: block;
   width: 100%;
   box-sizing: border-box;
@@ -466,45 +354,6 @@
   font-weight: 600;
   padding: 8rpx 48rpx;
 }
-
-/* ====== 加载与错误态 ====== */
-
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-  color: #C8B8A8;
-  font-size: 28rpx;
-}
-
-.error-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  padding: 60rpx;
-}
-
-.error-icon {
-  font-size: 80rpx;
-  margin-bottom: 20rpx;
-}
-
-.error-text {
-  font-size: 32rpx;
-  color: #B09888;
-  font-weight: 600;
-}
-
-.error-desc {
-  font-size: 26rpx;
-  color: #C8B8A8;
-  margin-top: 12rpx;
-}
-
-/* ====== 遮罩 ====== */
 
 .modal-overlay {
   position: fixed;
