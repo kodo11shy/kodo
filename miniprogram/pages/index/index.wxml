@@ -1,85 +1,112 @@
-<!-- 首页 · 封面设计版 -->
+<!-- 首页 · 封面设计版（保留原结构） -->
 <view class="page">
 
-  <!-- 加载 -->
-  <view class="loading-container" wx:if="{{loading}}"><text>加载中...</text></view>
+  <!-- 加载态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
 
-  <!-- 错误 -->
+  <!-- 加载失败态 -->
   <view class="error-container" wx:elif="{{loadError}}">
-    <text class="err-icon">😵</text>
-    <text class="err-txt">加载失败</text>
-    <text class="err-desc">请检查网络后重试</text>
+    <text class="error-icon">😵</text>
+    <text class="error-text">加载失败</text>
+    <text class="error-desc">请检查网络后重试</text>
     <button class="btn-primary" bindtap="loadHomepage" style="width:auto;padding:20rpx 60rpx;margin-top:30rpx;">重新加载</button>
   </view>
 
   <!-- ====== 主内容 ====== -->
-  <view class="cover-wrap" wx:else>
+  <block wx:else>
 
-    <!-- ====== 1. 品牌区域 ====== -->
-    <view class="brand-zone">
-      <image class="brand-bg" src="/images/banner-home-v2.png" mode="aspectFill"></image>
-      <view class="brand-fade"></view>
-      <view class="brand-content">
-        <image class="brand-logo" src="/images/logo-small-v2.png" mode="aspectFit"></image>
-        <text class="brand-name">{{schoolName}}</text>
-        <text class="brand-slogan">{{welcomeMessage}}</text>
-      </view>
-      <!-- 通知浮标 -->
-      <view class="brand-notice" wx:if="{{latestNotice}}" bindtap="tapNotice" data-id="{{latestNotice.id}}">
-        <text>📢 {{latestNotice.title}}</text>
+  <!-- ====== 1. 氛围大图 + 机构名 ====== -->
+  <view class="hero">
+    <image class="hero-image" src="/images/banner-home-v2.png" mode="aspectFill"></image>
+    <view class="hero-content">
+      <image class="hero-logo" src="/images/logo-small-v2.png" mode="aspectFit"></image>
+      <view class="hero-copy">
+        <text class="hero-title">{{schoolName}}</text>
+        <text class="hero-subtitle">{{welcomeMessage}}</text>
       </view>
     </view>
-
-    <!-- ====== 2. 机构简介 ====== -->
-    <view class="intro-line">
-      <text>课后陪伴 · 作业辅导 · 餐食照护 · 成长记录</text>
-    </view>
-
-    <!-- ====== 3. 精彩瞬间 ====== -->
-    <view class="moments-wrap" wx:if="{{featuredPhotos.length > 0}}">
-      <view class="moments-head">
-        <text class="moments-title">📸 精彩瞬间</text>
-      </view>
-      <scroll-view class="moments-scroll" scroll-x>
-        <image class="moments-img" wx:for="{{featuredPhotos}}" wx:key="id" src="{{item.url}}" mode="aspectFill" bindtap="previewPhoto" data-url="{{item.url}}"></image>
-      </scroll-view>
-    </view>
-
-    <!-- ====== 4. 底部操作区 ====== -->
-    <view class="bottom-zone">
-      <!-- 联系方式 -->
-      <view class="contact-bar">
-        <view class="ct-item" wx:if="{{contactWechat}}" bindtap="copyWechat">
-          <text class="ct-ico">💬</text>
-          <text class="ct-val">{{contactWechat}}</text>
-          <text class="ct-action">复制</text>
-        </view>
-        <view class="ct-divider" wx:if="{{contactWechat && contactPhone}}"></view>
-        <view class="ct-item" wx:if="{{contactPhone}}" bindtap="callPhone">
-          <text class="ct-ico">📞</text>
-          <text class="ct-val">{{contactPhone}}</text>
-          <text class="ct-action ct-call">拨打</text>
-        </view>
-      </view>
-
-      <!-- 家长入口 -->
-      <view class="parent-btn" bindtap="goParentLogin">
-        <view class="pb-icon">👨‍👩‍👧</view>
-        <view class="pb-texts">
-          <text class="pb-title">家长查看动态</text>
-          <text class="pb-desc">了解孩子的在班情况</text>
-        </view>
-        <view class="pb-arrow">›</view>
-      </view>
-
-      <!-- 老师入口 -->
-      <view class="teacher-line" bindtap="goTeacherLogin">
-        <text class="tl-ico">👩‍🏫</text>
-        <text class="tl-txt">老师登录</text>
-      </view>
-    </view>
-
   </view>
+
+  <!-- ====== 最新通知 ====== -->
+  <view class="section" style="padding-top: 12rpx;">
+    <view class="notice-card" wx:if="{{latestNotice}}" bindtap="tapNotice" data-id="{{latestNotice.id}}">
+      <text class="notice-dot">📢</text>
+      <text class="notice-text-short">最新通知：{{latestNotice.title}}</text>
+      <text class="notice-more">查看</text>
+    </view>
+  </view>
+
+  <!-- ====== 2. 联系方式 + 家长入口 ====== -->
+  <view class="contact-section">
+    <view class="contact-card">
+      <view class="contact-row" wx:if="{{contactWechat}}" bindtap="copyWechat">
+        <text class="contact-icon-big">💬</text>
+        <view class="contact-info">
+          <text class="contact-label">微信号</text>
+          <text class="contact-value">{{contactWechat}}</text>
+        </view>
+        <text class="contact-action">复制</text>
+      </view>
+      <view class="contact-divider" wx:if="{{contactWechat && contactPhone}}"></view>
+      <view class="contact-row" wx:if="{{contactPhone}}" bindtap="callPhone">
+        <text class="contact-icon-big">📞</text>
+        <view class="contact-info">
+          <text class="contact-label">联系电话</text>
+          <text class="contact-value">{{contactPhone}}</text>
+        </view>
+        <text class="contact-action call-act">拨打</text>
+      </view>
+      <view class="contact-divider" wx:if="{{contactWechat || contactPhone}}"></view>
+      <view class="contact-row parent-row" bindtap="goParentLogin">
+        <text class="contact-icon-big">👨‍👩‍👧</text>
+        <view class="contact-info">
+          <text class="contact-label">家长入口</text>
+          <text class="contact-desc">查看孩子的成长动态</text>
+        </view>
+        <text class="contact-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ====== 3. 精彩瞬间 ====== -->
+  <view class="section">
+    <text class="section-title">📸 精彩瞬间</text>
+    <swiper class="photo-swiper" autoplay interval="3000" duration="500" circular indicator-dots="{{featuredPhotos.length > 1}}">
+      <swiper-item wx:for="{{featuredPhotos}}" wx:key="id">
+        <view class="photo-item" bindtap="previewPhoto" data-url="{{item.url}}">
+          <image class="photo-img" src="{{item.url}}" mode="widthFix"></image>
+        </view>
+      </swiper-item>
+      <swiper-item wx:if="{{featuredPhotos.length === 0}}">
+        <view class="photo-placeholder">
+          <text class="placeholder-text">暂无照片</text>
+        </view>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- ====== 4. 关于托班 ====== -->
+  <view class="section">
+    <view class="about-card">
+      <text class="about-card-title">🏫 关于 {{schoolName}}</text>
+      <text class="about-card-desc">{{schoolName}}致力于为孩子提供温暖、专业的课后成长陪伴。
+每日接送、作业辅导、餐食照护、成长记录，让家长安心工作。</text>
+    </view>
+  </view>
+
+  <!-- ====== 5. 老师入口 ====== -->
+  <view class="teacher-bottom" bindtap="goTeacherLogin">
+    <text class="teacher-bottom-text">👩‍🏫 老师登录 ›</text>
+  </view>
+
+  <!-- ====== 6. 底部 ====== -->
+  <view class="footer">
+    <text class="footer-text">{{schoolName}} © 2026</text>
+  </view>
+
+  </block>
 
   <!-- 通知弹窗 -->
   <view class="modal-overlay" wx:if="{{showNoticeModal}}" bindtap="closeNotice">
