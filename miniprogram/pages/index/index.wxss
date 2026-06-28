@@ -1,347 +1,252 @@
-/* 首页 · 封面设计版 */
-/* 保留原结构 · 暖杏色系 · 层次与细节 */
+/* 首页 · 一屏封面 — 通知浮在图上 · 紧凑布局 */
 
 .page {
   background: #FCF8F3;
-  padding-bottom: 40rpx;
   min-height: 100vh;
 }
 
-/* ====== 1. 品牌大图 ====== */
-
-.hero {
-  margin: 24rpx 24rpx 0;
-  height: 380rpx;
-  border-radius: 36rpx;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 8rpx 32rpx rgba(180, 140, 120, 0.14);
+.cover {
+  display: flex;
+  flex-direction: column;
+  padding: 0 24rpx 20rpx;
 }
 
-.hero-image {
+/* ====== 1. 品牌大图（带通知浮标） ====== */
+
+.hero {
+  position: relative;
+  height: 260rpx;
+  border-radius: 28rpx;
+  overflow: hidden;
+  box-shadow: 0 6rpx 24rpx rgba(180, 140, 120, 0.12);
+  flex-shrink: 0;
+  margin-top: 20rpx;
+}
+
+.hero-img {
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
 }
 
-.hero-content {
+.hero-shade {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 40rpx 28rpx 28rpx;
+  height: 65%;
+  background: linear-gradient(0deg, rgba(74,58,48,0.55) 0%, transparent 100%);
+}
+
+/* 通知浮标 */
+.hero-notice {
+  position: absolute;
+  top: 14rpx;
+  left: 14rpx;
+  right: 14rpx;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(6rpx);
+  border-radius: 14rpx;
+  padding: 12rpx 16rpx;
   display: flex;
   align-items: center;
-  background: linear-gradient(0deg, rgba(74,58,48,0.60) 0%, rgba(74,58,48,0.10) 70%, transparent 100%);
+  overflow: hidden;
 }
 
-.hero-logo {
-  width: 68rpx;
-  height: 68rpx;
-  border-radius: 18rpx;
-  margin-right: 16rpx;
-  flex-shrink: 0;
-  background: #FFF;
-  padding: 4rpx;
-  box-shadow: 0 4rpx 12rpx rgba(74,58,48,0.10);
-}
-
-.hero-copy {
-  flex: 1;
-}
-
-.hero-title {
-  font-size: 38rpx;
-  font-weight: 800;
-  color: #FFFFFF;
-  display: block;
-  letter-spacing: 2rpx;
-  text-shadow: 0 2rpx 8rpx rgba(74,58,48,0.20);
-}
-
-.hero-subtitle {
-  font-size: 24rpx;
-  color: rgba(255,255,255,0.80);
-  margin-top: 6rpx;
-  display: block;
-  text-shadow: 0 1rpx 4rpx rgba(74,58,48,0.15);
-}
-
-/* ====== 通知条 ====== */
-
-.notice-card {
-  display: flex;
-  align-items: center;
-  background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 22rpx 26rpx;
-  box-shadow: 0 4rpx 16rpx rgba(180, 140, 120, 0.04);
-  border-left: 8rpx solid #E8C8A0;
-  transition: box-shadow 0.2s;
-}
-
-.notice-card:active {
-  box-shadow: 0 2rpx 8rpx rgba(180, 140, 120, 0.06);
-}
-
-.notice-dot {
-  font-size: 26rpx;
-  margin-right: 14rpx;
+.hn-dot {
+  font-size: 22rpx;
+  margin-right: 10rpx;
   flex-shrink: 0;
 }
 
-.notice-text-short {
-  flex: 1;
-  font-size: 26rpx;
+.hn-text {
+  font-size: 22rpx;
   color: #4A3A30;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
 }
 
-.notice-more {
-  font-size: 23rpx;
-  color: #D4A080;
-  flex-shrink: 0;
-  margin-left: 12rpx;
-  font-weight: 500;
-  padding: 4rpx 16rpx;
-  border: 2rpx solid #F0DACA;
-  border-radius: 999rpx;
-  line-height: 1.5;
-}
-
-/* ====== 联系方式 + 家长入口 ====== */
-
-.contact-section {
-  padding: 20rpx 24rpx 0;
-}
-
-.contact-card {
-  background: #FFFFFF;
-  border-radius: 28rpx;
-  overflow: hidden;
-  box-shadow: 0 6rpx 24rpx rgba(180, 140, 120, 0.06);
-}
-
-.contact-row {
+/* 品牌信息 */
+.hero-brand {
+  position: absolute;
+  bottom: 18rpx;
+  left: 20rpx;
   display: flex;
   align-items: center;
-  padding: 28rpx 28rpx;
-  transition: background 0.15s;
 }
 
-.contact-row:active {
+.hb-logo {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 14rpx;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+  background: #FFF;
+  padding: 3rpx;
+}
+
+.hb-texts {
+  flex: 1;
+}
+
+.hb-name {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #FFF;
+  display: block;
+  text-shadow: 0 2rpx 8rpx rgba(74,58,48,0.20);
+  letter-spacing: 1rpx;
+}
+
+.hb-slogan {
+  font-size: 20rpx;
+  color: rgba(255,255,255,0.75);
+  margin-top: 2rpx;
+  display: block;
+}
+
+/* ====== 2. 快捷栏 ====== */
+
+.quick-bar {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 0;
+  box-shadow: 0 3rpx 14rpx rgba(180, 140, 120, 0.04);
+  flex-shrink: 0;
+  margin-top: 16rpx;
+  overflow: hidden;
+}
+
+.qb-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22rpx 8rpx;
+}
+
+.qb-item:active {
   background: #FCF6F0;
 }
 
-.parent-row {
-  background: linear-gradient(135deg, #FAF0E8 0%, #FCF6EE 100%);
+.qb-ico {
+  font-size: 26rpx;
+  margin-right: 8rpx;
 }
 
-.parent-row:active {
-  background: #F5EBE0;
-}
-
-.contact-icon-big {
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 22rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 36rpx;
-  margin-right: 20rpx;
-  flex-shrink: 0;
-}
-
-/* 每个图标不同底色 */
-.contact-row:nth-child(1) .contact-icon-big { background: #F0EBE0; }
-.contact-row:nth-child(2) .contact-icon-big { background: #E5EDE5; }
-.parent-row .contact-icon-big { background: #F0DACA; }
-
-.contact-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.contact-label {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #4A3A30;
-  display: block;
-}
-
-.contact-value {
+.qb-txt {
   font-size: 24rpx;
-  color: #B09888;
-  margin-top: 4rpx;
-  display: block;
+  color: #5A4A40;
+  font-weight: 500;
 }
 
-.contact-desc {
-  font-size: 22rpx;
-  color: #C0B0A0;
-  margin-top: 4rpx;
-  display: block;
-}
-
-.contact-action {
-  font-size: 22rpx;
+.qb-arr {
+  font-size: 32rpx;
   color: #D4A080;
+  margin-left: 6rpx;
+}
+
+.qb-parent .qb-txt {
+  color: #C08860;
   font-weight: 600;
-  padding: 8rpx 22rpx;
-  border: 2rpx solid #F0DACA;
-  border-radius: 999rpx;
+}
+
+.qb-line {
+  width: 2rpx;
+  height: 36rpx;
+  background: #F0E8E0;
   flex-shrink: 0;
-  line-height: 1.4;
 }
 
-.call-act {
-  color: #7AB090;
-  border-color: #D5E8DE;
-}
+/* ====== 3. 精彩瞬间（紧凑轮播） ====== */
 
-.contact-arrow {
-  font-size: 40rpx;
-  color: #D4A080;
+.moments {
   flex-shrink: 0;
-  margin-left: 10rpx;
+  margin-top: 14rpx;
 }
 
-.contact-divider {
-  height: 2rpx;
-  background: #F0EAE2;
-  margin: 0 28rpx;
-}
-
-/* ====== 分区标题 ====== */
-
-.section {
-  padding: 24rpx 24rpx 0;
-}
-
-.section-title {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #4A3A30;
-  margin-bottom: 16rpx;
-  display: block;
-}
-
-/* ====== 精彩瞬间 ====== */
-
-.photo-swiper {
-  height: 340rpx;
-  border-radius: 28rpx;
+.moments-swiper {
+  height: 170rpx;
+  border-radius: 22rpx;
   overflow: hidden;
-  box-shadow: 0 6rpx 24rpx rgba(180, 140, 120, 0.06);
+  box-shadow: 0 4rpx 18rpx rgba(180, 140, 120, 0.06);
 }
 
-.photo-item {
+.mp-item {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #F5EBE0;
+}
+
+.mp-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.mp-empty {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   background: #F5EBE0;
-}
-
-.photo-img {
-  width: 100%;
-  display: block;
-  min-height: 160rpx;
-}
-
-.photo-placeholder {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  background: #F5EBE0;
-  border-radius: 28rpx;
-  justify-content: center;
-  align-items: center;
-}
-
-.placeholder-text {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #C0A890;
 }
 
-.photo-swiper .wx-swiper-dots {
-  margin-bottom: 10rpx;
+.moments-swiper .wx-swiper-dots {
+  margin-bottom: 6rpx;
 }
 
-.photo-swiper .wx-swiper-dot {
-  width: 14rpx;
-  height: 6rpx;
+.moments-swiper .wx-swiper-dot {
+  width: 12rpx;
+  height: 5rpx;
   border-radius: 3rpx;
-  margin: 0 4rpx;
+  margin: 0 3rpx;
   background: rgba(255,255,255,0.40);
-  transition: width 0.3s;
 }
 
-.photo-swiper .wx-swiper-dot-active {
-  width: 28rpx;
+.moments-swiper .wx-swiper-dot-active {
+  width: 22rpx;
   background: #FFFFFF;
 }
 
-/* ====== 关于托班 ====== */
+/* ====== 4. 关于（一句话） ====== */
 
-.about-card {
+.about-line {
+  flex-shrink: 0;
   background: #FFFFFF;
-  border-radius: 28rpx;
-  padding: 30rpx 28rpx;
-  box-shadow: 0 4rpx 20rpx rgba(180, 140, 120, 0.04);
-  border-top: 4rpx solid #E8C8A0;
-}
-
-.about-card-title {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #4A3A30;
-  display: block;
-  margin-bottom: 14rpx;
-}
-
-.about-card-desc {
-  font-size: 26rpx;
+  border-radius: 16rpx;
+  padding: 16rpx 20rpx;
+  margin-top: 12rpx;
+  text-align: center;
+  font-size: 22rpx;
   color: #B09888;
-  line-height: 1.8;
-  display: block;
+  letter-spacing: 2rpx;
+  box-shadow: 0 2rpx 10rpx rgba(180, 140, 120, 0.03);
 }
 
-/* ====== 老师入口 ====== */
+/* ====== 5. 老师入口 ====== */
 
-.teacher-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 36rpx 24rpx 0;
-}
-
-.teacher-bottom:active {
-  opacity: 0.6;
-}
-
-.teacher-bottom-text {
-  font-size: 24rpx;
+.teacher-link {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 20rpx 0 12rpx;
+  font-size: 22rpx;
   color: #C8B8A8;
   letter-spacing: 2rpx;
 }
 
-/* ====== 底部 ====== */
-
-.footer {
-  text-align: center;
-  padding: 32rpx 30rpx 10rpx;
-}
-
-.footer-text {
-  font-size: 20rpx;
-  color: #D0C8B8;
+.teacher-link:active {
+  opacity: 0.6;
 }
 
 /* ====== 加载/错误 ====== */
@@ -350,7 +255,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 60vh;
+  min-height: 100vh;
   color: #C8B8A8;
   font-size: 28rpx;
 }
@@ -360,7 +265,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
+  min-height: 100vh;
   padding: 60rpx;
 }
 
