@@ -156,6 +156,82 @@ Codex / Claude Code 每次开始本项目工作前，优先读取本文件。
 - 本轮不改前端代码，不需要重新上传。
 - 若后续回退或重做首页，需要重新上传体验版。
 
+### 2026-06-29-002：清理遗留未提交改动并保留必要图片性能修复
+
+完成内容：
+- 对上一轮遗留未提交改动做对账，先将当前工作区重置到远程最新 `origin/main`：`9298ec8 docs: add June 29 frontend design review`。
+- 删除确认无业务价值的临时检查目录：
+  - `backend/uploads_inspect_thumb/`
+  - `backend/uploads_inspect_thumb2/`
+  - `backend/uploads_inspect_tmp/`
+- 没有删除真实上传目录、数据库、业务页面、路由、模型或最新联系单。
+- 没有把旧首页结构、旧全局样式、旧 6 月 25 日联系单差异带回当前版本。
+- 保留并重新落到远程最新代码上的必要小修：
+  - 后端上传图片时生成缩略图前处理 EXIF 方向，避免手机竖拍照片方向异常。
+  - 后端上传图片时记录原图宽高。
+  - 家长照片墙接口增加 `page/page_size/total`，避免一次性加载 100 张。
+  - 小程序照片列表、作业照片、餐食照片、首页精彩瞬间等列表位置优先显示缩略图。
+  - 点击预览、长按保存时使用原图 URL，避免打开低清缩略图。
+  - 相关图片组件补充 `lazy-load`，降低首屏和列表渲染压力。
+
+清理判断：
+- 必须保留：
+  - 图片缩略图生成更稳的后端处理。
+  - 前端“缩略图展示、原图预览/保存”的体验修复。
+  - 家长照片墙分页加载。
+- 已丢弃：
+  - 旧工作区里相对于远程 main 的旧首页结构差异。
+  - 旧全局视觉样式差异。
+  - 旧联系单过期差异。
+  - 上传性能检查产生的临时目录。
+- 需要后续单独处理：
+  - 首页/封面设计问题仍按 `2026-06-29-001` 的复盘流程处理，本轮没有继续改首页信息架构。
+
+修改文件：
+- `backend/app/api/routes/photos.py`
+- `backend/app/api/routes/parent.py`
+- `miniprogram/pages/index/index.js`
+- `miniprogram/pages/index/index.wxml`
+- `miniprogram/pages/parent/dashboard/dashboard.js`
+- `miniprogram/pages/parent/dashboard/dashboard.wxml`
+- `miniprogram/pages/parent/homework/homework.js`
+- `miniprogram/pages/parent/homework/homework.wxml`
+- `miniprogram/pages/parent/photos/photos.js`
+- `miniprogram/pages/teacher/homework/detail/homework-detail.js`
+- `miniprogram/pages/teacher/homework/detail/homework-detail.wxml`
+- `miniprogram/pages/teacher/homework/list/homework-list.js`
+- `miniprogram/pages/teacher/homework/list/homework-list.wxml`
+- `miniprogram/pages/teacher/meal/meal.js`
+- `miniprogram/pages/teacher/meal/meal.wxml`
+- `docs/协作记录/Codex-Claude协作联系单-2026-06-29-01.md`
+
+验证结果：
+- `node --check` 已检查相关小程序 JS：通过。
+- `python -m py_compile backend/app/api/routes/photos.py backend/app/api/routes/parent.py`：通过。
+- WXML 高风险函数表达式扫描：未命中。
+- `git diff --check`：通过，仅有 CRLF 提示。
+
+commit hash：
+- 代码提交：`294d437 fix: clean up legacy image preview optimizations`
+- 联系单记录：本条记录提交后生成。
+
+当前任务状态：
+- 遗留未提交代码已清理完成。
+- 有价值改动已提交为代码 commit。
+- 临时目录已删除。
+
+需要 Claude Code 处理：
+- 暂无。首页/封面仍按 2026-06-29-001 先复盘，不要直接改。
+
+需要用户确认：
+- 体验版重新上传后，请真机验证照片列表加载速度、点击预览是否为清晰原图、家长照片墙触底加载是否正常。
+
+是否需要 Hermes：
+- 需要。云端后端需拉取最新 main 并重启，才能生效后端缩略图处理和家长照片墙分页接口。
+
+是否需要重新上传体验版：
+- 需要。本轮包含小程序前端 JS/WXML 改动，体验版需要重新上传后老师/家长手机才能验证。
+
 ## 5. 给 Claude Code 的复盘提示词
 
 请先不要改代码。请读取：
