@@ -115,7 +115,9 @@ Page({
       return {
         ...item,
         file_path: filePath,
-        url: api.imageUrl(filePath)
+        thumbnail: item.thumbnail || '',
+        url: api.imageUrl(item.thumbnail || filePath),
+        previewUrl: api.imageUrl(filePath || item.thumbnail)
       }
     })
   },
@@ -263,7 +265,7 @@ Page({
   previewPhotos(e) {
     const list = e.currentTarget.dataset.list || []
     const index = e.currentTarget.dataset.index || 0
-    const urls = list.map(item => item.url || api.imageUrl(item.file_path || item))
+    const urls = list.map(item => item.previewUrl || item.url || api.imageUrl(item.file_path || item))
     wx.previewImage({ urls, current: urls[index] })
   },
 

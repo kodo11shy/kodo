@@ -24,8 +24,8 @@
   </view>
 
   <view class="today-card" wx:if="{{todayRecorded && todayMeal}}">
-    <view class="today-cover" wx:if="{{todayMeal.coverUrl}}" bindtap="previewMealPhoto" data-url="{{todayMeal.coverUrl}}">
-      <image src="{{todayMeal.coverUrl}}" mode="aspectFill"></image>
+    <view class="today-cover" wx:if="{{todayMeal.coverUrl}}" bindtap="previewMealPhoto" data-url="{{todayMeal.coverPreviewUrl}}">
+      <image src="{{todayMeal.coverUrl}}" mode="aspectFill" lazy-load></image>
     </view>
     <view class="today-body">
       <view class="section-row">
@@ -56,7 +56,7 @@
 
   <view class="meal-list" wx:if="{{!loading && records.length > 0}}">
     <view class="meal-card" wx:for="{{records}}" wx:key="id" data-id="{{item.id}}" bindtap="openEditForm">
-      <image class="meal-cover" wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" />
+      <image class="meal-cover" wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" lazy-load />
       <view class="meal-cover placeholder" wx:else>
         <text>餐食</text>
       </view>
@@ -131,7 +131,7 @@
           </view>
           <view class="photo-library" wx:if="{{photoRows.length > 0}}">
             <view class="library-photo {{item.selected ? 'selected' : ''}}" wx:for="{{photoRows}}" wx:key="id" data-id="{{item.id}}" bindtap="toggleLibraryPhoto">
-              <image src="{{item.url}}" mode="aspectFill" />
+              <image src="{{item.url}}" mode="aspectFill" lazy-load />
               <text class="selected-mark" wx:if="{{item.selected}}">已选</text>
               <text class="cover-mark" wx:if="{{item.isCover}}">封面</text>
               <text class="cover-btn" wx:if="{{item.selected && !item.isCover}}" catchtap="setCoverPhoto" data-id="{{item.id}}">设封面</text>

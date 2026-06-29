@@ -74,7 +74,8 @@ Page({
   _buildMealRow(item) {
     const photos = (item.photos || []).map(photo => ({
       ...photo,
-      url: api.imageUrl(photo.file_path || photo.thumbnail)
+      url: api.imageUrl(photo.thumbnail || photo.file_path),
+      previewUrl: api.imageUrl(photo.file_path || photo.thumbnail)
     })).filter(photo => photo.url)
     const cover = item.cover_photo || photos[0] || null
     return {
@@ -83,7 +84,8 @@ Page({
       menuText: item.menu_text || item.menu || '未填写菜单',
       remarkText: item.overall_remark || '',
       photos,
-      coverUrl: cover ? api.imageUrl(cover.file_path || cover.thumbnail) : '',
+      coverUrl: cover ? api.imageUrl(cover.thumbnail || cover.file_path || cover.url) : '',
+      coverPreviewUrl: cover ? api.imageUrl(cover.file_path || cover.thumbnail || cover.previewUrl || cover.url) : '',
       photoCount: item.photo_count != null ? item.photo_count : photos.length,
       studentCount: item.student_count != null ? item.student_count : (item.students || []).length,
       studentNames: (item.students || []).map(student => student.name).join('、'),
@@ -163,7 +165,8 @@ Page({
         }))
         const photoRows = (photosData.photos || []).map(photo => ({
           id: photo.id,
-          url: api.imageUrl(photo.file_path || photo.thumbnail),
+          url: api.imageUrl(photo.thumbnail || photo.file_path),
+          previewUrl: api.imageUrl(photo.file_path || photo.thumbnail),
           remark: photo.remark || '',
           selected: this.data.selectedPhotoIds.includes(photo.id),
           isCover: this.data.coverPhotoId === photo.id

@@ -92,14 +92,16 @@ Page({
       const filePath = item.file_path || item
       return {
         file_path: filePath,
-        url: api.imageUrl(filePath)
+        thumbnail: item.thumbnail || '',
+        url: api.imageUrl(item.thumbnail || filePath),
+        previewUrl: api.imageUrl(filePath || item.thumbnail)
       }
     })
   },
 
   previewPhotos(e) {
     const list = e.currentTarget.dataset.list || []
-    const urls = list.map(item => item.url || api.imageUrl(item.file_path || item))
+    const urls = list.map(item => item.previewUrl || item.url || api.imageUrl(item.file_path || item))
     if (urls.length > 0) {
       wx.previewImage({ urls, current: urls[0] })
     }

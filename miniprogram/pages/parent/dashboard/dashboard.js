@@ -102,7 +102,8 @@ Page({
     const attendance = data.attendance_today || {}
     const latestPhotos = (data.latest_photos || []).map((photo) => ({
       id: photo.id,
-      url: api.imageUrl(photo.file_path || photo.thumbnail)
+      url: api.imageUrl(photo.thumbnail || photo.file_path),
+      previewUrl: api.imageUrl(photo.file_path || photo.thumbnail)
     })).filter(item => item.url)
 
     const homework = data.homework_today
@@ -176,7 +177,11 @@ Page({
             for (const ph of p) {
               if (!seen.has(ph.id) && photos.length < 9) {
                 seen.add(ph.id)
-                photos.push({ id: ph.id, url: api.imageUrl(ph.file_path || ph.url) })
+                photos.push({
+                  id: ph.id,
+                  url: api.imageUrl(ph.thumbnail || ph.file_path || ph.url),
+                  previewUrl: api.imageUrl(ph.file_path || ph.url || ph.thumbnail)
+                })
               }
             }
           }

@@ -30,7 +30,7 @@
         <text class="step-status done-status">✅ 已完成</text>
       </view>
       <view class="photo-scroll" wx:if="{{donePhotos.length > 0}}">
-        <image class="photo-thumb" wx:for="{{donePhotos}}" wx:key="id" src="{{item.url}}" mode="aspectFill" bindtap="previewPhotos" data-list="{{donePhotos}}" data-index="{{index}}"></image>
+        <image class="photo-thumb" wx:for="{{donePhotos}}" wx:key="id" src="{{item.url}}" mode="aspectFill" lazy-load bindtap="previewPhotos" data-list="{{donePhotos}}" data-index="{{index}}"></image>
       </view>
     </view>
 

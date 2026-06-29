@@ -8,6 +8,9 @@ Page({
     studentName: '',
     photos: [],
     loading: false,
+    page: 1,
+    pageSize: 30,
+    hasMore: true,
     // 全屏预览
     previewing: false,
     previewUrl: '',
@@ -21,26 +24,42 @@ Page({
   },
 
   onShow() {
-    this.loadPhotos()
+    this.loadPhotos(true)
   },
 
   onPullDownRefresh() {
-    this.loadPhotos().finally(() => wx.stopPullDownRefresh())
+    this.loadPhotos(true).finally(() => wx.stopPullDownRefresh())
   },
 
-  loadPhotos() {
+  onReachBottom() {
+    if (this.data.hasMore && !this.data.loading) {
+      this.loadPhotos(false)
+    }
+  },
+
+  loadPhotos(refresh) {
     if (!this.data.studentId) return
+    const page = refresh ? 1 : this.data.page + 1
     this.setData({ loading: true })
-    return api.request({ url: '/parent/photos/' + this.data.studentId })
+    return api.request({
+      url: '/parent/photos/' + this.data.studentId,
+      data: { page, page_size: this.data.pageSize }
+    })
       .then((data) => {
-        const photos = (data.photos || []).map(p => ({
+        const newPhotos = (data.photos || []).map(p => ({
           ...p,
-          imageUrl: p.thumbnail ? api.imageUrl(p.thumbnail) : api.imageUrl(p.file_path),
-          originalUrl: api.imageUrl(p.file_path),
+          imageUrl: api.imageUrl(p.thumbnail || p.file_path),
+          previewUrl: api.imageUrl(p.file_path || p.thumbnail),
           typeLabel: this.getTypeLabel(p.photo_type),
           timeStr: util.formatTime(p.taken_at)
         }))
-        this.setData({ photos })
+        const photos = refresh ? newPhotos : this.data.photos.concat(newPhotos)
+        const total = data.total || 0
+        this.setData({
+          photos,
+          page,
+          hasMore: total ? photos.length < total : newPhotos.length >= this.data.pageSize
+        })
       })
       .catch((err) => {
         util.showError(err.message || '加载失败')
@@ -66,7 +85,7 @@ Page({
     if (!photo) return
     this.setData({
       previewing: true,
-      previewUrl: photo.originalUrl || photo.imageUrl,
+      previewUrl: photo.previewUrl || photo.imageUrl,
       previewRemark: photo.remark || ''
     })
   },
@@ -84,7 +103,7 @@ Page({
     const idx = e.currentTarget.dataset.index
     const photo = this.data.photos[idx]
     if (!photo) return
-    this._downloadAndSave(photo.imageUrl, photo.remark || '照片')
+    this._downloadAndSave(photo.previewUrl || photo.imageUrl, photo.remark || '照片')
   },
 
   // 预览时保存

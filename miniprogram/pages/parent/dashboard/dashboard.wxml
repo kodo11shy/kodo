@@ -38,7 +38,7 @@
       <view class="section" wx:if="{{todayPhotos.length > 0}}">
         <text class="section-title">📸 今日瞬间</text>
         <scroll-view class="photo-scroll" scroll-x>
-          <image class="scroll-photo" wx:for="{{todayPhotos}}" wx:key="id" src="{{item.url}}" mode="widthFix" bindtap="previewPhoto" data-url="{{item.url}}"></image>
+          <image class="scroll-photo" wx:for="{{todayPhotos}}" wx:key="id" src="{{item.url}}" mode="widthFix" lazy-load bindtap="previewPhoto" data-url="{{item.previewUrl}}"></image>
         </scroll-view>
       </view>
 

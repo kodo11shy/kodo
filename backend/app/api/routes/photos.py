@@ -21,17 +21,33 @@ from app.schemas.photo import (
     PhotoUpdateRequest,
 )
 
-try:
-    from PIL import Image
-
-    HAS_PILLOW = True
-except ImportError:
-    HAS_PILLOW = False
-
 router = APIRouter(prefix="/photos", tags=["photos"])
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
 STUDENT_REQUIRED_PHOTO_TYPES = {"homework"}
+
+
+def _create_thumbnail(disk_path: Path, relative_dir: Path) -> tuple[str | None, int | None, int | None]:
+    try:
+        from PIL import Image, ImageOps
+    except Exception:
+        return None, None, None
+
+    try:
+        with Image.open(disk_path) as image:
+            image = ImageOps.exif_transpose(image)
+            width, height = image.size
+            image.thumbnail((640, 640))
+            if image.mode not in ("RGB", "L"):
+                image = image.convert("RGB")
+
+            thumb_name = f"{disk_path.stem}_thumb.jpg"
+            thumb_path = disk_path.with_name(thumb_name)
+            image.save(thumb_path, format="JPEG", quality=76, optimize=True)
+            thumb_public = public_upload_path(str(Path("uploads") / relative_dir / thumb_name))
+            return thumb_public, width, height
+    except Exception:
+        return None, None, None
 
 
 def _delete_photo_file(photo: Photo) -> None:
@@ -105,35 +121,14 @@ def upload_photo(
 
     public_path = public_upload_path(str(Path("uploads") / relative_dir / filename))
 
-    # Generate thumbnail (480px max side) if Pillow is available
-    thumb_public_path = None
-    if HAS_PILLOW:
-        try:
-            thumb_filename = f"{Path(filename).stem}_thumb{suffix}"
-            thumb_disk_path = upload_dir / thumb_filename
-            img = Image.open(disk_path)
-            max_size = 480
-            w, h = img.size
-            if w > max_size or h > max_size:
-                if w > h:
-                    new_w = max_size
-                    new_h = int(h * max_size / w)
-                else:
-                    new_h = max_size
-                    new_w = int(w * max_size / h)
-                img = img.resize((new_w, new_h), Image.LANCZOS)
-            img.save(thumb_disk_path, quality=85)
-            thumb_public_path = public_upload_path(
-                str(Path("uploads") / relative_dir / thumb_filename)
-            )
-        except Exception:
-            thumb_public_path = None  # Thumbnail failed, fall back to original
-
+    thumb_public_path, width, height = _create_thumbnail(disk_path, relative_dir)
     photo = Photo(
         file_path=public_path,
         thumbnail_path=thumb_public_path,
         original_name=file.filename,
         file_size=size,
+        width=width,
+        height=height,
         photo_type="general",
         taken_by=current_teacher.id,
         taken_at=now_utc_naive(),

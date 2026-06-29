@@ -64,7 +64,7 @@
         <text class="op-text">{{item.operatorInfo}}</text>
       </view>
       <view class="card-photos" wx:if="{{item.donePhotoThumbs.length > 0}}">
-        <image class="card-photo-thumb" wx:for="{{item.donePhotoThumbs}}" wx:key="id" src="{{item.url}}" mode="aspectFill"></image>
+        <image class="card-photo-thumb" wx:for="{{item.donePhotoThumbs}}" wx:key="id" src="{{item.url}}" mode="aspectFill" lazy-load></image>
       </view>
     </view>
   </view>

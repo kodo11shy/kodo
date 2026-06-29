@@ -134,7 +134,8 @@ Page({
       for (const step of ['done', 'graded', 'corrected']) {
         photos[step] = (r.photos[step] || []).map(p => ({
           ...p,
-          url: api.imageUrl(p.file_path)
+          url: api.imageUrl(p.thumbnail || p.file_path),
+          previewUrl: api.imageUrl(p.file_path || p.thumbnail)
         }))
       }
     }

@@ -432,6 +432,8 @@ def parent_growth(
 @router.get("/photos/{student_id}")
 def parent_photos(
     student_id: int,
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=30, ge=1, le=100),
     db: Session = Depends(get_db),
     current_parent: Parent = Depends(get_current_parent),
 ):
@@ -439,15 +441,25 @@ def parent_photos(
     if denied:
         return denied
 
+    total = db.execute(
+        select(func.count(Photo.id))
+        .join(PhotoStudent, PhotoStudent.photo_id == Photo.id)
+        .where(PhotoStudent.student_id == student_id)
+    ).scalar_one()
+
     photos = db.execute(
         select(Photo)
         .join(PhotoStudent, PhotoStudent.photo_id == Photo.id)
         .where(PhotoStudent.student_id == student_id)
         .order_by(Photo.taken_at.desc(), Photo.id.desc())
-        .limit(100)
+        .offset((page - 1) * page_size)
+        .limit(page_size)
     ).scalars().all()
     return ok(
         {
+            "total": total,
+            "page": page,
+            "page_size": page_size,
             "photos": [
                 {
                     "id": photo.id,

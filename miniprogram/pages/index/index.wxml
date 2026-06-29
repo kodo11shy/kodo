@@ -57,8 +57,8 @@
     <view class="moments">
       <swiper class="moments-swiper" autoplay interval="3000" duration="500" circular indicator-dots="{{featuredPhotos.length > 1}}">
         <swiper-item wx:for="{{featuredPhotos}}" wx:key="id">
-          <view class="mp-item" bindtap="previewPhoto" data-url="{{item.url}}">
-            <image class="mp-img" src="{{item.url}}" mode="aspectFill"></image>
+          <view class="mp-item" bindtap="previewPhoto" data-url="{{item.previewUrl}}">
+            <image class="mp-img" src="{{item.url}}" mode="aspectFill" lazy-load></image>
           </view>
         </swiper-item>
         <swiper-item wx:if="{{featuredPhotos.length === 0}}">
